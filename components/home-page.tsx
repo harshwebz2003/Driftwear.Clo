@@ -1,8 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import { AnimatePresence } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ArrowUpRight, Check, ChevronRight, Facebook, Instagram, Mail, MapPin, MessageCircle, Phone, Send, Sparkles } from 'lucide-react';
 import Navbar from '@/components/navbar';
@@ -13,7 +11,6 @@ import { contact, faqs, gallery, navItems, processSteps, products, reasons, what
 export default function HomePage() {
   return (
     <>
-      <MediaIntro />
       <Navbar />
       <main id="home">
         <Hero />
@@ -41,138 +38,80 @@ export default function HomePage() {
   );
 }
 
-function MediaIntro() {
-  const [visible, setVisible] = useState(true);
-  const audioRef = useRef<HTMLAudioElement>(null);
-
-  useEffect(() => {
-    const hideTimer = window.setTimeout(() => setVisible(false), 3200);
-    return () => window.clearTimeout(hideTimer);
-  }, []);
-
-  useEffect(() => {
-    if (visible || typeof window === 'undefined') return undefined;
-    const playedKey = 'driftwear-intro-voice-played';
-    if (window.localStorage.getItem(playedKey) === 'true') return undefined;
-
-    const audio = audioRef.current;
-    if (!audio) return undefined;
-
-    const markPlayed = () => window.localStorage.setItem(playedKey, 'true');
-    const tryPlay = async () => {
-      try {
-        audio.volume = 0.55;
-        await audio.play();
-        markPlayed();
-      } catch {
-        window.addEventListener('pointerdown', tryPlay, { once: true });
-        window.addEventListener('keydown', tryPlay, { once: true });
-      }
-    };
-
-    void tryPlay();
-
-    return () => {
-      window.removeEventListener('pointerdown', tryPlay);
-      window.removeEventListener('keydown', tryPlay);
-    };
-  }, [visible]);
-
-  return (
-    <>
-      <AnimatePresence>
-        {visible ? (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: 'easeInOut' }}
-            className="fixed inset-0 z-[100] grid place-items-center overflow-hidden bg-obsidian"
-            aria-label="Driftwear loading screen"
-          >
-            <video
-              className="absolute inset-0 h-full w-full object-cover opacity-70"
-              autoPlay
-              muted
-              playsInline
-              preload="auto"
-              onEnded={() => setVisible(false)}
-            >
-              <source src="/assets/preloader.mp4" type="video/mp4" />
-            </video>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(200,205,210,.14),transparent_24rem),linear-gradient(180deg,rgba(7,17,31,.38),rgba(7,17,31,.88))]" />
-            <div className="relative z-10 text-center">
-              <p className="font-brand text-xs font-bold uppercase tracking-[.42em] text-gold">Driftwear Clo.</p>
-              <p className="aida-title mt-4 text-[clamp(3.5rem,11vw,10rem)] text-white">
-                <span>Wear</span>
-                <span>Your</span>
-                <span className="aida-muted">Vibe.</span>
-              </p>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-      <audio ref={audioRef} src="/assets/voice.mp3" preload="auto" />
-    </>
-  );
-}
-
 function Hero() {
   return (
-    <section className="relative min-h-screen overflow-hidden px-5 pb-20 pt-32 sm:px-8 lg:px-14 lg:pt-24" aria-labelledby="hero-title">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_42%,rgba(200,205,210,.26),transparent_28rem)]" />
-      <div className="absolute left-1/2 top-1/2 h-[22rem] w-[22rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-gold/20 blur-sm sm:h-[42rem] sm:w-[42rem]" />
-      <motion.div className="shell relative grid min-h-[calc(100vh-6rem)] items-center gap-12 lg:grid-cols-[.95fr_1.05fr]" variants={stagger} initial="hidden" animate="show">
-        <div>
-          <motion.p variants={fadeUp} className="eyebrow">Sri Lankan custom print studio</motion.p>
-          <motion.h1 id="hero-title" variants={fadeUp} className="aida-title mt-6 max-w-4xl text-[clamp(5.5rem,14vw,13.5rem)] text-white">
-            <span>Wear</span>
-            <span>Your</span>
-            <span className="aida-muted">Vibe.</span>
-          </motion.h1>
-          <motion.p variants={fadeUp} className="mt-6 max-w-2xl text-lg leading-8 text-white/68 sm:text-xl">
-            Custom T-shirts, unique designs, and premium DTF printing made for your style.
-          </motion.p>
-          <motion.div variants={fadeUp} className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <a href={whatsappLink('Hi Driftwear Clo., I want to order a custom T-shirt.')} className="cta-primary" target="_blank" rel="noreferrer">
-              Order Now <ArrowUpRight size={18} />
-            </a>
-            <a href="#shop" className="cta-secondary">View Designs <ChevronRight size={18} /></a>
-          </motion.div>
-          <motion.div variants={fadeUp} className="mt-10 grid max-w-xl grid-cols-3 gap-3">
-            {['Custom tees', 'DTF prints', 'Bulk orders'].map((item) => (
-              <div key={item} className="font-grande gold-border rounded-2xl px-4 py-4 text-center text-xs font-bold uppercase tracking-[.18em] text-white/78">
-                {item}
-              </div>
-            ))}
+    <section className="relative min-h-screen overflow-hidden bg-[#130A18] px-5 pb-12 pt-28 sm:px-8 lg:px-14 lg:pt-24" aria-labelledby="hero-title">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_52%,rgba(168,74,196,.52),transparent_24rem),radial-gradient(circle_at_22%_24%,rgba(200,205,210,.12),transparent_18rem),linear-gradient(105deg,#130A18_0%,#0D0711_48%,#190B20_100%)]" />
+      <div className="absolute bottom-[-12rem] right-[-8rem] h-[34rem] w-[34rem] rounded-full bg-[#A44CC6]/55 blur-3xl sm:right-[2rem] sm:h-[48rem] sm:w-[48rem]" />
+      <div className="absolute bottom-[8%] right-[3%] h-[18rem] w-[18rem] rounded-full bg-[#A44CC6]/55 sm:h-[32rem] sm:w-[32rem]" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(13,7,17,.96)_0%,rgba(13,7,17,.78)_36%,rgba(13,7,17,.2)_100%)] lg:bg-[linear-gradient(90deg,rgba(13,7,17,.96)_0%,rgba(13,7,17,.82)_39%,rgba(13,7,17,.12)_100%)]" />
+
+      <motion.div className="shell relative z-10 grid min-h-[calc(100vh-7rem)] content-between gap-8" variants={stagger} initial="hidden" animate="show">
+        <div className="grid flex-1 items-center gap-8 pt-8 lg:grid-cols-[.78fr_1.22fr] lg:pt-0">
+          <div className="relative z-20 max-w-xl">
+            <motion.p variants={fadeUp} className="font-brand text-xs font-bold uppercase tracking-[.22em] text-white">Our vision</motion.p>
+            <motion.h1 id="hero-title" variants={fadeUp} className="mt-8 font-body text-[clamp(4.2rem,10vw,9.5rem)] font-light uppercase leading-[.82] tracking-normal text-white">
+              Wear<br />
+              Your<br />
+              Vibe
+            </motion.h1>
+            <motion.p variants={fadeUp} className="mt-7 max-w-md text-sm font-medium leading-7 text-white/76 sm:text-base">
+              Custom T-shirts, unique designs, and premium DTF printing made for your style.
+            </motion.p>
+
+            <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center gap-4">
+              <a
+                href={whatsappLink('Hi Driftwear Clo., I want to order a custom T-shirt.')}
+                className="group inline-flex h-14 w-14 items-center justify-center rounded-full border border-white/25 bg-white/[.04] text-white transition hover:border-white hover:bg-white hover:text-[#130A18]"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Order Now"
+              >
+                <ArrowUpRight size={22} className="transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </a>
+              <a href={whatsappLink('Hi Driftwear Clo., I want to order a custom T-shirt.')} target="_blank" rel="noreferrer" className="font-brand text-sm font-bold text-white">
+                Order Now
+              </a>
+              <a href="#shop" className="font-brand inline-flex items-center gap-2 text-sm font-bold text-white/70 transition hover:text-white">
+                View Designs <ChevronRight size={17} />
+              </a>
+            </motion.div>
+          </div>
+
+          <motion.div variants={fadeUp} className="relative min-h-[420px] lg:min-h-[690px]">
+            <div className="absolute left-[18%] top-[12%] h-[20rem] w-[20rem] rounded-full bg-[#A44CC6]/45 blur-xl sm:left-[26%] sm:h-[32rem] sm:w-[32rem]" />
+            <video
+              className="absolute bottom-[-4rem] left-1/2 z-10 h-[112%] w-[130%] max-w-none -translate-x-1/2 object-contain object-bottom drop-shadow-[0_34px_80px_rgba(0,0,0,.72)] sm:bottom-[-6rem] lg:left-[56%] lg:h-[118%] lg:w-[118%]"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              poster="/assets/tshirt_black_oversized.jpg"
+              aria-label="Driftwear T-shirt cinematic showcase"
+            >
+              <source src="/assets/driftwear-showcase.mp4" type="video/mp4" />
+            </video>
+            <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 h-28 bg-gradient-to-t from-[#130A18] to-transparent" />
           </motion.div>
         </div>
 
-        <motion.div variants={fadeUp} className="relative mx-auto w-full max-w-[620px]">
-          <div className="absolute inset-8 rounded-full bg-gold/30 blur-[90px]" />
-          <div className="font-brand absolute -left-10 top-16 z-10 rounded-full border border-gold/30 bg-black/55 px-4 py-2 text-xs font-bold uppercase tracking-[.16em] text-gold backdrop-blur-xl">
-            Premium DTF
+        <motion.div variants={fadeUp} className="relative z-30 grid gap-6 pb-2 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+          <div className="font-brand text-xs font-bold text-white">01</div>
+          <div className="grid grid-cols-5 gap-2">
+            {[0, 1, 2, 3, 4].map((item) => (
+              <span key={item} className={`h-[3px] rounded-full ${item < 2 ? 'bg-white' : 'bg-white/24'}`} />
+            ))}
           </div>
-          <div className="font-grande absolute -right-2 bottom-20 z-10 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[.16em] text-white backdrop-blur-xl">
-            Galle, Sri Lanka
-          </div>
-          <motion.div animate={{ y: [0, -18, 0], rotate: [0, 1.6, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }} className="relative overflow-hidden rounded-[2rem] border border-gold/20 bg-white/[.04] p-4 shadow-gold">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[1.5rem] bg-carbon">
-              <video
-                className="h-full w-full object-cover object-center"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                poster="/assets/tshirt_black_oversized.jpg"
-                aria-label="Driftwear clothing video preview"
-              >
-                <source src="/assets/video.mp4" type="video/mp4" />
-              </video>
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_25%,transparent,rgba(7,17,31,.28)_58%,rgba(7,17,31,.68))]" />
+          <div className="font-brand flex items-center gap-5 text-xs font-bold text-white">
+            <span>05</span>
+            <div className="hidden items-center gap-3 sm:flex">
+              <span className="grid h-11 w-11 place-items-center rounded-full border border-white/22">
+                <ChevronRight size={20} />
+              </span>
+              <span>Swipe Right</span>
             </div>
-          </motion.div>
-          <div className="font-grande pointer-events-none absolute -bottom-10 left-0 right-0 text-center text-[clamp(5rem,12vw,9rem)] uppercase leading-none text-white/[.035]">Driftwear</div>
+          </div>
         </motion.div>
       </motion.div>
     </section>

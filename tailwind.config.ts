@@ -13,8 +13,8 @@ const config: Config = {
         smoke: '#C8CDD2'
       },
       fontFamily: {
-        display: ['var(--font-display)', 'Impact', 'sans-serif'],
-        body: ['var(--font-body)', 'system-ui', 'sans-serif']
+        display: ['var(--font-display)', 'Bodoni 72', 'Didot', 'serif'],
+        body: ['var(--font-body)', 'Cormorant Garamond', 'Georgia', 'serif']
       },
       boxShadow: {
         gold: '0 24px 90px rgba(200, 205, 210, 0.22)',

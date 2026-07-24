@@ -32,7 +32,7 @@ export default function HomePage() {
         aria-label="Sticky WhatsApp order button"
       >
         <MessageCircle size={22} />
-        <span className="ml-2 hidden text-sm font-black uppercase tracking-[.14em] sm:inline">Order</span>
+        <span className="ml-2 hidden text-sm font-bold uppercase tracking-[.14em] sm:inline">Order</span>
       </a>
     </>
   );
@@ -60,7 +60,7 @@ function Hero() {
           </motion.div>
           <motion.div variants={fadeUp} className="mt-10 grid max-w-xl grid-cols-3 gap-3">
             {['Custom tees', 'DTF prints', 'Bulk orders'].map((item) => (
-              <div key={item} className="gold-border rounded-2xl px-4 py-4 text-center text-xs font-black uppercase tracking-[.14em] text-white/78">
+              <div key={item} className="gold-border rounded-2xl px-4 py-4 text-center text-xs font-bold uppercase tracking-[.14em] text-white/78">
                 {item}
               </div>
             ))}
@@ -69,10 +69,10 @@ function Hero() {
 
         <motion.div variants={fadeUp} className="relative mx-auto w-full max-w-[620px]">
           <div className="absolute inset-8 rounded-full bg-gold/30 blur-[90px]" />
-          <div className="absolute -left-10 top-16 z-10 rounded-full border border-gold/30 bg-black/55 px-4 py-2 text-xs font-black uppercase tracking-[.16em] text-gold backdrop-blur-xl">
+          <div className="absolute -left-10 top-16 z-10 rounded-full border border-gold/30 bg-black/55 px-4 py-2 text-xs font-bold uppercase tracking-[.16em] text-gold backdrop-blur-xl">
             Premium DTF
           </div>
-          <div className="absolute -right-2 bottom-20 z-10 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[.16em] text-white backdrop-blur-xl">
+          <div className="absolute -right-2 bottom-20 z-10 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[.16em] text-white backdrop-blur-xl">
             Galle, Sri Lanka
           </div>
           <motion.div animate={{ y: [0, -18, 0], rotate: [0, 1.6, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }} className="relative overflow-hidden rounded-[2rem] border border-gold/20 bg-white/[.04] p-4 shadow-gold">
@@ -108,8 +108,8 @@ function FeaturedProducts() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
               </div>
               <div className="p-5">
-                <p className="text-xs font-black uppercase tracking-[.18em] text-gold">{product.category}</p>
-                <h3 className="mt-3 text-2xl font-black text-white">{product.name}</h3>
+                <p className="text-xs font-bold uppercase tracking-[.18em] text-gold">{product.category}</p>
+                <h3 className="mt-3 text-2xl font-bold text-white">{product.name}</h3>
                 <p className="mt-2 text-sm text-white/58">{product.price}</p>
                 <a href={whatsappLink(`Hi Driftwear Clo., I want to order: ${product.name}.`)} target="_blank" rel="noreferrer" className="cta-secondary mt-5 w-full">
                   Order on WhatsApp
@@ -135,7 +135,7 @@ function Process() {
           {processSteps.map(([number, title, copy]) => (
             <motion.article key={number} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="gold-border rounded-[1.5rem] p-6">
               <span className="font-display text-6xl text-gold">{number}</span>
-              <h3 className="mt-4 text-2xl font-black text-white">{title}</h3>
+              <h3 className="mt-4 text-2xl font-bold text-white">{title}</h3>
               <p className="mt-3 text-sm leading-7 text-white/60">{copy}</p>
             </motion.article>
           ))}
@@ -195,7 +195,7 @@ function Testimonials() {
             <article key={quote} className="gold-border rounded-[1.5rem] p-6">
               <div className="flex gap-1 text-gold">{Array.from({ length: 5 }).map((_, star) => <Sparkles key={star} size={16} fill="currentColor" />)}</div>
               <p className="mt-5 text-white/70">{quote}</p>
-              <p className="mt-5 text-xs font-black uppercase tracking-[.18em] text-white/45">Demo review {index + 1}</p>
+              <p className="mt-5 text-xs font-bold uppercase tracking-[.18em] text-white/45">Demo review {index + 1}</p>
             </article>
           ))}
         </div>
@@ -212,7 +212,7 @@ function FAQ() {
         <div className="grid gap-4 lg:grid-cols-2">
           {faqs.map(([question, answer]) => (
             <article key={question} className="gold-border rounded-[1.25rem] p-6">
-              <h3 className="text-xl font-black text-white">{question}</h3>
+              <h3 className="text-xl font-bold text-white">{question}</h3>
               <p className="mt-3 text-white/62">{answer}</p>
             </article>
           ))}
@@ -297,7 +297,7 @@ function Footer() {
                 <Image src="/assets/logo.png" alt="" width={54} height={54} className="h-12 w-12 rounded-full border border-gold/30 object-cover" />
                 <span className="font-display text-2xl uppercase leading-none text-white">Driftwear Clo.</span>
               </a>
-              <p className="max-w-xs text-left text-xs font-black uppercase leading-5 tracking-[.22em] text-gold sm:text-right">
+              <p className="max-w-xs text-left text-xs font-bold uppercase leading-5 tracking-[.22em] text-gold sm:text-right">
                 Wear fast. Print premium.
               </p>
             </div>
@@ -325,7 +325,7 @@ function Footer() {
               </FooterColumn>
 
               <div>
-                <p className="text-xs font-black uppercase tracking-[.22em] text-white">Order Studio</p>
+                <p className="text-xs font-bold uppercase tracking-[.22em] text-white">Order Studio</p>
                 <div className="mt-4 space-y-3 text-sm leading-6 text-white/60">
                   <p>{contact.location}</p>
                   <p>{contact.phone}</p>
@@ -351,7 +351,7 @@ function Footer() {
 function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div>
-      <p className="text-xs font-black uppercase tracking-[.22em] text-white">{title}</p>
+      <p className="text-xs font-bold uppercase tracking-[.22em] text-white">{title}</p>
       <div className="mt-4 grid gap-2 text-sm text-white/60">
         {children}
       </div>

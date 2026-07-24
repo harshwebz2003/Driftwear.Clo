@@ -1,17 +1,18 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-import { Anton, Manrope } from 'next/font/google';
+import { Bodoni_Moda, Cormorant_Garamond } from 'next/font/google';
 import './globals.css';
 
-const anton = Anton({
-  weight: '400',
+const bodoni = Bodoni_Moda({
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
   variable: '--font-display',
   display: 'swap'
 });
 
-const manrope = Manrope({
+const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-body',
   display: 'swap'
 });
@@ -56,7 +57,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${anton.variable} ${manrope.variable}`}>{children}</body>
+      <body className={`${bodoni.variable} ${cormorant.variable}`}>{children}</body>
     </html>
   );
 }

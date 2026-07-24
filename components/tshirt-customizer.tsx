@@ -98,11 +98,11 @@ function supportsWebGL() {
 }
 
 function createFabricBumpTexture() {
+  if (typeof window === 'undefined') return null;
   const canvas = document.createElement('canvas');
   canvas.width = 128;
   canvas.height = 128;
   const context = canvas.getContext('2d');
-
   if (!context) return null;
 
   context.fillStyle = '#808080';
@@ -111,14 +111,15 @@ function createFabricBumpTexture() {
   const imageData = context.getImageData(0, 0, 128, 128);
   const data = imageData.data;
 
-  for (let x = 0; x < 128; x += 1) {
-    for (let y = 0; y < 128; y += 1) {
+  for (let y = 0; y < 128; y += 1) {
+    for (let x = 0; x < 128; x += 1) {
       const index = (y * 128 + x) * 4;
-      const noise = (Math.sin(x * 0.45) + Math.cos(y * 0.45)) * 14;
-      const value = clamp(128 + noise, 0, 255);
-      data[index] = value;
-      data[index + 1] = value;
-      data[index + 2] = value;
+      const noise = ((x + y) % 2 === 0 ? 12 : -12) + (Math.sin(x * 0.4) * 6);
+      const val = clamp(128 + noise, 0, 255);
+      data[index] = val;
+      data[index + 1] = val;
+      data[index + 2] = val;
+      data[index + 3] = 255;
     }
   }
 
@@ -127,64 +128,40 @@ function createFabricBumpTexture() {
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(24, 24);
+  texture.repeat.set(16, 16);
   return texture;
-}
-
-function processDarkBackground(image: HTMLImageElement) {
-  const canvas = document.createElement('canvas');
-  canvas.width = image.naturalWidth || image.width;
-  canvas.height = image.naturalHeight || image.height;
-  const context = canvas.getContext('2d');
-
-  if (!context) return { dataUrl: image.src, processed: false };
-
-  context.drawImage(image, 0, 0);
-  const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-  const data = imageData.data;
-  let modified = false;
-
-  for (let i = 0; i < data.length; i += 4) {
-    const red = data[i];
-    const green = data[i + 1];
-    const blue = data[i + 2];
-    const alpha = data[i + 3];
-
-    if (alpha > 0 && red < 34 && green < 34 && blue < 34) {
-      data[i + 3] = 0;
-      modified = true;
-    }
-  }
-
-  if (!modified) {
-    return { dataUrl: image.src, processed: false };
-  }
-
-  context.putImageData(imageData, 0, 0);
-  return { dataUrl: canvas.toDataURL('image/png'), processed: true };
 }
 
 function ShirtModel({ state }: { state: DesignState }) {
   const gltf = useGLTF('/models/tshirt.glb') as any;
 
+  // Clone scene so materials can be safely mutated
+  const clonedScene = useMemo(() => {
+    if (!gltf.scene) return null;
+    const clone = gltf.scene.clone(true);
+    clone.traverse((node: any) => {
+      if (node.isMesh) {
+        node.castShadow = true;
+        node.receiveShadow = true;
+        if (node.material) {
+          node.material = node.material.clone();
+        }
+      }
+    });
+    return clone;
+  }, [gltf.scene]);
+
   const targetMesh = useMemo(() => {
     let foundMesh: THREE.Mesh | null = null;
-    if (gltf.scene) {
-      gltf.scene.traverse((child: any) => {
+    if (clonedScene) {
+      clonedScene.traverse((child: any) => {
         if (child.isMesh && !foundMesh) {
           foundMesh = child;
         }
       });
     }
-    return foundMesh || (gltf.nodes?.T_Shirt as THREE.Mesh);
-  }, [gltf]);
-
-  const targetMaterial = useMemo(() => {
-    if (targetMesh && targetMesh.material) {
-      return (Array.isArray(targetMesh.material) ? targetMesh.material[0] : targetMesh.material) as THREE.MeshStandardMaterial;
-    }
-    return (Object.values(gltf.materials || {})[0] as THREE.MeshStandardMaterial) || new THREE.MeshStandardMaterial();
-  }, [targetMesh, gltf]);
+    return foundMesh;
+  }, [clonedScene]);
 
   const [decalTexture, setDecalTexture] = useState<THREE.Texture | null>(null);
   const fabricBumpMap = useMemo(() => createFabricBumpTexture(), []);
@@ -220,24 +197,27 @@ function ShirtModel({ state }: { state: DesignState }) {
   }, [state.textureUrl]);
 
   useFrame((_, delta) => {
-    if (!targetMaterial) return;
+    if (!clonedScene) return;
 
     const targetColor = new THREE.Color(state.color.value);
     const lighting = materialLightingFor(state.color);
 
-    if (targetMaterial.color) {
-      targetMaterial.color.lerp(targetColor, delta * 6);
-    }
-    if (typeof targetMaterial.roughness === 'number') {
-      targetMaterial.roughness = THREE.MathUtils.lerp(targetMaterial.roughness, lighting.roughness, delta * 4);
-    }
-
-    if (fabricBumpMap && targetMaterial) {
-      targetMaterial.bumpMap = fabricBumpMap;
-      targetMaterial.bumpScale = lighting.bumpScale;
-    }
-
-    targetMaterial.needsUpdate = true;
+    clonedScene.traverse((node: any) => {
+      if (node.isMesh && node.material) {
+        const mat = node.material as THREE.MeshStandardMaterial;
+        if (mat.color) {
+          mat.color.lerp(targetColor, delta * 6);
+        }
+        if (typeof mat.roughness === 'number') {
+          mat.roughness = THREE.MathUtils.lerp(mat.roughness, lighting.roughness, delta * 4);
+        }
+        if (fabricBumpMap) {
+          mat.bumpMap = fabricBumpMap;
+          mat.bumpScale = lighting.bumpScale;
+        }
+        mat.needsUpdate = true;
+      }
+    });
   });
 
   const decalPosition = useMemo(
@@ -247,17 +227,20 @@ function ShirtModel({ state }: { state: DesignState }) {
 
   return (
     <group>
-      {targetMesh ? (
-        <mesh castShadow receiveShadow geometry={targetMesh.geometry} material={targetMaterial}>
-          {decalTexture ? (
-            <Decal
-              position={decalPosition}
-              rotation={[0, 0, state.rotation]}
-              scale={[state.scale, state.scale, 0.45]}
-              map={decalTexture}
-            />
+      {clonedScene ? (
+        <primitive object={clonedScene}>
+          {targetMesh && decalTexture ? (
+            <mesh geometry={(targetMesh as any).geometry}>
+              <meshBasicMaterial transparent opacity={0} />
+              <Decal
+                position={decalPosition}
+                rotation={[0, 0, state.rotation]}
+                scale={[state.scale, state.scale, 0.45]}
+                map={decalTexture}
+              />
+            </mesh>
           ) : null}
-        </mesh>
+        </primitive>
       ) : null}
     </group>
   );
@@ -298,52 +281,48 @@ function Scene({ state, onReady }: { state: DesignState; onReady: () => void }) 
       </Center>
 
       <ContactShadows position={[0, -0.92, 0]} opacity={0.65} scale={3.2} blur={1.8} far={1.5} color="#000000" />
-      <OrbitControls enablePan={false} minDistance={1.8} maxDistance={3.8} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI / 1.75} />
+      <OrbitControls enablePan enableZoom minDistance={1.4} maxDistance={4.2} maxPolarAngle={Math.PI / 1.7} />
     </>
   );
 }
 
+if (typeof window !== 'undefined') {
+  useGLTF.preload('/models/tshirt.glb');
+}
+
 export default function TshirtCustomizer() {
   const [state, setState] = useState<DesignState>(initialState);
-  const [hasWebGL, setHasWebGL] = useState(true);
-  const [sceneReady, setSceneReady] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [sceneReady, setSceneReady] = useState(false);
+  const [hasWebGL, setHasWebGL] = useState(true);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setHasWebGL(supportsWebGL());
   }, []);
 
-  const update = (partial: Partial<DesignState>) => {
-    setState((current) => ({ ...current, ...partial }));
-  };
+  const update = useCallback((partial: Partial<DesignState>) => {
+    setState((curr) => ({ ...curr, ...partial }));
+  }, []);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const rawUrl = URL.createObjectURL(file);
-    const image = new window.Image();
-
-    image.onload = () => {
-      const { dataUrl, processed } = processDarkBackground(image);
-      update({
-        textureUrl: dataUrl,
-        fileName: file.name,
-        sampleName: 'Uploaded file',
-        processedBackground: processed
-      });
-    };
-
-    image.src = rawUrl;
+    const url = URL.createObjectURL(file);
+    update({
+      textureUrl: url,
+      fileName: file.name,
+      sampleName: ''
+    });
   };
 
   const selectSample = (sample: { name: string; url: string }) => {
     update({
-      textureUrl: sample.url || null,
-      sampleName: sample.name,
-      fileName: sample.url ? sample.name : 'No uploaded design',
-      processedBackground: false
+      textureUrl: sample.url,
+      fileName: `${sample.name} Sample`,
+      sampleName: sample.name
     });
   };
 
@@ -506,11 +485,11 @@ export default function TshirtCustomizer() {
                       key={c.label}
                       type="button"
                       onClick={() => update({ color: c })}
-                      className={`flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-bold transition ${
-                        state.color.label === c.label ? 'border-gold bg-gold/20 text-gold shadow-[0_0_12px_rgba(245,194,66,0.3)]' : 'border-white/15 bg-black/40 text-white/70 hover:border-white/40'
+                      className={`group flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-bold transition ${
+                        state.color.label === c.label ? 'border-gold bg-gold/25 text-white shadow-md' : 'border-white/15 bg-black/40 text-white/60 hover:border-gold/40 hover:text-white'
                       }`}
                     >
-                      <span className="h-3.5 w-3.5 rounded-full border border-white/30" style={{ backgroundColor: c.value }} />
+                      <span className="h-3.5 w-3.5 rounded-full border border-white/30 shadow-inner" style={{ backgroundColor: c.value }} />
                       {c.label}
                     </button>
                   ))}
@@ -518,15 +497,15 @@ export default function TshirtCustomizer() {
               </div>
 
               <div>
-                <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">4. Select Garment Size</span>
-                <div className="mt-2.5 flex gap-2">
+                <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">4. Select T-Shirt Size</span>
+                <div className="mt-2.5 flex flex-wrap gap-2">
                   {['S', 'M', 'L', 'XL', 'XXL'].map((sz) => (
                     <button
                       key={sz}
                       type="button"
                       onClick={() => update({ size: sz })}
-                      className={`flex-1 rounded-xl border py-2 text-xs font-bold transition ${
-                        state.size === sz ? 'border-gold bg-gold text-black shadow-md' : 'border-white/15 bg-black/40 text-white/70 hover:border-white/40'
+                      className={`h-9 w-11 rounded-xl border font-brand text-xs font-bold uppercase transition ${
+                        state.size === sz ? 'border-gold bg-gold text-black font-extrabold shadow-md' : 'border-white/15 bg-black/40 text-white/70 hover:border-gold/50'
                       }`}
                     >
                       {sz}
@@ -535,71 +514,58 @@ export default function TshirtCustomizer() {
                 </div>
               </div>
 
-              {state.textureUrl ? (
-                <div className="grid gap-3.5 border-t border-white/10 pt-4">
-                  <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">5. Fine-Tune Position & Scale</span>
+              <div>
+                <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">5. Position & Fine Controls</span>
+                <div className="mt-2.5 flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-black/40 p-3">
+                  <div className="grid grid-cols-3 gap-1">
+                    <div />
+                    <button type="button" onClick={() => nudge('y', 1)} className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-white transition hover:bg-gold/20 hover:text-gold" title="Move Up"><MoveUp size={14} /></button>
+                    <div />
+                    <button type="button" onClick={() => nudge('x', -1)} className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-white transition hover:bg-gold/20 hover:text-gold" title="Move Left"><MoveLeft size={14} /></button>
+                    <button type="button" onClick={reset} className="flex h-8 w-8 items-center justify-center rounded-lg border border-gold/40 bg-gold/10 text-gold transition hover:bg-gold hover:text-black" title="Reset Position"><RotateCcw size={14} /></button>
+                    <button type="button" onClick={() => nudge('x', 1)} className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-white transition hover:bg-gold/20 hover:text-gold" title="Move Right"><MoveRight size={14} /></button>
+                    <div />
+                    <button type="button" onClick={() => nudge('y', -1)} className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-white transition hover:bg-gold/20 hover:text-gold" title="Move Down"><MoveDown size={14} /></button>
+                    <div />
+                  </div>
 
-                  <ControlSlider label="Custom Scale" min={0.2} max={0.7} step={0.01} value={state.scale} onChange={(scale) => update({ scale })} />
-                  <ControlSlider label="Rotation" min={-Math.PI} max={Math.PI} step={0.05} value={state.rotation} onChange={(rotation) => update({ rotation })} />
-
-                  <div className="grid gap-2">
-                    <span className="font-brand text-[11px] font-bold uppercase tracking-wider text-white/60">Position Controls</span>
-                    <div className="grid grid-cols-4 gap-2">
-                      <NudgeButton label="Left" icon={<MoveLeft size={16} />} onClick={() => nudge('x', -1)} />
-                      <NudgeButton label="Right" icon={<MoveRight size={16} />} onClick={() => nudge('x', 1)} />
-                      <NudgeButton label="Up" icon={<MoveUp size={16} />} onClick={() => nudge('y', 1)} />
-                      <NudgeButton label="Down" icon={<MoveDown size={16} />} onClick={() => nudge('y', -1)} />
-                    </div>
+                  <div className="flex flex-1 flex-col gap-1.5 pl-2">
+                    <label className="flex items-center justify-between text-[11px] font-medium text-white/70">
+                      <span>Custom Scale</span>
+                      <span className="font-mono text-gold">{state.scale.toFixed(2)}</span>
+                    </label>
+                    <input
+                      type="range"
+                      min={0.15}
+                      max={0.75}
+                      step={0.01}
+                      value={state.scale}
+                      onChange={(e) => update({ scale: Number(e.target.value) })}
+                      className="accent-gold h-1.5 w-full cursor-pointer rounded-lg bg-white/20"
+                    />
                   </div>
                 </div>
-              ) : null}
-
-              <label className="font-brand grid gap-2 text-xs font-bold uppercase tracking-[.18em] text-white/60">
-                Custom note
-                <textarea value={state.note} onChange={(event) => update({ note: event.target.value })} placeholder="Add print size, deadline, or delivery notes" className="min-h-20 sm:min-h-24 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none placeholder:text-white/30 focus:border-gold" />
-              </label>
-
-              <div className="grid grid-cols-3 gap-2">
-                <button type="button" className="cta-secondary px-2 text-xs" onClick={reset}><RotateCcw size={15} /> Reset</button>
-                <button type="button" className="cta-secondary px-2 text-xs" onClick={toggleFullscreen}><Maximize2 size={15} /> {fullscreen ? 'Exit' : 'Full'}</button>
-                <button type="button" className="cta-secondary px-2 text-xs" onClick={downloadPreview}><Download size={15} /> Save</button>
               </div>
+            </div>
 
+            <div className="mt-6 flex flex-col gap-2.5 border-t border-white/10 pt-5">
               <AnimatedWhatsAppButton
                 text="Order Custom Design"
                 message={orderMessage}
                 size="md"
                 className="w-full"
               />
+              <button
+                type="button"
+                onClick={downloadPreview}
+                className="font-brand flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/20 bg-black/40 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:border-gold hover:text-gold"
+              >
+                <Download size={15} /> Download 3D Snapshot
+              </button>
             </div>
           </motion.aside>
         </div>
       </div>
     </section>
   );
-}
-
-function ControlSlider({ label, min, max, step, value, onChange }: { label: string; min: number; max: number; step: number; value: number; onChange: (value: number) => void }) {
-  return (
-    <label className="font-brand grid gap-2 text-xs font-bold uppercase tracking-[.18em] text-white/60">
-      <span className="flex justify-between gap-3"><span>{label}</span><span className="text-gold">{value.toFixed(2)}</span></span>
-      <input type="range" min={min} max={max} step={step} value={value} onChange={(event) => onChange(Number(event.target.value))} className="accent-gold" />
-    </label>
-  );
-}
-
-function NudgeButton({ label, icon, onClick }: { label: string; icon: ReactNode; onClick: () => void }) {
-  return (
-    <button type="button" onClick={onClick} className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[.06] text-white/75 transition hover:border-gold hover:text-gold" aria-label={`Move design ${label.toLowerCase()}`}>
-      {icon}
-    </button>
-  );
-}
-
-if (typeof window !== 'undefined') {
-  try {
-    useGLTF.preload('/models/tshirt.glb');
-  } catch {
-    // Ignore GLTF preload failure
-  }
 }

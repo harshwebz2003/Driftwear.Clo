@@ -162,12 +162,12 @@ export default function HomePage() {
 }
 
 /* ==========================================================================
-   HERO SECTION - Video Background, Animated Title, Direct Action Order Button
+   HERO SECTION - Full Video Background, Frameless Floating Typography & Badge
    ========================================================================== */
 function Hero() {
   return (
     <section className="relative min-h-screen overflow-hidden px-4 pb-12 pt-28 sm:px-8 sm:pt-32 lg:px-14 lg:pt-36 flex items-center justify-center" aria-labelledby="hero-title">
-      {/* Background Showcase Video */}
+      {/* Full-Bleed High-Clarity Showcase Background Video */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <video
           src="/assets/driftwear-showcase.mp4"
@@ -175,74 +175,68 @@ function Hero() {
           muted
           playsInline
           loop
-          className="h-full w-full object-cover opacity-35 filter brightness-85 contrast-110"
+          className="h-full w-full object-cover opacity-75 filter brightness-95 contrast-110"
         />
-        {/* Dark Vignette & Gold Ambient Overlays */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_15%,rgba(6,4,10,0.85)_85%)]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#06040A] via-transparent to-[#06040A]/80" />
+        {/* Soft Radial Vignette for Text Contrast */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,rgba(6,4,10,0.75)_80%)]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#06040A] via-transparent to-[#06040A]/60" />
       </div>
 
-      {/* Golden & Purple Ambient Lighting Gradients */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,194,66,0.28),transparent_38rem),radial-gradient(circle_at_20%_80%,rgba(168,74,196,0.2),transparent_30rem)] pointer-events-none z-0" />
+      {/* Golden & Purple Ambient Glow Accent */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,194,66,0.18),transparent_35rem)] pointer-events-none z-0" />
 
       {/* Pulsating Gold Light Glow */}
       <motion.div
-        animate={{ scale: [1, 1.25, 1], opacity: [0.4, 0.75, 0.4] }}
+        animate={{ scale: [1, 1.25, 1], opacity: [0.35, 0.65, 0.35] }}
         transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[40rem] w-[40rem] rounded-full bg-radial-gold blur-[140px] z-0"
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[38rem] w-[38rem] rounded-full bg-radial-gold blur-[130px] z-0"
       />
 
       <motion.div className="shell relative z-10 flex flex-col items-center text-center justify-center min-h-[calc(100vh-10rem)]" variants={stagger} initial="hidden" animate="show">
-        {/* Centered Layered Gold-Bordered Frosted Glass Card */}
-        <motion.div variants={fadeUp} className="relative z-20 w-full max-w-2xl">
-          {/* Layer 1: Background Offset Glass Frame */}
-          <div className="absolute -inset-3 rounded-[3rem] border border-gold/25 bg-gold/5 backdrop-blur-md translate-y-3 hidden sm:block pointer-events-none" />
+        {/* Frameless Floating Hero Container (No Outer Card Shapes or Box Borders) */}
+        <motion.div variants={fadeUp} className="relative z-20 w-full max-w-2xl flex flex-col items-center drop-shadow-[0_15px_35px_rgba(0,0,0,0.9)]">
+          {/* ANIMATED HERO TITLE: WEAR YOUR VIBE. */}
+          <motion.div variants={fadeUp} className="flex justify-center">
+            <AnimatedHeroTitle />
+          </motion.div>
 
-          {/* Layer 2: Main Layered Frosted Glass Card */}
-          <div className="relative rounded-[2.2rem] sm:rounded-[3rem] gold-gradient-border p-6 sm:p-12 lg:p-14 shadow-[0_30px_100px_rgba(0,0,0,0.95),0_0_70px_rgba(245,194,66,0.25)] backdrop-blur-2xl flex flex-col items-center">
-            {/* ANIMATED HERO TITLE: WEAR YOUR VIBE. */}
-            <motion.div variants={fadeUp} className="flex justify-center">
-              <AnimatedHeroTitle />
-            </motion.div>
-
-            {/* ENLARGED LOGO & DRIFTWEAR CLO. BRAND BADGE DIVIDER */}
-            <motion.div variants={fadeUp} className="my-7 flex items-center justify-center gap-3 w-full">
-              <span className="h-[1px] flex-1 max-w-[60px] sm:max-w-[100px] bg-gradient-to-r from-transparent to-gold/70" />
-              <div className="flex items-center gap-3 rounded-full border border-gold/50 bg-black/70 px-5 py-2.5 shadow-[0_0_30px_rgba(245,194,66,0.4)] backdrop-blur-md">
-                <Image
-                  src="/assets/logo.png"
-                  alt="Driftwear Clo. Logo"
-                  width={52}
-                  height={52}
-                  className="h-11 w-11 sm:h-13 sm:w-13 rounded-full object-cover border border-gold/70 shadow-md"
-                />
-                <span className="font-brand text-sm sm:text-lg font-extrabold uppercase tracking-[.26em] gold-gradient-text">
-                  Driftwear <span className="text-white">Clo.</span>
-                </span>
-              </div>
-              <span className="h-[1px] flex-1 max-w-[60px] sm:max-w-[100px] bg-gradient-to-l from-transparent to-gold/70" />
-            </motion.div>
-
-            {/* Subtitle with Character Entrance Animation */}
-            <motion.div variants={fadeUp} className="max-w-md">
-              <AnimatedTextReveal text="Custom T-shirts & Premium DTF Printing" className="font-brand text-base sm:text-lg font-medium leading-7 text-white/88" />
-            </motion.div>
-
-            {/* Action Buttons */}
-            <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:mt-9">
-              <AnimatedWhatsAppButton
-                text="Order Now"
-                message="Hi Driftwear Clo., I want to order a custom T-shirt."
-                size="lg"
+          {/* ENLARGED LOGO & DRIFTWEAR CLO. BRAND BADGE DIVIDER */}
+          <motion.div variants={fadeUp} className="my-7 flex items-center justify-center gap-3 w-full">
+            <span className="h-[1px] flex-1 max-w-[60px] sm:max-w-[100px] bg-gradient-to-r from-transparent via-gold to-gold/70" />
+            <div className="flex items-center gap-3 rounded-full border border-gold/60 bg-black/80 px-5 py-2.5 shadow-[0_0_35px_rgba(245,194,66,0.5)] backdrop-blur-xl">
+              <Image
+                src="/assets/logo.png"
+                alt="Driftwear Clo. Logo"
+                width={52}
+                height={52}
+                className="h-11 w-11 sm:h-13 sm:w-13 rounded-full object-cover border border-gold/70 shadow-md"
               />
-              <a
-                href="#shop"
-                className="font-brand inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-gold/50 bg-gold/10 px-7 py-3.5 text-xs font-bold uppercase tracking-[.18em] text-white transition duration-300 hover:border-gold hover:bg-gold/20 hover:text-gold sm:text-sm shadow-[0_0_20px_rgba(245,194,66,0.25)]"
-              >
-                View Designs <ArrowRight size={17} />
-              </a>
-            </motion.div>
-          </div>
+              <span className="font-brand text-sm sm:text-lg font-extrabold uppercase tracking-[.26em] gold-gradient-text">
+                Driftwear <span className="text-white">Clo.</span>
+              </span>
+            </div>
+            <span className="h-[1px] flex-1 max-w-[60px] sm:max-w-[100px] bg-gradient-to-l from-transparent via-gold to-gold/70" />
+          </motion.div>
+
+          {/* Subtitle with Character Entrance Animation */}
+          <motion.div variants={fadeUp} className="max-w-md">
+            <AnimatedTextReveal text="Custom T-shirts & Premium DTF Printing" className="font-brand text-base sm:text-lg font-bold leading-7 text-white drop-shadow-md" />
+          </motion.div>
+
+          {/* Action Buttons */}
+          <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:mt-9">
+            <AnimatedWhatsAppButton
+              text="Order Now"
+              message="Hi Driftwear Clo., I want to order a custom T-shirt."
+              size="lg"
+            />
+            <a
+              href="#shop"
+              className="font-brand inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-gold/60 bg-black/75 px-7 py-3.5 text-xs font-bold uppercase tracking-[.18em] text-white backdrop-blur-xl transition duration-300 hover:border-gold hover:bg-gold/20 hover:text-gold sm:text-sm shadow-[0_0_25px_rgba(245,194,66,0.3)]"
+            >
+              View Designs <ArrowRight size={17} />
+            </a>
+          </motion.div>
         </motion.div>
       </motion.div>
     </section>

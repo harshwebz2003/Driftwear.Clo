@@ -13,8 +13,13 @@ const config: Config = {
         smoke: '#C8CDD2'
       },
       fontFamily: {
-        display: ['var(--font-display)', 'Bodoni 72', 'Didot', 'serif'],
-        body: ['var(--font-body)', 'Cormorant Garamond', 'Georgia', 'serif']
+        display: ['var(--font-romantic)', 'Bodoni 72', 'Didot', 'serif'],
+        body: ['var(--font-calista)', 'Cormorant Garamond', 'Georgia', 'serif'],
+        romantic: ['var(--font-romantic)', 'Bodoni 72', 'Didot', 'serif'],
+        calista: ['var(--font-calista)', 'Cormorant Garamond', 'Georgia', 'serif'],
+        brand: ['var(--font-brand)', 'Cinzel Decorative', 'serif'],
+        lucky: ['var(--font-lucky)', 'Playfair Display', 'Georgia', 'serif'],
+        grande: ['var(--font-grande)', 'Libre Bodoni', 'Bodoni 72', 'serif']
       },
       boxShadow: {
         gold: '0 24px 90px rgba(200, 205, 210, 0.22)',

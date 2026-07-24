@@ -1,7 +1,7 @@
 'use client';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Bounds, Center, Decal, Environment, Html, OrbitControls, PerspectiveCamera, useGLTF, useTexture } from '@react-three/drei';
+import { Bounds, Center, Environment, Html, OrbitControls, PerspectiveCamera, useGLTF } from '@react-three/drei';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Download, Maximize2, MessageCircle, MoveDown, MoveLeft, MoveRight, MoveUp, RotateCcw, Upload } from 'lucide-react';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -69,7 +69,6 @@ function TshirtModel({ state }: { state: DesignState }) {
   const group = useRef<THREE.Group>(null);
   const { scene } = useGLTF('/models/tshirt.glb');
   const model = useMemo(() => scene.clone(true), [scene]);
-  const decalTexture = useTexture(state.textureUrl || '/designs/drift-flame.svg');
   const hasDesign = Boolean(state.textureUrl);
 
   useEffect(() => {
@@ -93,24 +92,81 @@ function TshirtModel({ state }: { state: DesignState }) {
     group.current.rotation.y += delta * 0.16;
   });
 
-  decalTexture.colorSpace = THREE.SRGBColorSpace;
-  decalTexture.anisotropy = 8;
-
   return (
     <group ref={group}>
       <Center>
         <primitive object={model} scale={2.1} rotation={[0, Math.PI, 0]} />
-        {hasDesign ? (
-          <Decal
-            debug={false}
-            position={[state.positionX, state.positionY + 0.34, 0.64]}
-            rotation={[0, 0, state.rotation]}
-            scale={[state.scale, state.scale, state.scale]}
-            map={decalTexture}
-          />
-        ) : null}
+        {hasDesign ? <PrintedDesign state={state} /> : null}
       </Center>
     </group>
+  );
+}
+
+function PrintedDesign({ state }: { state: DesignState }) {
+  const [texture, setTexture] = useState<THREE.Texture | null>(null);
+
+  useEffect(() => {
+    if (!state.textureUrl) {
+      setTexture((current) => {
+        current?.dispose();
+        return null;
+      });
+      return undefined;
+    }
+
+    setTexture((current) => {
+      current?.dispose();
+      return null;
+    });
+
+    let active = true;
+    let loaded: THREE.Texture | null = null;
+    const loader = new THREE.TextureLoader();
+
+    loader.load(
+      state.textureUrl,
+      (loadedTexture) => {
+        if (!active) {
+          loadedTexture.dispose();
+          return;
+        }
+
+        loaded = loadedTexture;
+        loaded.colorSpace = THREE.SRGBColorSpace;
+        loaded.anisotropy = 8;
+        loaded.needsUpdate = true;
+        setTexture((current) => {
+          current?.dispose();
+          return loadedTexture;
+        });
+      },
+      undefined,
+      () => {
+        if (active) setTexture(null);
+      }
+    );
+
+    return () => {
+      active = false;
+      loaded?.dispose();
+    };
+  }, [state.textureUrl]);
+
+  if (!texture) return null;
+
+  return (
+    <mesh position={[state.positionX, state.positionY + 0.34, 0.82]} rotation={[0, 0, state.rotation]} renderOrder={10}>
+      <planeGeometry args={[state.scale, state.scale]} />
+      <meshBasicMaterial
+        map={texture}
+        transparent
+        opacity={0.94}
+        depthWrite={false}
+        depthTest={false}
+        toneMapped={false}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
   );
 }
 
@@ -253,7 +309,7 @@ Please confirm price and order details.`;
             <AnimatePresence>
               {!ready && webgl ? (
                 <motion.div initial={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-20 grid place-items-center bg-obsidian/80">
-                  <div className="rounded-2xl border border-gold/30 bg-black/70 px-5 py-4 text-sm font-bold uppercase tracking-[.14em] text-gold">
+                  <div className="font-brand rounded-2xl border border-gold/30 bg-black/70 px-5 py-4 text-sm font-bold uppercase tracking-[.14em] text-gold">
                     Loading 3D model
                   </div>
                 </motion.div>
@@ -268,12 +324,12 @@ Please confirm price and order details.`;
             ) : (
               <div className="grid h-full min-h-[540px] place-items-center p-8 text-center">
                 <div>
-                  <h3 className="text-2xl font-bold text-white">WebGL is not supported.</h3>
+                  <h3 className="font-calista text-3xl font-semibold text-white">WebGL is not supported.</h3>
                   <p className="mt-3 text-white/60">Please open this page in a modern browser with hardware acceleration enabled.</p>
                 </div>
               </div>
             )}
-            <div className="pointer-events-none absolute bottom-5 left-5 z-20 rounded-full border border-white/10 bg-black/55 px-4 py-2 text-xs font-bold uppercase tracking-[.14em] text-white/70 backdrop-blur-xl">
+            <div className="font-brand pointer-events-none absolute bottom-5 left-5 z-20 rounded-full border border-white/10 bg-black/55 px-4 py-2 text-xs font-bold uppercase tracking-[.14em] text-white/70 backdrop-blur-xl">
               Drag to orbit / scroll to zoom
             </div>
           </motion.div>
@@ -281,8 +337,8 @@ Please confirm price and order details.`;
           <motion.aside initial={{ opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="gold-border rounded-[2rem] p-5 sm:p-6">
             <div className="grid gap-5">
               <div>
-                <label className="text-xs font-bold uppercase tracking-[.18em] text-white/60" htmlFor="design-upload">Upload PNG, JPG, or SVG</label>
-                <label htmlFor="design-upload" className="mt-3 flex cursor-pointer items-center justify-center gap-3 rounded-2xl border border-dashed border-gold/40 bg-gold/10 px-4 py-5 text-sm font-bold uppercase tracking-[.13em] text-gold transition hover:bg-gold/15">
+                <label className="font-brand text-xs font-bold uppercase tracking-[.18em] text-white/60" htmlFor="design-upload">Upload PNG, JPG, or SVG</label>
+                <label htmlFor="design-upload" className="font-brand mt-3 flex cursor-pointer items-center justify-center gap-3 rounded-2xl border border-dashed border-gold/40 bg-gold/10 px-4 py-5 text-sm font-bold uppercase tracking-[.13em] text-gold transition hover:bg-gold/15">
                   <Upload size={18} /> Upload artwork
                 </label>
                 <input id="design-upload" type="file" accept="image/png,image/jpeg,image/svg+xml" className="sr-only" onChange={(event) => handleUpload(event.target.files?.[0])} />
@@ -290,14 +346,14 @@ Please confirm price and order details.`;
               </div>
 
               <div>
-                <p className="text-xs font-bold uppercase tracking-[.18em] text-white/60">Sample designs</p>
+                <p className="font-brand text-xs font-bold uppercase tracking-[.18em] text-white/60">Sample designs</p>
                 <div className="mt-3 grid grid-cols-3 gap-2">
                   {samples.map((sample) => (
                     <button
                       key={sample.name}
                       type="button"
                       onClick={() => chooseSample(sample.url, sample.name)}
-                      className={`rounded-2xl border px-3 py-3 text-xs font-bold uppercase tracking-[.1em] transition ${state.sampleName === sample.name ? 'border-gold bg-gold text-black' : 'border-white/10 bg-white/[.05] text-white/70 hover:border-gold/60'}`}
+                      className={`font-grande rounded-2xl border px-3 py-3 text-xs font-bold uppercase tracking-[.14em] transition ${state.sampleName === sample.name ? 'border-gold bg-gold text-black' : 'border-white/10 bg-white/[.05] text-white/70 hover:border-gold/60'}`}
                     >
                       {sample.name}
                     </button>
@@ -306,14 +362,14 @@ Please confirm price and order details.`;
               </div>
 
               <div>
-                <p className="text-xs font-bold uppercase tracking-[.18em] text-white/60">T-shirt color</p>
+                <p className="font-brand text-xs font-bold uppercase tracking-[.18em] text-white/60">T-shirt color</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {colors.map((color) => (
                     <button
                       key={color.label}
                       type="button"
                       onClick={() => update({ color })}
-                      className={`flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-bold uppercase tracking-[.12em] ${state.color.label === color.label ? 'border-gold text-gold' : 'border-white/10 text-white/60'}`}
+                      className={`font-grande flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-bold uppercase tracking-[.14em] ${state.color.label === color.label ? 'border-gold text-gold' : 'border-white/10 text-white/60'}`}
                     >
                       <span className="h-5 w-5 rounded-full border border-white/30" style={{ backgroundColor: color.value }} />
                       {color.label}
@@ -322,7 +378,7 @@ Please confirm price and order details.`;
                 </div>
               </div>
 
-              <label className="grid gap-2 text-xs font-bold uppercase tracking-[.18em] text-white/60">
+              <label className="font-brand grid gap-2 text-xs font-bold uppercase tracking-[.18em] text-white/60">
                 Size
                 <select value={state.size} onChange={(event) => update({ size: event.target.value })} className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none focus:border-gold">
                   {['S', 'M', 'L', 'XL', 'XXL'].map((size) => <option key={size}>{size}</option>)}
@@ -341,7 +397,7 @@ Please confirm price and order details.`;
                 <NudgeButton label="Down" icon={<MoveDown size={17} />} onClick={() => nudge('y', -0.05)} />
               </div>
 
-              <label className="grid gap-2 text-xs font-bold uppercase tracking-[.18em] text-white/60">
+              <label className="font-brand grid gap-2 text-xs font-bold uppercase tracking-[.18em] text-white/60">
                 Custom note
                 <textarea value={state.note} onChange={(event) => update({ note: event.target.value })} placeholder="Add print size, deadline, or delivery notes" className="min-h-24 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none placeholder:text-white/30 focus:border-gold" />
               </label>
@@ -365,7 +421,7 @@ Please confirm price and order details.`;
 
 function ControlSlider({ label, min, max, step, value, onChange }: { label: string; min: number; max: number; step: number; value: number; onChange: (value: number) => void }) {
   return (
-    <label className="grid gap-2 text-xs font-bold uppercase tracking-[.18em] text-white/60">
+    <label className="font-brand grid gap-2 text-xs font-bold uppercase tracking-[.18em] text-white/60">
       <span className="flex justify-between gap-3"><span>{label}</span><span className="text-gold">{value.toFixed(2)}</span></span>
       <input type="range" min={min} max={max} step={step} value={value} onChange={(event) => onChange(Number(event.target.value))} className="accent-gold" />
     </label>

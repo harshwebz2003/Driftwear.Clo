@@ -14,14 +14,14 @@ export default function Navbar() {
         <a href="#home" className="flex items-center gap-3" aria-label="Driftwear Clo. home">
           <Image src="/assets/logo.png" alt="Driftwear Clo. logo" width={48} height={48} className="rounded-full border border-gold/30 object-cover" priority />
           <span className="leading-none">
-            <span className="block text-sm font-bold uppercase tracking-[.2em] text-white">Driftwear</span>
-            <span className="block text-xs font-bold uppercase tracking-[.24em] text-gold">Clo.</span>
+            <span className="font-brand block text-sm font-bold uppercase tracking-[.2em] text-white">Driftwear</span>
+            <span className="font-grande block text-xs font-bold uppercase tracking-[.24em] text-gold">Clo.</span>
           </span>
         </a>
 
         <nav className="hidden items-center gap-8 lg:flex" aria-label="Main navigation">
           {navItems.map((item) => (
-            <a key={item.href} href={item.href} className="text-xs font-bold uppercase tracking-[.18em] text-white/65 transition hover:text-gold">
+            <a key={item.href} href={item.href} className="font-brand text-xs font-bold uppercase tracking-[.18em] text-white/65 transition hover:text-gold">
               {item.label}
             </a>
           ))}
@@ -47,7 +47,7 @@ export default function Navbar() {
         <div className="border-t border-white/10 bg-obsidian px-5 py-5 lg:hidden">
           <nav className="grid gap-2" aria-label="Mobile navigation">
             {navItems.map((item) => (
-              <a key={item.href} href={item.href} onClick={() => setOpen(false)} className="rounded-2xl border border-white/10 bg-white/[.04] px-4 py-4 text-sm font-bold uppercase tracking-[.16em]">
+              <a key={item.href} href={item.href} onClick={() => setOpen(false)} className="font-brand rounded-2xl border border-white/10 bg-white/[.04] px-4 py-4 text-sm font-bold uppercase tracking-[.16em]">
                 {item.label}
               </a>
             ))}

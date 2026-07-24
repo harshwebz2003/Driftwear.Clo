@@ -32,7 +32,7 @@ export default function HomePage() {
         aria-label="Sticky WhatsApp order button"
       >
         <MessageCircle size={22} />
-        <span className="ml-2 hidden text-sm font-bold uppercase tracking-[.14em] sm:inline">Order</span>
+        <span className="font-brand ml-2 hidden text-sm font-bold uppercase tracking-[.14em] sm:inline">Order</span>
       </a>
     </>
   );
@@ -60,7 +60,7 @@ function Hero() {
           </motion.div>
           <motion.div variants={fadeUp} className="mt-10 grid max-w-xl grid-cols-3 gap-3">
             {['Custom tees', 'DTF prints', 'Bulk orders'].map((item) => (
-              <div key={item} className="gold-border rounded-2xl px-4 py-4 text-center text-xs font-bold uppercase tracking-[.14em] text-white/78">
+              <div key={item} className="font-grande gold-border rounded-2xl px-4 py-4 text-center text-xs font-bold uppercase tracking-[.18em] text-white/78">
                 {item}
               </div>
             ))}
@@ -69,16 +69,16 @@ function Hero() {
 
         <motion.div variants={fadeUp} className="relative mx-auto w-full max-w-[620px]">
           <div className="absolute inset-8 rounded-full bg-gold/30 blur-[90px]" />
-          <div className="absolute -left-10 top-16 z-10 rounded-full border border-gold/30 bg-black/55 px-4 py-2 text-xs font-bold uppercase tracking-[.16em] text-gold backdrop-blur-xl">
+          <div className="font-brand absolute -left-10 top-16 z-10 rounded-full border border-gold/30 bg-black/55 px-4 py-2 text-xs font-bold uppercase tracking-[.16em] text-gold backdrop-blur-xl">
             Premium DTF
           </div>
-          <div className="absolute -right-2 bottom-20 z-10 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[.16em] text-white backdrop-blur-xl">
+          <div className="font-grande absolute -right-2 bottom-20 z-10 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[.16em] text-white backdrop-blur-xl">
             Galle, Sri Lanka
           </div>
           <motion.div animate={{ y: [0, -18, 0], rotate: [0, 1.6, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }} className="relative overflow-hidden rounded-[2rem] border border-gold/20 bg-white/[.04] p-4 shadow-gold">
             <Image src="/assets/tshirt_black_oversized.jpg" alt="Black oversized Driftwear T-shirt mockup" width={900} height={1100} className="aspect-[4/5] rounded-[1.5rem] object-cover object-top" priority />
           </motion.div>
-          <div className="pointer-events-none absolute -bottom-10 left-0 right-0 text-center font-display text-[clamp(5rem,12vw,9rem)] uppercase leading-none text-white/[.035]">Driftwear</div>
+          <div className="font-grande pointer-events-none absolute -bottom-10 left-0 right-0 text-center text-[clamp(5rem,12vw,9rem)] uppercase leading-none text-white/[.035]">Driftwear</div>
         </motion.div>
       </motion.div>
     </section>
@@ -108,8 +108,8 @@ function FeaturedProducts() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
               </div>
               <div className="p-5">
-                <p className="text-xs font-bold uppercase tracking-[.18em] text-gold">{product.category}</p>
-                <h3 className="mt-3 text-2xl font-bold text-white">{product.name}</h3>
+                <p className="font-grande text-xs font-bold uppercase tracking-[.2em] text-gold">{product.category}</p>
+                <h3 className="font-calista mt-3 text-3xl font-semibold text-white">{product.name}</h3>
                 <p className="mt-2 text-sm text-white/58">{product.price}</p>
                 <a href={whatsappLink(`Hi Driftwear Clo., I want to order: ${product.name}.`)} target="_blank" rel="noreferrer" className="cta-secondary mt-5 w-full">
                   Order on WhatsApp
@@ -134,8 +134,8 @@ function Process() {
         <div className="grid gap-4 sm:grid-cols-2">
           {processSteps.map(([number, title, copy]) => (
             <motion.article key={number} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="gold-border rounded-[1.5rem] p-6">
-              <span className="font-display text-6xl text-gold">{number}</span>
-              <h3 className="mt-4 text-2xl font-bold text-white">{title}</h3>
+              <span className="font-brand text-6xl text-gold">{number}</span>
+              <h3 className="font-calista mt-4 text-3xl font-semibold text-white">{title}</h3>
               <p className="mt-3 text-sm leading-7 text-white/60">{copy}</p>
             </motion.article>
           ))}
@@ -158,7 +158,7 @@ function WhyChoose() {
             {reasons.map((reason) => (
               <div key={reason} className="flex gap-4 rounded-2xl border border-white/10 bg-black/35 p-5">
                 <Check className="mt-1 shrink-0 text-gold" />
-                <p className="m-0 text-white/72">{reason}</p>
+                <p className="font-lucky m-0 text-white/72">{reason}</p>
               </div>
             ))}
           </div>
@@ -194,8 +194,8 @@ function Testimonials() {
           {['Clean print quality and the design looked exactly like the mockup.', 'Fast WhatsApp communication and a premium feel for our team tees.', 'The midnight and silver brand style feels unique and bold.'].map((quote, index) => (
             <article key={quote} className="gold-border rounded-[1.5rem] p-6">
               <div className="flex gap-1 text-gold">{Array.from({ length: 5 }).map((_, star) => <Sparkles key={star} size={16} fill="currentColor" />)}</div>
-              <p className="mt-5 text-white/70">{quote}</p>
-              <p className="mt-5 text-xs font-bold uppercase tracking-[.18em] text-white/45">Demo review {index + 1}</p>
+              <p className="font-lucky mt-5 text-xl italic text-white/70">{quote}</p>
+              <p className="font-brand mt-5 text-xs font-bold uppercase tracking-[.18em] text-white/45">Demo review {index + 1}</p>
             </article>
           ))}
         </div>
@@ -212,7 +212,7 @@ function FAQ() {
         <div className="grid gap-4 lg:grid-cols-2">
           {faqs.map(([question, answer]) => (
             <article key={question} className="gold-border rounded-[1.25rem] p-6">
-              <h3 className="text-xl font-bold text-white">{question}</h3>
+              <h3 className="font-calista text-2xl font-semibold text-white">{question}</h3>
               <p className="mt-3 text-white/62">{answer}</p>
             </article>
           ))}
@@ -250,7 +250,7 @@ function ContactLine({ icon, text }: { icon: ReactNode; text: string }) {
   return (
     <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-white/10 bg-black/35 p-4 text-white/78 sm:gap-4 sm:p-5">
       <span className="text-gold [&_svg]:h-5 [&_svg]:w-5">{icon}</span>
-      <span className="min-w-0 break-words font-bold">{text}</span>
+      <span className="font-lucky min-w-0 break-words font-semibold">{text}</span>
     </div>
   );
 }
@@ -295,9 +295,9 @@ function Footer() {
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
               <a href="#home" className="inline-flex items-center gap-3 self-start" aria-label="Driftwear Clo. home">
                 <Image src="/assets/logo.png" alt="" width={54} height={54} className="h-12 w-12 rounded-full border border-gold/30 object-cover" />
-                <span className="font-display text-2xl uppercase leading-none text-white">Driftwear Clo.</span>
+                <span className="font-brand text-2xl uppercase leading-none text-white">Driftwear Clo.</span>
               </a>
-              <p className="max-w-xs text-left text-xs font-bold uppercase leading-5 tracking-[.22em] text-gold sm:text-right">
+              <p className="font-grande max-w-xs text-left text-xs font-bold uppercase leading-5 tracking-[.22em] text-gold sm:text-right">
                 Wear fast. Print premium.
               </p>
             </div>
@@ -325,7 +325,7 @@ function Footer() {
               </FooterColumn>
 
               <div>
-                <p className="text-xs font-bold uppercase tracking-[.22em] text-white">Order Studio</p>
+                <p className="font-brand text-xs font-bold uppercase tracking-[.22em] text-white">Order Studio</p>
                 <div className="mt-4 space-y-3 text-sm leading-6 text-white/60">
                   <p>{contact.location}</p>
                   <p>{contact.phone}</p>
@@ -337,7 +337,7 @@ function Footer() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 text-xs font-bold uppercase tracking-[.16em] text-white/40 sm:flex-row sm:items-center sm:justify-between">
+            <div className="font-grande flex flex-col gap-3 text-xs font-bold uppercase tracking-[.16em] text-white/40 sm:flex-row sm:items-center sm:justify-between">
               <p>© {new Date().getFullYear()} Driftwear Clo. All rights reserved.</p>
               <p>Custom T-shirts and DTF printing in Galle, Sri Lanka.</p>
             </div>
@@ -351,7 +351,7 @@ function Footer() {
 function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div>
-      <p className="text-xs font-bold uppercase tracking-[.22em] text-white">{title}</p>
+      <p className="font-brand text-xs font-bold uppercase tracking-[.22em] text-white">{title}</p>
       <div className="mt-4 grid gap-2 text-sm text-white/60">
         {children}
       </div>

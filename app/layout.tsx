@@ -1,42 +1,27 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-import { Bodoni_Moda, Cinzel_Decorative, Cormorant_Garamond, Libre_Bodoni, Playfair_Display } from 'next/font/google';
+import { Bodoni_Moda, Cormorant_Garamond, Manrope } from 'next/font/google';
 import './globals.css';
 
-const romantic = Bodoni_Moda({
+const display = Bodoni_Moda({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800', '900'],
-  variable: '--font-romantic',
+  variable: '--font-display',
   display: 'swap'
 });
 
-const calista = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-calista',
-  display: 'swap'
-});
-
-const brand = Cinzel_Decorative({
-  subsets: ['latin'],
-  weight: ['400', '700', '900'],
-  variable: '--font-brand',
-  display: 'swap'
-});
-
-const lucky = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
-  style: ['normal', 'italic'],
-  variable: '--font-lucky',
-  display: 'swap'
-});
-
-const grande = Libre_Bodoni({
+const accent = Cormorant_Garamond({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   style: ['normal', 'italic'],
-  variable: '--font-grande',
+  variable: '--font-accent',
+  display: 'swap'
+});
+
+const body = Manrope({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-body',
   display: 'swap'
 });
 
@@ -80,7 +65,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${romantic.variable} ${calista.variable} ${brand.variable} ${lucky.variable} ${grande.variable}`}>{children}</body>
+      <body className={`${display.variable} ${accent.variable} ${body.variable}`}>{children}</body>
     </html>
   );
 }

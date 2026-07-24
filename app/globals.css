@@ -23,8 +23,8 @@ body {
     radial-gradient(circle at 80% 20%, rgba(255, 255, 255, .08), transparent 28rem),
     linear-gradient(135deg, #07111F 0%, #0B1523 50%, #07111F 100%);
   color: #FFFFFF;
-  font-family: var(--font-calista), Georgia, serif;
-  font-size: 18px;
+  font-family: var(--font-body), Manrope, system-ui, sans-serif;
+  font-size: 16px;
   font-weight: 500;
 }
 
@@ -53,17 +53,17 @@ body::before {
   }
 
   .eyebrow {
-    font-family: var(--font-grande), 'Libre Bodoni', serif;
+    font-family: var(--font-body), Manrope, system-ui, sans-serif;
     @apply text-xs font-semibold uppercase tracking-[0.42em] text-gold;
   }
 
   .display-title {
-    font-family: var(--font-romantic), 'Bodoni 72', Didot, serif;
+    font-family: var(--font-display), 'Bodoni 72', Didot, serif;
     @apply uppercase leading-[.9] tracking-normal;
   }
 
   .aida-title {
-    font-family: var(--font-romantic), 'Bodoni 72', Didot, serif;
+    font-family: var(--font-display), 'Bodoni 72', Didot, serif;
     font-feature-settings: 'kern' 1, 'liga' 1, 'dlig' 1;
     text-wrap: balance;
     @apply uppercase leading-[.72] tracking-[-0.015em];
@@ -78,7 +78,7 @@ body::before {
   }
 
   .font-display {
-    font-family: var(--font-romantic), 'Bodoni 72', Didot, serif;
+    font-family: var(--font-display), 'Bodoni 72', Didot, serif;
   }
 
   .gold-border {
@@ -86,12 +86,12 @@ body::before {
   }
 
   .cta-primary {
-    font-family: var(--font-brand), 'Cinzel Decorative', serif;
+    font-family: var(--font-body), Manrope, system-ui, sans-serif;
     @apply inline-flex min-h-12 max-w-full items-center justify-center gap-2 rounded-full bg-gold px-5 py-3 text-center text-xs font-semibold uppercase tracking-[.22em] text-obsidian shadow-gold transition hover:-translate-y-0.5 hover:bg-ambergold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-obsidian sm:px-6 sm:text-sm sm:tracking-[.24em];
   }
 
   .cta-secondary {
-    font-family: var(--font-brand), 'Cinzel Decorative', serif;
+    font-family: var(--font-body), Manrope, system-ui, sans-serif;
     @apply inline-flex min-h-12 max-w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[.06] px-5 py-3 text-center text-xs font-semibold uppercase tracking-[.22em] text-white transition hover:-translate-y-0.5 hover:border-gold hover:text-gold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-obsidian sm:px-6 sm:text-sm sm:tracking-[.24em];
   }
 
@@ -101,27 +101,27 @@ body::before {
 }
 
 .font-display {
-  font-family: var(--font-romantic), 'Bodoni 72', Didot, serif !important;
+  font-family: var(--font-display), 'Bodoni 72', Didot, serif !important;
 }
 
 .font-romantic {
-  font-family: var(--font-romantic), 'Bodoni 72', Didot, serif !important;
+  font-family: var(--font-display), 'Bodoni 72', Didot, serif !important;
 }
 
 .font-calista {
-  font-family: var(--font-calista), 'Cormorant Garamond', Georgia, serif !important;
+  font-family: var(--font-accent), 'Cormorant Garamond', Georgia, serif !important;
 }
 
 .font-brand {
-  font-family: var(--font-brand), 'Cinzel Decorative', serif !important;
+  font-family: var(--font-body), Manrope, system-ui, sans-serif !important;
 }
 
 .font-lucky {
-  font-family: var(--font-lucky), 'Playfair Display', Georgia, serif !important;
+  font-family: var(--font-accent), 'Cormorant Garamond', Georgia, serif !important;
 }
 
 .font-grande {
-  font-family: var(--font-grande), 'Libre Bodoni', 'Bodoni 72', serif !important;
+  font-family: var(--font-body), Manrope, system-ui, sans-serif !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

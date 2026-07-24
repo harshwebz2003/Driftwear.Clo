@@ -102,7 +102,11 @@ function MediaIntro() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(200,205,210,.14),transparent_24rem),linear-gradient(180deg,rgba(7,17,31,.38),rgba(7,17,31,.88))]" />
             <div className="relative z-10 text-center">
               <p className="font-brand text-xs font-bold uppercase tracking-[.42em] text-gold">Driftwear Clo.</p>
-              <p className="display-title mt-4 text-[clamp(3.5rem,11vw,10rem)] text-white">Wear Your Vibe.</p>
+              <p className="aida-title mt-4 text-[clamp(3.5rem,11vw,10rem)] text-white">
+                <span>Wear</span>
+                <span>Your</span>
+                <span className="aida-muted">Vibe.</span>
+              </p>
             </div>
           </motion.div>
         ) : null}
@@ -120,8 +124,10 @@ function Hero() {
       <motion.div className="shell relative grid min-h-[calc(100vh-6rem)] items-center gap-12 lg:grid-cols-[.95fr_1.05fr]" variants={stagger} initial="hidden" animate="show">
         <div>
           <motion.p variants={fadeUp} className="eyebrow">Sri Lankan custom print studio</motion.p>
-          <motion.h1 id="hero-title" variants={fadeUp} className="display-title mt-6 max-w-4xl text-[clamp(5rem,13vw,13rem)] text-white">
-            Wear Your <span className="text-gold">Vibe.</span>
+          <motion.h1 id="hero-title" variants={fadeUp} className="aida-title mt-6 max-w-4xl text-[clamp(5.5rem,14vw,13.5rem)] text-white">
+            <span>Wear</span>
+            <span>Your</span>
+            <span className="aida-muted">Vibe.</span>
           </motion.h1>
           <motion.p variants={fadeUp} className="mt-6 max-w-2xl text-lg leading-8 text-white/68 sm:text-xl">
             Custom T-shirts, unique designs, and premium DTF printing made for your style.

@@ -62,6 +62,21 @@ body::before {
     @apply uppercase leading-[.9] tracking-normal;
   }
 
+  .aida-title {
+    font-family: var(--font-romantic), 'Bodoni 72', Didot, serif;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'dlig' 1;
+    text-wrap: balance;
+    @apply uppercase leading-[.72] tracking-[-0.015em];
+  }
+
+  .aida-title span {
+    @apply block;
+  }
+
+  .aida-title .aida-muted {
+    @apply text-gold;
+  }
+
   .font-display {
     font-family: var(--font-romantic), 'Bodoni 72', Didot, serif;
   }

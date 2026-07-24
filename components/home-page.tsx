@@ -22,7 +22,9 @@ import {
   Zap,
   Ruler,
   Layers,
-  Award
+  Award,
+  Navigation,
+  ExternalLink
 } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import { SafeErrorBoundary } from '@/components/error-boundary';
@@ -112,6 +114,7 @@ export default function HomePage() {
         <Testimonials />
         <FAQ />
         <Contact />
+        <LocationMap />
       </main>
 
       <Footer />
@@ -566,6 +569,70 @@ function ContactLine({ icon, text }: { icon: ReactNode; text: string }) {
       <span className="text-gold [&_svg]:h-5 [&_svg]:w-5">{icon}</span>
       <span className="font-lucky min-w-0 break-words text-xs sm:text-sm font-semibold">{text}</span>
     </motion.div>
+  );
+}
+
+/* NEW SECTION: Interactive Dark Mode Location Map (Galle, Sri Lanka) */
+function LocationMap() {
+  return (
+    <section className="section-pad pt-0">
+      <div className="shell">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="relative overflow-hidden rounded-[2.2rem] sm:rounded-[2.8rem] gold-gradient-border bg-[#0B0813]/90 shadow-2xl backdrop-blur-2xl"
+        >
+          <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/10">
+            <div>
+              <p className="eyebrow">Studio Location</p>
+              <h3 className="font-calista text-2xl sm:text-3xl font-bold text-white mt-1">Visit Driftwear Clo. in Galle</h3>
+              <p className="text-xs sm:text-sm text-white/60 mt-1">Galle 80000, Southern Province, Sri Lanka</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <a
+                href="https://maps.google.com/?q=Galle+Sri+Lanka"
+                target="_blank"
+                rel="noreferrer"
+                className="cta-secondary text-xs inline-flex items-center gap-2"
+              >
+                <Navigation size={15} /> Open in Google Maps <ExternalLink size={13} />
+              </a>
+              <AnimatedWhatsAppButton
+                text="Ask Location"
+                message="Hi Driftwear Clo., please share your exact studio location & pickup details in Galle."
+                size="sm"
+              />
+            </div>
+          </div>
+
+          <div className="relative aspect-[16/9] w-full min-h-[320px] sm:min-h-[420px] bg-black">
+            <iframe
+              title="Driftwear Clo. Galle Studio Location Map"
+              src="https://maps.google.com/maps?q=Galle%20Sri%20Lanka&t=&z=13&ie=UTF8&iwloc=&output=embed"
+              width="100%"
+              height="100%"
+              style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) contrast(125%) opacity(0.85)' }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="w-full h-full"
+            />
+            {/* Floating Glass Badge Overlay */}
+            <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-10 flex items-center gap-3 rounded-2xl border border-gold/40 bg-black/80 p-3.5 sm:p-4 backdrop-blur-xl shadow-2xl max-w-xs sm:max-w-sm">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gold/50 bg-gold/20 text-gold shadow-[0_0_15px_rgba(245,194,66,0.3)]">
+                <MapPin size={20} />
+              </div>
+              <div>
+                <p className="font-brand text-xs font-bold uppercase tracking-wider text-white">DTF Studio Dispatch</p>
+                <p className="text-[11px] text-white/70">Fast 24h Delivery in Galle & 48h Islandwide Sri Lanka</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
   );
 }
 

@@ -1,30 +1,28 @@
-# Driftwear Clo. Static Website
+# Driftwear Clo.
 
-Premium static redesign for Driftwear Clo., a Galle-based custom DTF clothing printing business.
+Premium Next.js website for Driftwear Clo., a Sri Lankan custom T-shirt and DTF clothing printing brand.
 
-## What is included
+## Stack
 
-- Responsive multi-page single HTML app
-- Home, shop, designer, DTF services, product details, bulk orders, gallery, about, size guide, contact, cart, checkout, success, privacy, terms and admin-ready UI
-- LocalStorage cart persistence
-- Interactive T-shirt preview with color, text, upload, size, print position, quantity and WhatsApp submission
-- Editable demo product data in `script.js`
-- Business configuration reference in `config/site.ts`
-- Asset generation and integration docs in `docs/`
+- Next.js App Router
+- React
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- Lucide icons
 
-## Run locally
+## Commands
 
-Open `index.html` directly in a browser, or serve the folder with any static server.
-
-```powershell
-python -m http.server 4173
+```bash
+npm install
+npm run dev
+npm run typecheck
+npm run build
 ```
 
-Then open `http://localhost:4173`.
+## Brand details
 
-## Important production notes
-
-- Demo testimonials are marked in `script.js` and must be replaced with verified customer reviews before public launch.
-- Prices, GSM, fabric composition, stock and delivery timing are editable placeholders until confirmed by Driftwear Clo.
-- No payment gateway is connected.
-- Admin screens are mock UI only. Connect authentication and database rules before using them operationally.
+- Phone: 078 385 0769
+- Email: nipunsathsara203@gmail.com
+- Location: Galle, Sri Lanka
+- Facebook: Driftwear Clo.

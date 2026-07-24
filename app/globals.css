@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 20% 5%, rgba(246, 179, 38, .18), transparent 34rem),
+    radial-gradient(circle at 80% 20%, rgba(255, 207, 102, .08), transparent 28rem),
+    linear-gradient(135deg, #050505 0%, #111 50%, #050505 100%);
+  color: #f7f2e8;
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: .07;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: #f6b326;
+  color: #050505;
+}
+
+@layer components {
+  .section-pad {
+    @apply px-5 py-20 sm:px-8 lg:px-14 xl:px-20;
+  }
+
+  .shell {
+    @apply mx-auto w-full max-w-[1480px];
+  }
+
+  .eyebrow {
+    @apply text-xs font-black uppercase tracking-[0.32em] text-gold;
+  }
+
+  .display-title {
+    @apply font-display uppercase leading-[.86] tracking-normal;
+  }
+
+  .gold-border {
+    @apply border border-white/10 bg-white/[.045] shadow-card backdrop-blur-xl;
+  }
+
+  .cta-primary {
+    @apply inline-flex min-h-12 max-w-full items-center justify-center gap-2 rounded-full bg-gold px-5 py-3 text-center text-xs font-black uppercase tracking-[.13em] text-obsidian shadow-gold transition hover:-translate-y-0.5 hover:bg-ambergold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-obsidian sm:px-6 sm:text-sm sm:tracking-[.16em];
+  }
+
+  .cta-secondary {
+    @apply inline-flex min-h-12 max-w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[.06] px-5 py-3 text-center text-xs font-black uppercase tracking-[.13em] text-white transition hover:-translate-y-0.5 hover:border-gold hover:text-gold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-obsidian sm:px-6 sm:text-sm sm:tracking-[.16em];
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}

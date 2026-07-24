@@ -1,0 +1,9 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1024" height="1024" fill="none"/>
+  <path d="M171 589C277 491 386 444 501 447C433 380 408 304 426 219C521 278 598 359 657 462C700 454 764 467 853 501C758 538 690 587 647 647C595 720 511 771 397 801C435 749 444 702 424 660C356 676 272 652 171 589Z" fill="#F6B326"/>
+  <path d="M255 606C348 538 438 511 526 525C487 481 469 431 472 374C558 434 620 508 658 596C582 658 487 697 373 713C398 673 400 637 379 604C343 615 302 616 255 606Z" fill="#0A0A0A"/>
+  <path d="M277 386H747" stroke="white" stroke-width="34" stroke-linecap="round"/>
+  <path d="M335 319H689" stroke="#F6B326" stroke-width="34" stroke-linecap="round"/>
+  <text x="512" y="589" text-anchor="middle" fill="white" font-family="Arial Black, Arial, sans-serif" font-size="118" font-weight="900" letter-spacing="-4">DRIFT</text>
+  <text x="512" y="683" text-anchor="middle" fill="#F6B326" font-family="Arial, sans-serif" font-size="44" font-weight="900" letter-spacing="18">WEAR YOUR VIBE</text>
+</svg>

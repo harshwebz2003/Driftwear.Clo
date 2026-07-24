@@ -15,7 +15,11 @@ import {
   Send,
   Sparkles,
   X,
-  Maximize2
+  Maximize2,
+  Layers,
+  Zap,
+  MousePointer,
+  Sliders
 } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import {
@@ -54,7 +58,7 @@ export default function HomePage() {
 
       <Footer />
 
-      {/* WhatsApp Sticky Floating Button with Pulse Motion */}
+      {/* WhatsApp Sticky Floating Button */}
       <motion.a
         whileHover={{ scale: 1.1, rotate: 5 }}
         whileTap={{ scale: 0.95 }}
@@ -114,9 +118,41 @@ export default function HomePage() {
   );
 }
 
+/* ==========================================================================
+   HERO SECTION - Figma Animated Design (Video Completely Removed)
+   ========================================================================== */
 function Hero() {
+  const [activeVariantIndex, setActiveVariantIndex] = useState(0);
+
+  const apparelVariants = [
+    {
+      name: 'All Eyes On Me Black Tee',
+      tag: 'Oversized Streetwear',
+      image: '/assets/tshirt_black_oversized.jpg',
+      color: '#121316',
+      badge: '🔥 Best Seller'
+    },
+    {
+      name: 'Studio White Custom Tee',
+      tag: 'Minimal DTF Print',
+      image: '/assets/tshirt_white_regular.jpg',
+      color: '#F4F5F7',
+      badge: '✨ Studio Pick'
+    },
+    {
+      name: 'Urban Streetwear Look',
+      tag: 'Custom DTF Graphic',
+      image: '/assets/Gallery/streetwear_look_01.jpg',
+      color: '#1C1625',
+      badge: '💎 Premium Release'
+    }
+  ];
+
+  const currentVariant = apparelVariants[activeVariantIndex];
+
   return (
     <section className="relative min-h-screen overflow-hidden bg-[#130A18] px-5 pb-12 pt-28 sm:px-8 lg:px-14 lg:pt-24" aria-labelledby="hero-title">
+      {/* Background Lighting Gradients */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_52%,rgba(168,74,196,.52),transparent_24rem),radial-gradient(circle_at_22%_24%,rgba(200,205,210,.12),transparent_18rem),linear-gradient(105deg,#130A18_0%,#0D0711_48%,#190B20_100%)]" />
       <motion.div
         animate={{ scale: [1, 1.15, 1], opacity: [0.45, 0.65, 0.45] }}
@@ -126,14 +162,23 @@ function Hero() {
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(13,7,17,.96)_0%,rgba(13,7,17,.78)_36%,rgba(13,7,17,.2)_100%)] lg:bg-[linear-gradient(90deg,rgba(13,7,17,.96)_0%,rgba(13,7,17,.82)_39%,rgba(13,7,17,.12)_100%)]" />
 
       <motion.div className="shell relative z-10 grid min-h-[calc(100vh-7rem)] content-between gap-8" variants={stagger} initial="hidden" animate="show">
-        <div className="grid flex-1 items-center gap-8 pt-8 lg:grid-cols-[.78fr_1.22fr] lg:pt-0">
+        <div className="grid flex-1 items-center gap-12 pt-8 lg:grid-cols-[.85fr_1.15fr] lg:pt-0">
+          {/* Left Column Text Content */}
           <div className="relative z-20 max-w-xl">
-            <motion.p variants={fadeUp} className="font-brand text-xs font-bold uppercase tracking-[.22em] text-white">Our vision</motion.p>
-            <motion.h1 id="hero-title" variants={fadeUp} className="mt-8 font-body text-[clamp(4.2rem,10vw,9.5rem)] font-light uppercase leading-[.82] tracking-normal text-white">
-              Wear<br />
-              Your<br />
-              Vibe
+            <motion.p variants={fadeUp} className="font-brand text-xs font-bold uppercase tracking-[.22em] text-gold">
+              OUR VISION
+            </motion.p>
+
+            <motion.h1
+              id="hero-title"
+              variants={fadeUp}
+              className="mt-6 font-body text-[clamp(4.2rem,10vw,9rem)] font-light uppercase leading-[.82] tracking-normal text-white"
+            >
+              WEAR<br />
+              YOUR<br />
+              VIBE
             </motion.h1>
+
             <motion.p variants={fadeUp} className="mt-7 max-w-md text-sm font-medium leading-7 text-white/76 sm:text-base">
               Custom T-shirts, unique designs, and premium DTF printing made for your style.
             </motion.p>
@@ -142,7 +187,7 @@ function Hero() {
               <Magnetic>
                 <a
                   href={whatsappLink('Hi Driftwear Clo., I want to order a custom T-shirt.')}
-                  className="group inline-flex h-14 w-14 items-center justify-center rounded-full border border-white/25 bg-white/[.04] text-white transition hover:border-white hover:bg-white hover:text-[#130A18]"
+                  className="group inline-flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-gold/10 text-white transition hover:border-gold hover:bg-gold hover:text-obsidian shadow-[0_0_30px_rgba(216,180,95,0.2)]"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Order Now"
@@ -150,46 +195,167 @@ function Hero() {
                   <ArrowUpRight size={22} className="transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </a>
               </Magnetic>
-              <a href={whatsappLink('Hi Driftwear Clo., I want to order a custom T-shirt.')} target="_blank" rel="noreferrer" className="font-brand text-sm font-bold text-white transition hover:text-gold">
+              <a
+                href={whatsappLink('Hi Driftwear Clo., I want to order a custom T-shirt.')}
+                target="_blank"
+                rel="noreferrer"
+                className="font-brand text-sm font-bold text-white transition hover:text-gold"
+              >
                 Order Now
               </a>
-              <a href="#shop" className="font-brand inline-flex items-center gap-2 text-sm font-bold text-white/70 transition hover:text-white">
+              <a
+                href="#shop"
+                className="font-brand inline-flex items-center gap-2 text-sm font-bold text-white/70 transition hover:text-white"
+              >
                 View Designs <ChevronRight size={17} />
               </a>
             </motion.div>
           </div>
 
-          <motion.div variants={fadeUp} className="relative min-h-[420px] lg:min-h-[690px]">
-            <div className="absolute left-[18%] top-[12%] h-[20rem] w-[20rem] rounded-full bg-[#A44CC6]/45 blur-xl sm:left-[26%] sm:h-[32rem] sm:w-[32rem]" />
-            <motion.video
-              animate={{ y: [0, -12, 0] }}
-              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute bottom-[-4rem] left-1/2 z-10 h-[112%] w-[130%] max-w-none -translate-x-1/2 object-contain object-bottom drop-shadow-[0_34px_80px_rgba(0,0,0,.72)] sm:bottom-[-6rem] lg:left-[56%] lg:h-[118%] lg:w-[118%]"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              poster="/assets/tshirt_black_oversized.jpg"
-              aria-label="Driftwear T-shirt cinematic showcase"
-            >
-              <source src="/assets/driftwear-showcase.mp4" type="video/mp4" />
-            </motion.video>
-            <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 h-28 bg-gradient-to-t from-[#130A18] to-transparent" />
+          {/* Right Column: Figma Interactive Prototype Canvas Stage (Replaces Video) */}
+          <motion.div variants={fadeUp} className="relative z-10 w-full">
+            {/* Figma Selection Outer Frame */}
+            <TiltCard className="relative overflow-hidden rounded-[2rem] border-2 border-[#1ABCFE] bg-[#0C0816]/90 p-5 shadow-[0_30px_90px_rgba(0,0,0,0.8),0_0_40px_rgba(26,188,254,0.25)] backdrop-blur-2xl sm:p-7">
+              {/* Figma Corner Resize Handles */}
+              <div className="absolute -left-1 -top-1 h-3 w-3 border border-white bg-[#1ABCFE]" />
+              <div className="absolute -right-1 -top-1 h-3 w-3 border border-white bg-[#1ABCFE]" />
+              <div className="absolute -bottom-1 -left-1 h-3 w-3 border border-white bg-[#1ABCFE]" />
+              <div className="absolute -bottom-1 -right-1 h-3 w-3 border border-white bg-[#1ABCFE]" />
+
+              {/* Top Figma Header Tag Bar */}
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="rounded bg-[#1ABCFE] px-2 py-0.5 font-mono text-[10px] font-bold text-slate-950">
+                    #Hero_Apparel_Canvas
+                  </span>
+                  <span className="font-mono text-xs text-white/50">580 × 640 • Smart Animate</span>
+                </div>
+
+                {/* Variant Switcher Pills */}
+                <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 p-1">
+                  {apparelVariants.map((v, idx) => (
+                    <button
+                      key={v.name}
+                      onClick={() => setActiveVariantIndex(idx)}
+                      className={`relative rounded-full px-3 py-1 text-[11px] font-bold transition ${
+                        activeVariantIndex === idx ? 'text-slate-950' : 'text-white/60 hover:text-white'
+                      }`}
+                    >
+                      {activeVariantIndex === idx && (
+                        <motion.div
+                          layoutId="heroVariantPill"
+                          transition={springQuick}
+                          className="absolute inset-0 rounded-full bg-gradient-to-r from-gold via-ambergold to-gold shadow-md"
+                        />
+                      )}
+                      <span className="relative z-10">Variant {idx + 1}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Main Garment Mockup Showcase Card */}
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-[#07050E] sm:aspect-[1.1/1]">
+                <motion.div
+                  key={currentVariant.name}
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={springGentle}
+                  className="relative h-full w-full"
+                >
+                  <Image
+                    src={currentVariant.image}
+                    alt={currentVariant.name}
+                    fill
+                    priority
+                    className="object-cover object-center"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
+
+                  {/* Floating Badges */}
+                  <div className="absolute left-4 top-4 flex flex-col gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-black/60 px-3 py-1 font-mono text-xs font-bold text-gold backdrop-blur-md">
+                      <Sparkles size={13} />
+                      {currentVariant.badge}
+                    </span>
+                    <span className="inline-flex items-center gap-1 font-mono text-[11px] text-white/80 bg-black/50 px-2.5 py-0.5 rounded-md backdrop-blur-md">
+                      {currentVariant.tag}
+                    </span>
+                  </div>
+
+                  {/* Simulated Figma Animated Cursor 1 */}
+                  <motion.div
+                    animate={{
+                      x: [40, 180, 100, 40],
+                      y: [30, 90, 160, 30]
+                    }}
+                    transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+                    className="pointer-events-none absolute left-0 top-0 z-30"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#A259FF" stroke="#FFF" strokeWidth="1.2">
+                      <path d="M5.65376 12.3673H5.46026L5.31717 12.4976L0.500002 16.8829L0.500002 1.19841L11.7841 12.3673H5.65376Z" />
+                    </svg>
+                    <div className="ml-3 -mt-1 rounded-full bg-[#A259FF] px-2 py-0.5 font-mono text-[9px] font-bold text-white shadow-md">
+                      ✨ Figma Motion
+                    </div>
+                  </motion.div>
+
+                  {/* Simulated Figma Animated Cursor 2 */}
+                  <motion.div
+                    animate={{
+                      x: [240, 120, 200, 240],
+                      y: [180, 240, 100, 180]
+                    }}
+                    transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                    className="pointer-events-none absolute left-0 top-0 z-30"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#1ABCFE" stroke="#FFF" strokeWidth="1.2">
+                      <path d="M5.65376 12.3673H5.46026L5.31717 12.4976L0.500002 16.8829L0.500002 1.19841L11.7841 12.3673H5.65376Z" />
+                    </svg>
+                    <div className="ml-3 -mt-1 rounded-full bg-[#1ABCFE] px-2 py-0.5 font-mono text-[9px] font-bold text-slate-950 shadow-md">
+                      🎨 AI Studio
+                    </div>
+                  </motion.div>
+
+                  {/* Bottom Product Info Bar */}
+                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-xl border border-white/20 bg-black/60 p-3.5 backdrop-blur-xl">
+                    <div>
+                      <h3 className="font-calista text-xl font-bold text-white">{currentVariant.name}</h3>
+                      <p className="font-mono text-xs text-gold">High DPI DTF Print • Galle Studio</p>
+                    </div>
+                    <a
+                      href={whatsappLink(`Hi Driftwear Clo., I want to order variant: ${currentVariant.name}`)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="cta-primary text-xs px-4 py-2"
+                    >
+                      Order Tee
+                    </a>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Bottom Canvas Footer Specs */}
+              <div className="mt-3 flex items-center justify-between font-mono text-[11px] text-white/50">
+                <span>layout: Flex Column (gap: 16px)</span>
+                <span className="text-gold">spring(stiffness: 300, damping: 26)</span>
+              </div>
+            </TiltCard>
           </motion.div>
         </div>
 
+        {/* Bottom Pagination Stepper Bar */}
         <motion.div variants={fadeUp} className="relative z-30 grid gap-6 pb-2 sm:grid-cols-[auto_1fr_auto] sm:items-center">
           <div className="font-brand text-xs font-bold text-white">01</div>
           <div className="grid grid-cols-5 gap-2">
             {[0, 1, 2, 3, 4].map((item) => (
-              <span key={item} className={`h-[3px] rounded-full ${item < 2 ? 'bg-white' : 'bg-white/24'}`} />
+              <span key={item} className={`h-[3px] rounded-full ${item < 2 ? 'bg-gold' : 'bg-white/24'}`} />
             ))}
           </div>
           <div className="font-brand flex items-center gap-5 text-xs font-bold text-white">
             <span>05</span>
             <div className="hidden items-center gap-3 sm:flex">
-              <span className="grid h-11 w-11 place-items-center rounded-full border border-white/22">
+              <span className="grid h-11 w-11 place-items-center rounded-full border border-gold/40 text-gold">
                 <ChevronRight size={20} />
               </span>
               <span>Swipe Right</span>

@@ -158,10 +158,26 @@ function processDarkBackground(image: HTMLImageElement) {
 }
 
 function ShirtModel({ state }: { state: DesignState }) {
-  const { nodes, materials } = useGLTF('/models/tshirt.glb') as unknown as {
-    nodes: { T_Shirt: THREE.Mesh };
-    materials: { 'FABRIC_1_FRONT_4193.001': THREE.MeshStandardMaterial };
-  };
+  const gltf = useGLTF('/models/tshirt.glb') as any;
+
+  const targetMesh = useMemo(() => {
+    let foundMesh: THREE.Mesh | null = null;
+    if (gltf.scene) {
+      gltf.scene.traverse((child: any) => {
+        if (child.isMesh && !foundMesh) {
+          foundMesh = child;
+        }
+      });
+    }
+    return foundMesh || (gltf.nodes?.T_Shirt as THREE.Mesh);
+  }, [gltf]);
+
+  const targetMaterial = useMemo(() => {
+    if (targetMesh && targetMesh.material) {
+      return (Array.isArray(targetMesh.material) ? targetMesh.material[0] : targetMesh.material) as THREE.MeshStandardMaterial;
+    }
+    return (Object.values(gltf.materials || {})[0] as THREE.MeshStandardMaterial) || new THREE.MeshStandardMaterial();
+  }, [targetMesh, gltf]);
 
   const [decalTexture, setDecalTexture] = useState<THREE.Texture | null>(null);
   const fabricBumpMap = useMemo(() => createFabricBumpTexture(), []);
@@ -197,19 +213,24 @@ function ShirtModel({ state }: { state: DesignState }) {
   }, [state.textureUrl]);
 
   useFrame((_, delta) => {
+    if (!targetMaterial) return;
+
     const targetColor = new THREE.Color(state.color.value);
-    const material = materials['FABRIC_1_FRONT_4193.001'];
     const lighting = materialLightingFor(state.color);
 
-    material.color.lerp(targetColor, delta * 6);
-    material.roughness = THREE.MathUtils.lerp(material.roughness, lighting.roughness, delta * 4);
-
-    if (fabricBumpMap) {
-      material.bumpMap = fabricBumpMap;
-      material.bumpScale = lighting.bumpScale;
+    if (targetMaterial.color) {
+      targetMaterial.color.lerp(targetColor, delta * 6);
+    }
+    if (typeof targetMaterial.roughness === 'number') {
+      targetMaterial.roughness = THREE.MathUtils.lerp(targetMaterial.roughness, lighting.roughness, delta * 4);
     }
 
-    material.needsUpdate = true;
+    if (fabricBumpMap && targetMaterial) {
+      targetMaterial.bumpMap = fabricBumpMap;
+      targetMaterial.bumpScale = lighting.bumpScale;
+    }
+
+    targetMaterial.needsUpdate = true;
   });
 
   const decalPosition = useMemo(
@@ -219,16 +240,18 @@ function ShirtModel({ state }: { state: DesignState }) {
 
   return (
     <group>
-      <mesh castShadow receiveShadow geometry={nodes.T_Shirt.geometry} material={materials['FABRIC_1_FRONT_4193.001']}>
-        {decalTexture ? (
-          <Decal
-            position={decalPosition}
-            rotation={[0, 0, state.rotation]}
-            scale={[state.scale, state.scale, 0.45]}
-            map={decalTexture}
-          />
-        ) : null}
-      </mesh>
+      {targetMesh ? (
+        <mesh castShadow receiveShadow geometry={targetMesh.geometry} material={targetMaterial}>
+          {decalTexture ? (
+            <Decal
+              position={decalPosition}
+              rotation={[0, 0, state.rotation]}
+              scale={[state.scale, state.scale, 0.45]}
+              map={decalTexture}
+            />
+          ) : null}
+        </mesh>
+      ) : null}
     </group>
   );
 }
@@ -248,255 +271,245 @@ function CameraRig({ isReady }: { isReady: boolean }) {
 function Scene({ state, onReady }: { state: DesignState; onReady: () => void }) {
   const lighting = useMemo(() => materialLightingFor(state.color), [state.color]);
 
+  useEffect(() => {
+    onReady();
+  }, [onReady]);
+
   return (
     <>
-      <PerspectiveCamera makeDefault position={[0, 0.22, 2.55]} fov={34} />
+      <PerspectiveCamera makeDefault position={[0, 0.2, 2.65]} fov={38} />
       <CameraRig isReady />
-      <ambientLight intensity={0.78} />
-      <directionalLight position={[3, 4, 3]} intensity={1.35} castShadow shadow-mapSize={[1024, 1024]} shadow-bias={-0.0001} />
-      <directionalLight position={[-3, 2, -2]} intensity={0.55} color="#d8b45f" />
-      <pointLight position={[0, -2, 2]} intensity={0.35} color="#ffffff" />
-      <Environment preset="studio" environmentIntensity={lighting.envMapIntensity} />
-      <Bounds fit clip observe margin={1.15}>
-        <Center onCentered={onReady}>
-          <ShirtModel state={state} />
-        </Center>
-      </Bounds>
-      <ContactShadows position={[0, -0.92, 0]} opacity={0.62} scale={4} blur={2.2} far={2.5} />
-      <OrbitControls makeDefault enablePan={false} enableZoom minDistance={1.4} maxDistance={3.4} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI / 1.75} />
-    </>
-  );
-}
 
-function CanvasFallback() {
-  return (
-    <Html center>
-      <div className="font-brand flex flex-col items-center gap-3 text-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-gold border-t-transparent" />
-        <p className="text-xs font-bold uppercase tracking-[.2em] text-gold">Loading 3D T-Shirt Studio</p>
-      </div>
-    </Html>
+      <ambientLight intensity={0.7} />
+      <directionalLight position={[3, 4, 3]} intensity={1.25} castShadow shadow-mapSize={[1024, 1024]} />
+      <directionalLight position={[-3, 2, -2]} intensity={0.4} />
+
+      <Environment preset="city" environmentIntensity={lighting.envMapIntensity} />
+
+      <Center top>
+        <ShirtModel state={state} />
+      </Center>
+
+      <ContactShadows position={[0, -0.92, 0]} opacity={0.65} scale={3.2} blur={1.8} far={1.5} color="#000000" />
+      <OrbitControls enablePan={false} minDistance={1.8} maxDistance={3.8} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI / 1.75} />
+    </>
   );
 }
 
 export default function TshirtCustomizer() {
   const [state, setState] = useState<DesignState>(initialState);
-  const [ready, setReady] = useState(false);
+  const [hasWebGL, setHasWebGL] = useState(true);
+  const [sceneReady, setSceneReady] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
-  const [webgl, setWebgl] = useState(true);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setWebgl(supportsWebGL());
+    setHasWebGL(supportsWebGL());
   }, []);
 
-  const update = useCallback((slice: Partial<DesignState>) => {
-    setState((current) => ({ ...current, ...slice }));
-  }, []);
+  const update = (partial: Partial<DesignState>) => {
+    setState((current) => ({ ...current, ...partial }));
+  };
 
-  const handleUpload = useCallback(
-    (file?: File) => {
-      if (!file) return;
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const rawUrl = event.target?.result as string;
-        if (!rawUrl) return;
+    const rawUrl = URL.createObjectURL(file);
+    const image = new window.Image();
 
-        const image = new window.Image();
-        image.crossOrigin = 'anonymous';
-        image.onload = () => {
-          const { dataUrl, processed } = processDarkBackground(image);
-          update({
-            textureUrl: dataUrl,
-            fileName: file.name,
-            sampleName: 'Custom Upload',
-            processedBackground: processed
-          });
-        };
-        image.src = rawUrl;
-      };
-      reader.readAsDataURL(file);
-    },
-    [update]
-  );
-
-  const chooseSample = useCallback(
-    (url: string, name: string) => {
+    image.onload = () => {
+      const { dataUrl, processed } = processDarkBackground(image);
       update({
-        textureUrl: url || null,
-        fileName: url ? name : 'No uploaded design',
-        sampleName: name,
-        processedBackground: false
+        textureUrl: dataUrl,
+        fileName: file.name,
+        sampleName: 'Uploaded file',
+        processedBackground: processed
       });
-    },
-    [update]
-  );
+    };
 
-  const nudge = useCallback(
-    (axis: 'x' | 'y', amount: number) => {
-      if (axis === 'x') {
-        const nextX = clamp(state.positionX + amount, CHEST_LIMITS.x.min, CHEST_LIMITS.x.max);
-        update({ positionX: nextX });
-        return;
-      }
+    image.src = rawUrl;
+  };
 
-      const minY = CHEST_LIMITS.y.min - CHEST_POSITION.y;
-      const maxY = CHEST_LIMITS.y.max - CHEST_POSITION.y;
-      const nextY = clamp(state.positionY + amount, minY, maxY);
-      update({ positionY: nextY });
-    },
-    [state.positionX, state.positionY, update]
-  );
+  const selectSample = (sample: { name: string; url: string }) => {
+    update({
+      textureUrl: sample.url || null,
+      sampleName: sample.name,
+      fileName: sample.url ? sample.name : 'No uploaded design',
+      processedBackground: false
+    });
+  };
 
-  const reset = useCallback(() => {
+  const reset = () => {
     setState(initialState);
-  }, []);
-
-  const toggleFullscreen = useCallback(() => {
-    if (!containerRef.current) return;
-
-    if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen?.();
-      setFullscreen(true);
-      return;
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
+  };
 
-    document.exitFullscreen?.();
-    setFullscreen(false);
-  }, []);
+  const toggleFullscreen = () => {
+    setFullscreen((value) => !value);
+  };
+
+  const downloadPreview = () => {
+    const canvas = document.querySelector('#customizer-canvas canvas') as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    const link = document.createElement('a');
+    link.download = `driftwear-custom-${state.color.label.toLowerCase()}-${state.size.toLowerCase()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  };
+
+  const nudge = (axis: 'x' | 'y', direction: 1 | -1) => {
+    const step = 0.02;
+    if (axis === 'x') {
+      update({ positionX: clamp(state.positionX + step * direction, CHEST_LIMITS.x.min, CHEST_LIMITS.x.max) });
+    } else {
+      update({ positionY: clamp(state.positionY + step * direction, CHEST_LIMITS.y.min, CHEST_LIMITS.y.max) });
+    }
+  };
 
   const orderMessage = useMemo(() => {
-    const details = [
-      'Hi Driftwear Clo., I styled a T-shirt in the 3D customizer studio.',
-      `Color: ${state.color.label}`,
-      `Size: ${state.size}`,
-      `Design: ${state.sampleName === 'Custom Upload' ? `Custom uploaded design (${state.fileName})` : state.sampleName}`,
-      `Placement: X ${(state.positionX * 100).toFixed(0)}%, Y ${(state.positionY * 100).toFixed(0)}%, Scale ${(state.scale * 100).toFixed(0)}%`
+    const lines = [
+      'Hi Driftwear Clo., I built a custom design in your 3D fitting studio:',
+      `- Garment Color: ${state.color.label}`,
+      `- Size: ${state.size}`,
+      `- Design File: ${state.fileName}`
     ];
 
     if (state.note.trim()) {
-      details.push(`Note: ${state.note.trim()}`);
+      lines.push(`- Notes: ${state.note.trim()}`);
     }
 
-    return details.join('\n');
-  }, [state]);
-
-  const downloadPreview = useCallback(() => {
-    const canvas = containerRef.current?.querySelector('canvas');
-    if (!canvas) return;
-    const link = document.createElement('a');
-    link.download = `driftwear-custom-tshirt-${state.color.label.toLowerCase()}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  }, [state.color.label]);
+    lines.push('Please confirm print pricing and dispatch timeframe.');
+    return lines.join('\n');
+  }, [state.color.label, state.fileName, state.note, state.size]);
 
   return (
-    <section id="customizer" className="section-pad">
+    <section id="customizer" className="section-pad relative z-10">
       <div className="shell">
-        <div className="mb-10 max-w-4xl">
+        <div className="mb-8 max-w-4xl sm:mb-10">
           <p className="eyebrow">Interactive 3D Studio</p>
-          <h2 className="display-title mt-4 text-[clamp(3.2rem,7vw,7rem)] text-white">Create your custom T-shirt.</h2>
-          <p className="mt-5 max-w-2xl text-base sm:text-lg leading-7 sm:leading-8 text-white/62">
-            Upload your artwork, adjust the print position, choose your tee color, and place your order directly on WhatsApp.
+          <h2 className="display-title mt-3 text-[clamp(2.6rem,6.5vw,7rem)] text-white">Fit your design on 3D T-shirts.</h2>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-white/68 sm:text-lg sm:leading-8">
+            Upload your artwork, adjust placement, scale, and color in real-time. Experience industrial DTF transfer fitting before ordering.
           </p>
         </div>
 
-        <div ref={containerRef} className={`grid gap-8 lg:grid-cols-[1.2fr_.8fr] lg:items-start ${fullscreen ? 'fixed inset-0 z-50 overflow-y-auto bg-obsidian p-6' : ''}`}>
-          <motion.div initial={{ opacity: 0, scale: 0.96 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="gold-border relative aspect-square w-full overflow-hidden rounded-[2rem] bg-carbon sm:aspect-[4/3] lg:aspect-[1.1/1]">
-            <AnimatePresence>
-              {!ready && webgl ? (
-                <motion.div exit={{ opacity: 0 }} className="absolute inset-0 z-20 grid place-items-center bg-obsidian">
-                  <CanvasFallback />
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
-            {webgl ? (
-              <Canvas className="h-full w-full" gl={{ preserveDrawingBuffer: true, antialias: true, alpha: false }} dpr={[1, 1.75]} performance={{ min: 0.55 }}>
-                <Suspense fallback={<CanvasFallback />}>
-                  <Scene state={state} onReady={() => setReady(true)} />
-                </Suspense>
-              </Canvas>
-            ) : (
-              <div className="grid h-full min-h-[400px] place-items-center p-8 text-center sm:min-h-[540px]">
-                <div>
-                  <h3 className="font-calista text-2xl font-semibold text-white sm:text-3xl">WebGL is not supported.</h3>
-                  <p className="mt-3 text-sm text-white/60">Please open this page in a modern browser with hardware acceleration enabled.</p>
+        <div className={`grid gap-6 lg:grid-cols-[1.25fr_.75fr] ${fullscreen ? 'fixed inset-4 z-50 bg-black/90 p-4 sm:p-6 backdrop-blur-2xl rounded-3xl border border-gold/40' : ''}`}>
+          <div className="relative min-h-[460px] sm:min-h-[580px] overflow-hidden rounded-[2.2rem] sm:rounded-[2.8rem] gold-gradient-border bg-[#0B0813]/90 shadow-2xl backdrop-blur-2xl">
+            <div id="customizer-canvas" className="absolute inset-0">
+              {hasWebGL ? (
+                <Canvas shadows gl={{ preserveDrawingBuffer: true, antialias: true }}>
+                  <Suspense fallback={null}>
+                    <Scene state={state} onReady={() => setSceneReady(true)} />
+                  </Suspense>
+                </Canvas>
+              ) : (
+                <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center text-white/70">
+                  <p className="font-brand text-sm font-bold uppercase tracking-wider text-gold">WebGL Unavailable</p>
+                  <p className="mt-2 text-xs">Your browser doesn't support interactive 3D rendering.</p>
                 </div>
-              </div>
-            )}
-            <div className="font-brand pointer-events-none absolute bottom-4 left-4 z-20 rounded-full border border-white/10 bg-black/55 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.14em] text-white/70 backdrop-blur-xl sm:bottom-5 sm:left-5 sm:px-4 sm:py-2 sm:text-xs">
-              Drag to orbit / scroll to zoom
+              )}
             </div>
-          </motion.div>
 
-          <motion.aside initial={{ opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="gold-border rounded-[2rem] p-4 sm:p-6">
-            <div className="grid gap-4 sm:gap-5">
+            {!sceneReady && hasWebGL ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/80 backdrop-blur-md">
+                <div className="h-10 w-10 animate-spin rounded-full border-2 border-gold border-t-transparent" />
+                <p className="font-brand text-xs font-bold uppercase tracking-[.2em] text-gold">Building 3D Model Scene...</p>
+              </div>
+            ) : null}
+
+            <div className="absolute left-4 top-4 flex flex-wrap gap-2 sm:left-6 sm:top-6">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-black/70 px-3.5 py-1.5 font-brand text-xs font-bold text-white backdrop-blur-md">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
+                3D Live Studio
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 px-3.5 py-1.5 font-brand text-xs font-medium text-white/80 backdrop-blur-md">
+                {state.color.label} Garment
+              </span>
+            </div>
+
+            <div className="absolute bottom-4 right-4 flex gap-2 sm:bottom-6 sm:right-6">
+              <button
+                onClick={toggleFullscreen}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-gold/40 bg-black/70 text-white backdrop-blur-md transition hover:border-gold hover:text-gold"
+                title={fullscreen ? 'Exit Fullscreen' : 'Fullscreen 3D View'}
+              >
+                <Maximize2 size={16} />
+              </button>
+            </div>
+          </div>
+
+          <motion.aside initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col justify-between rounded-[2.2rem] sm:rounded-[2.8rem] gold-gradient-border bg-[#0B0813]/90 p-5 sm:p-7 backdrop-blur-2xl">
+            <div className="grid gap-5">
               <div>
-                <label className="font-brand text-xs font-bold uppercase tracking-[.18em] text-white/60" htmlFor="design-upload">Upload PNG, JPG, or SVG</label>
-                <label htmlFor="design-upload" className="font-brand mt-3 flex cursor-pointer items-center justify-center gap-3 rounded-2xl border border-dashed border-gold/40 bg-gold/10 px-4 py-4 text-xs font-bold uppercase tracking-[.13em] text-gold transition hover:bg-gold/15 sm:py-5 sm:text-sm">
-                  <Upload size={18} /> Upload artwork
-                </label>
-                <input id="design-upload" type="file" accept="image/png,image/jpeg,image/svg+xml" className="sr-only" onChange={(event) => handleUpload(event.target.files?.[0])} />
-                <p className="mt-2 break-words text-xs text-white/55 sm:text-sm">{state.fileName}</p>
-                {state.processedBackground ? (
-                  <p className="mt-2 rounded-xl border border-gold/20 bg-gold/10 px-3 py-2 text-xs leading-5 text-gold">
-                    Black artwork background removed for a clean printed preview.
-                  </p>
-                ) : null}
+                <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">1. Upload Artwork</span>
+                <div className="mt-2.5 flex flex-col gap-2">
+                  <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" onChange={handleFileUpload} className="hidden" id="design-upload-input" />
+                  <label htmlFor="design-upload-input" className="cta-secondary cursor-pointer w-full text-center">
+                    <Upload size={16} /> Upload Design File
+                  </label>
+                  <p className="truncate text-center font-brand text-[11px] font-medium text-white/50">{state.fileName}</p>
+                </div>
               </div>
 
               <div>
-                <p className="font-brand text-xs font-bold uppercase tracking-[.18em] text-white/60">Sample designs</p>
-                <div className="mt-3 grid grid-cols-3 gap-2">
-                  {samples.map((sample) => (
+                <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">2. Select Garment Color</span>
+                <div className="mt-2.5 flex flex-wrap gap-2.5">
+                  {colors.map((c) => (
                     <button
-                      key={sample.name}
+                      key={c.label}
                       type="button"
-                      onClick={() => chooseSample(sample.url, sample.name)}
-                      className={`font-grande rounded-2xl border px-2 py-2.5 text-[11px] font-bold uppercase tracking-[.14em] transition sm:px-3 sm:py-3 sm:text-xs ${state.sampleName === sample.name ? 'border-gold bg-gold text-black' : 'border-white/10 bg-white/[.05] text-white/70 hover:border-gold/60'}`}
+                      onClick={() => update({ color: c })}
+                      className={`flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-bold transition ${
+                        state.color.label === c.label ? 'border-gold bg-gold/20 text-gold shadow-[0_0_12px_rgba(245,194,66,0.3)]' : 'border-white/15 bg-black/40 text-white/70 hover:border-white/40'
+                      }`}
                     >
-                      {sample.name}
+                      <span className="h-3.5 w-3.5 rounded-full border border-white/30" style={{ backgroundColor: c.value }} />
+                      {c.label}
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <p className="font-brand text-xs font-bold uppercase tracking-[.18em] text-white/60">T-shirt color</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {colors.map((color) => (
+                <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">3. Select Garment Size</span>
+                <div className="mt-2.5 flex gap-2">
+                  {['S', 'M', 'L', 'XL', 'XXL'].map((sz) => (
                     <button
-                      key={color.label}
+                      key={sz}
                       type="button"
-                      onClick={() => update({ color })}
-                      className={`font-grande flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.14em] sm:py-2 sm:text-xs ${state.color.label === color.label ? 'border-gold text-gold' : 'border-white/10 text-white/60'}`}
+                      onClick={() => update({ size: sz })}
+                      className={`flex-1 rounded-xl border py-2 text-xs font-bold transition ${
+                        state.size === sz ? 'border-gold bg-gold text-black shadow-md' : 'border-white/15 bg-black/40 text-white/70 hover:border-white/40'
+                      }`}
                     >
-                      <span className="h-4 w-4 rounded-full border border-white/30 sm:h-5 sm:w-5" style={{ backgroundColor: color.value }} />
-                      {color.label}
+                      {sz}
                     </button>
                   ))}
                 </div>
               </div>
 
-              <label className="font-brand grid gap-2 text-xs font-bold uppercase tracking-[.18em] text-white/60">
-                Size
-                <select value={state.size} onChange={(event) => update({ size: event.target.value })} className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none focus:border-gold">
-                  {['S', 'M', 'L', 'XL', 'XXL'].map((size) => <option key={size}>{size}</option>)}
-                </select>
-              </label>
+              {state.textureUrl ? (
+                <div className="grid gap-3.5 border-t border-white/10 pt-4">
+                  <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">4. Fine-Tune Position & Scale</span>
 
-              <ControlSlider label="Design size" min={0.16} max={0.72} step={0.01} value={state.scale} onChange={(scale) => update({ scale })} />
-              <ControlSlider label="Design rotation" min={-3.14} max={3.14} step={0.01} value={state.rotation} onChange={(rotation) => update({ rotation })} />
-              <ControlSlider label="Horizontal position" min={CHEST_LIMITS.x.min} max={CHEST_LIMITS.x.max} step={0.01} value={state.positionX} onChange={(positionX) => update({ positionX })} />
-              <ControlSlider label="Vertical position" min={CHEST_LIMITS.y.min - CHEST_POSITION.y} max={CHEST_LIMITS.y.max - CHEST_POSITION.y} step={0.01} value={state.positionY} onChange={(positionY) => update({ positionY })} />
+                  <ControlSlider label="Print Scale" min={0.2} max={0.7} step={0.01} value={state.scale} onChange={(scale) => update({ scale })} />
+                  <ControlSlider label="Rotation" min={-Math.PI} max={Math.PI} step={0.05} value={state.rotation} onChange={(rotation) => update({ rotation })} />
 
-              <div className="grid grid-cols-4 gap-2">
-                <NudgeButton label="Left" icon={<MoveLeft size={16} />} onClick={() => nudge('x', -0.05)} />
-                <NudgeButton label="Right" icon={<MoveRight size={16} />} onClick={() => nudge('x', 0.05)} />
-                <NudgeButton label="Up" icon={<MoveUp size={16} />} onClick={() => nudge('y', 0.05)} />
-                <NudgeButton label="Down" icon={<MoveDown size={16} />} onClick={() => nudge('y', -0.05)} />
-              </div>
+                  <div className="grid gap-2">
+                    <span className="font-brand text-[11px] font-bold uppercase tracking-wider text-white/60">Position Controls</span>
+                    <div className="grid grid-cols-4 gap-2">
+                      <NudgeButton label="Left" icon={<MoveLeft size={16} />} onClick={() => nudge('x', -1)} />
+                      <NudgeButton label="Right" icon={<MoveRight size={16} />} onClick={() => nudge('x', 1)} />
+                      <NudgeButton label="Up" icon={<MoveUp size={16} />} onClick={() => nudge('y', 1)} />
+                      <NudgeButton label="Down" icon={<MoveDown size={16} />} onClick={() => nudge('y', -1)} />
+                    </div>
+                  </div>
+                </div>
+              ) : null}
 
               <label className="font-brand grid gap-2 text-xs font-bold uppercase tracking-[.18em] text-white/60">
                 Custom note
@@ -547,4 +560,3 @@ if (typeof window !== 'undefined') {
     // Ignore GLTF preload failure
   }
 }
-

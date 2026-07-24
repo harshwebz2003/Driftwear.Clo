@@ -22,7 +22,8 @@ import {
   Zap,
   Ruler,
   Layers,
-  Award
+  Award,
+  Box
 } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import { SafeErrorBoundary } from '@/components/error-boundary';
@@ -39,6 +40,7 @@ import {
   HorizontalMarquee,
   AnimatedColorBackground,
   AnimatedTextReveal,
+  AnimatedHeroTitle,
   ShimmeringTextGradient,
   springQuick,
   springGentle,
@@ -158,7 +160,7 @@ export default function HomePage() {
 }
 
 /* ==========================================================================
-   HERO SECTION - Video Background, Enlarged Logo, Clean Luxury Garment Showcase
+   HERO SECTION - Video Background, Animated Title, 3D Garment Studio Showcase
    ========================================================================== */
 function Hero() {
   const [activeVariantIndex, setActiveVariantIndex] = useState(0);
@@ -221,15 +223,10 @@ function Hero() {
 
           {/* Layer 2: Main Layered Frosted Glass Card */}
           <div className="relative rounded-[2.2rem] sm:rounded-[2.8rem] gold-gradient-border p-6 sm:p-10 lg:p-12 shadow-[0_30px_90px_rgba(0,0,0,0.92),0_0_60px_rgba(245,194,66,0.22)] backdrop-blur-2xl">
-            {/* Animated Title */}
-            <motion.h1
-              id="hero-title"
-              variants={fadeUp}
-              className="font-body font-extrabold uppercase leading-[0.92] tracking-tight text-white"
-            >
-              <span className="block text-[clamp(3.2rem,6.8vw,5.6rem)]">Wear Your</span>
-              <ShimmeringTextGradient text="Vibe." className="block text-[clamp(3.5rem,7.5vw,6.4rem)] font-body font-extrabold" />
-            </motion.h1>
+            {/* ANIMATED HERO TITLE: WEAR YOUR VIBE. */}
+            <motion.div variants={fadeUp}>
+              <AnimatedHeroTitle />
+            </motion.div>
 
             {/* ENLARGED LOGO & DRIFTWEAR CLO. BRAND BADGE DIVIDER */}
             <motion.div variants={fadeUp} className="my-6 flex items-center justify-center gap-3">
@@ -262,10 +259,10 @@ function Hero() {
                 size="md"
               />
               <a
-                href="#shop"
+                href="#customizer"
                 className="font-brand inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-gold/50 bg-gold/10 px-6 py-3 text-xs font-bold uppercase tracking-[.18em] text-white transition duration-300 hover:border-gold hover:bg-gold/20 hover:text-gold sm:text-sm shadow-[0_0_15px_rgba(245,194,66,0.2)]"
               >
-                View Designs <ArrowRight size={17} />
+                <Box size={17} className="text-gold animate-pulse" /> 3D Fitting Studio
               </a>
             </motion.div>
           </div>
@@ -334,11 +331,12 @@ function Hero() {
                     <h3 className="font-calista text-lg font-bold text-white sm:text-2xl">{currentVariant.name}</h3>
                     <p className="font-brand text-xs font-bold uppercase tracking-wider gold-gradient-text">{currentVariant.tag}</p>
                   </div>
-                  <AnimatedWhatsAppButton
-                    text="Order Tee"
-                    message={`Hi Driftwear Clo., I want to order: ${currentVariant.name}`}
-                    size="sm"
-                  />
+                  <a
+                    href="#customizer"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-gold/50 bg-gold/20 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-gold hover:bg-gold hover:text-black transition"
+                  >
+                    Fit Design <ArrowRight size={14} />
+                  </a>
                 </div>
               </motion.div>
             </div>

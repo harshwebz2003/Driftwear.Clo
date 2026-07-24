@@ -1,137 +1,213 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import type { Variants, Transition } from 'framer-motion';
-import { MessageCircle, Sparkles } from 'lucide-react';
+import { animate, motion, AnimatePresence, useMotionValue, useSpring, useTransform, type Variants } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { Sparkles, MessageCircle } from 'lucide-react';
 import { whatsappLink } from '@/lib/site-data';
 
-export { motion };
+export { motion, AnimatePresence };
 
-// Spring Transition Configs
-export const springGentle: Transition = {
-  type: 'spring',
-  stiffness: 260,
-  damping: 26,
-  mass: 1
-};
-
-export const springQuick: Transition = {
-  type: 'spring',
-  stiffness: 420,
-  damping: 24,
-  mass: 0.8
-};
-
-export const springBouncy: Transition = {
-  type: 'spring',
-  stiffness: 340,
-  damping: 14,
-  mass: 1
-};
-
-// Motion Variants
+// Motion Animation Preset Variants
 export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 36 },
-  show: { opacity: 1, y: 0, transition: springGentle }
+  hidden: { opacity: 0, y: 35 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
 };
 
 export const fadeInScale: Variants = {
   hidden: { opacity: 0, scale: 0.92 },
-  show: { opacity: 1, scale: 1, transition: springQuick }
+  show: { opacity: 1, scale: 1, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } }
 };
 
 export const fadeLeft: Variants = {
-  hidden: { opacity: 0, x: -50 },
-  show: { opacity: 1, x: 0, transition: springGentle }
+  hidden: { opacity: 0, x: -40 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } }
 };
 
 export const fadeRight: Variants = {
-  hidden: { opacity: 0, x: 50 },
-  show: { opacity: 1, x: 0, transition: springGentle }
+  hidden: { opacity: 0, x: 40 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } }
 };
 
 export const stagger: Variants = {
   hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.04
-    }
-  }
+  show: { transition: { staggerChildren: 0.12 } }
 };
 
-// Background Dynamic Color Orbs Component
+export const springQuick = { type: 'spring' as const, stiffness: 400, damping: 25 };
+export const springGentle = { type: 'spring' as const, stiffness: 200, damping: 20 };
+export const springBouncy = { type: 'spring' as const, stiffness: 350, damping: 15 };
+
+// Dynamic Animated Background Color Orbs
 export function AnimatedColorBackground() {
   return (
     <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-      {/* Dynamic Floating Color Orb 1 (Gold/Amber Glow) */}
+      {/* Orb 1: Gold / Amber Glow */}
       <motion.div
         animate={{
           x: [0, 80, -60, 0],
-          y: [0, -90, 70, 0],
-          scale: [1, 1.25, 0.9, 1],
-          opacity: [0.25, 0.45, 0.25]
+          y: [0, -70, 50, 0],
+          scale: [1, 1.25, 0.9, 1]
         }}
-        transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute -left-20 top-1/4 h-[35rem] w-[35rem] rounded-full bg-radial-gold blur-[130px]"
+        transition={{
+          duration: 18,
+          repeat: Infinity,
+          ease: 'easeInOut'
+        }}
+        className="absolute -left-20 -top-20 h-[38rem] w-[38rem] rounded-full bg-radial-gold opacity-60 blur-[120px]"
       />
 
-      {/* Dynamic Floating Color Orb 2 (Royal Purple/Magenta Glow) */}
+      {/* Orb 2: Royal Purple / Magenta Glow */}
       <motion.div
         animate={{
-          x: [0, -100, 70, 0],
-          y: [0, 110, -80, 0],
-          scale: [1, 1.3, 0.95, 1],
-          opacity: [0.2, 0.4, 0.2]
+          x: [0, -90, 70, 0],
+          y: [0, 80, -60, 0],
+          scale: [1, 1.15, 0.95, 1]
         }}
-        transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute -right-24 top-1/3 h-[40rem] w-[40rem] rounded-full bg-radial-purple blur-[140px]"
+        transition={{
+          duration: 22,
+          repeat: Infinity,
+          ease: 'easeInOut'
+        }}
+        className="absolute -right-20 top-[30%] h-[42rem] w-[42rem] rounded-full bg-radial-purple opacity-50 blur-[140px]"
       />
 
-      {/* Dynamic Floating Color Orb 3 (Cyan/Emerald Accents) */}
+      {/* Orb 3: Golden Cyan / Amber Accent Glow */}
       <motion.div
         animate={{
-          x: [0, 60, -80, 0],
-          y: [0, -70, 90, 0],
-          scale: [0.9, 1.2, 0.95, 0.9],
-          opacity: [0.15, 0.35, 0.15]
+          x: [0, 60, -70, 0],
+          y: [0, -50, 60, 0],
+          scale: [1, 1.3, 0.85, 1]
         }}
-        transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute left-1/3 bottom-10 h-[30rem] w-[30rem] rounded-full bg-radial-cyan blur-[120px]"
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: 'easeInOut'
+        }}
+        className="absolute bottom-[-10rem] left-[25%] h-[40rem] w-[40rem] rounded-full bg-radial-cyan opacity-45 blur-[130px]"
       />
     </div>
   );
 }
 
-// Word-by-Word Animated Text Reveal Component
-export function AnimatedTextReveal({ text, className = '' }: { text: string; className?: string }) {
-  const words = text.split(' ');
+// Staggered Character & Word Animated Title for "WEAR YOUR VIBE."
+export function AnimatedHeroTitle() {
+  const line1 = "WEAR";
+  const line2 = "YOUR";
+  const line3 = "VIBE.";
 
   const containerVariants: Variants = {
-    hidden: {},
+    hidden: { opacity: 0 },
     show: {
+      opacity: 1,
       transition: {
-        staggerChildren: 0.06
+        staggerChildren: 0.08,
+        delayChildren: 0.1
       }
     }
   };
 
-  const wordVariants: Variants = {
-    hidden: { opacity: 0, y: 24, filter: 'blur(8px)' },
-    show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: springGentle }
+  const letterVariants: Variants = {
+    hidden: { opacity: 0, y: 40, rotateX: -60 },
+    show: {
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      transition: {
+        type: 'spring',
+        stiffness: 260,
+        damping: 18
+      }
+    }
   };
 
   return (
-    <motion.span
+    <motion.div
       variants={containerVariants}
       initial="hidden"
+      animate="show"
+      className="font-body font-extrabold uppercase leading-[0.92] tracking-tight text-white select-none"
+    >
+      {/* Line 1: WEAR */}
+      <div className="flex overflow-hidden text-[clamp(3.2rem,6.8vw,5.6rem)]">
+        {line1.split('').map((char, index) => (
+          <motion.span
+            key={index}
+            variants={letterVariants}
+            whileHover={{ scale: 1.15, y: -6, color: '#F5C242' }}
+            transition={springQuick}
+            className="inline-block"
+          >
+            {char}
+          </motion.span>
+        ))}
+      </div>
+
+      {/* Line 2: YOUR */}
+      <div className="flex overflow-hidden text-[clamp(3.2rem,6.8vw,5.6rem)]">
+        {line2.split('').map((char, index) => (
+          <motion.span
+            key={index}
+            variants={letterVariants}
+            whileHover={{ scale: 1.15, y: -6, color: '#F5C242' }}
+            transition={springQuick}
+            className="inline-block"
+          >
+            {char}
+          </motion.span>
+        ))}
+      </div>
+
+      {/* Line 3: VIBE. */}
+      <div className="flex overflow-hidden text-[clamp(3.5rem,7.5vw,6.4rem)] font-body font-extrabold gold-gradient-text">
+        {line3.split('').map((char, index) => (
+          <motion.span
+            key={index}
+            variants={letterVariants}
+            animate={{
+              y: [0, -4, 0],
+              scale: [1, 1.03, 1]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              delay: index * 0.15,
+              ease: 'easeInOut'
+            }}
+            whileHover={{ scale: 1.2, rotate: 3 }}
+            className="inline-block"
+          >
+            {char}
+          </motion.span>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+// Character-by-Character Staggered Entrance Reveal
+export function AnimatedTextReveal({ text, className = '' }: { text: string; className?: string }) {
+  const words = text.split(' ');
+
+  return (
+    <motion.span
+      initial="hidden"
       whileInView="show"
-      viewport={{ once: true, margin: '-40px' }}
+      viewport={{ once: true }}
+      variants={{
+        hidden: {},
+        show: { transition: { staggerChildren: 0.05 } }
+      }}
       className={`inline-block ${className}`}
     >
       {words.map((word, idx) => (
-        <motion.span key={idx} variants={wordVariants} className="inline-block mr-[0.25em] last:mr-0">
+        <motion.span
+          key={idx}
+          variants={{
+            hidden: { opacity: 0, y: 15, filter: 'blur(8px)' },
+            show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: springGentle }
+          }}
+          className="inline-block mr-[0.28em]"
+        >
           {word}
         </motion.span>
       ))}
@@ -139,12 +215,10 @@ export function AnimatedTextReveal({ text, className = '' }: { text: string; cla
   );
 }
 
-// Shimmering Text Gradient Title Component
+// Metallic Shimmering Gradient Text
 export function ShimmeringTextGradient({ text, className = '' }: { text: string; className?: string }) {
   return (
-    <span
-      className={`bg-gradient-to-r from-[#FCE182] via-[#E2A63B] to-[#FCE182] bg-[length:200%_auto] bg-clip-text text-transparent animate-gradient-shift ${className}`}
-    >
+    <span className={`gold-gradient-text ${className}`}>
       {text}
     </span>
   );
@@ -249,19 +323,19 @@ export function TiltCard({
 // Glowing Animated WhatsApp Order Button
 export function AnimatedWhatsAppButton({
   text = 'Order on WhatsApp',
-  message = 'Hi Driftwear Clo., I want to place a custom T-shirt order.',
-  className = '',
-  size = 'md'
+  message = 'Hi Driftwear Clo., I want to place a custom order.',
+  size = 'md',
+  className = ''
 }: {
   text?: string;
   message?: string;
-  className?: string;
   size?: 'sm' | 'md' | 'lg';
+  className?: string;
 }) {
   const paddingMap = {
     sm: 'px-4 py-2 text-xs',
-    md: 'px-5 py-3 text-xs sm:text-sm',
-    lg: 'px-6 py-3.5 text-sm sm:text-base'
+    md: 'px-6 py-3 text-xs sm:text-sm',
+    lg: 'px-8 py-4 text-sm sm:text-base'
   };
 
   return (

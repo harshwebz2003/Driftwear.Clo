@@ -1,39 +1,115 @@
 'use client';
 
 import Image from 'next/image';
-import type { ReactNode } from 'react';
-import { ArrowUpRight, Check, ChevronRight, Facebook, Instagram, Mail, MapPin, MessageCircle, Phone, Send, Sparkles } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import {
+  ArrowUpRight,
+  Check,
+  ChevronRight,
+  Facebook,
+  Instagram,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Send,
+  Sparkles,
+  X,
+  Maximize2
+} from 'lucide-react';
 import Navbar from '@/components/navbar';
-import { fadeUp, motion, stagger } from '@/components/motion';
+import {
+  fadeUp,
+  fadeInScale,
+  fadeLeft,
+  fadeRight,
+  motion,
+  stagger,
+  Magnetic,
+  TiltCard,
+  springQuick,
+  springGentle,
+  springBouncy
+} from '@/components/motion';
 import TshirtCustomizer from '@/components/tshirt-customizer';
 import { contact, faqs, gallery, navItems, processSteps, products, reasons, whatsappLink } from '@/lib/site-data';
 
 export default function HomePage() {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   return (
     <>
       <Navbar />
       <main id="home">
         <Hero />
         <TshirtCustomizer />
-        <FeaturedProducts />
+        <FeaturedProducts onPreview={(img) => setSelectedImage(img)} />
         <Process />
         <WhyChoose />
-        <Gallery />
+        <Gallery onPreview={(img) => setSelectedImage(img)} />
         <Testimonials />
         <FAQ />
         <Contact />
       </main>
+
       <Footer />
-      <a
+
+      {/* WhatsApp Sticky Floating Button with Pulse Motion */}
+      <motion.a
+        whileHover={{ scale: 1.1, rotate: 5 }}
+        whileTap={{ scale: 0.95 }}
+        transition={springBouncy}
         href={whatsappLink('Hi Driftwear Clo., I want to order a custom T-shirt.')}
         target="_blank"
         rel="noreferrer"
-        className="fixed bottom-5 right-5 z-50 inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-obsidian shadow-2xl shadow-black/50 transition hover:scale-105 sm:w-auto sm:px-5"
+        className="fixed bottom-5 right-5 z-50 inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-obsidian shadow-2xl shadow-emerald-950/80 transition sm:w-auto sm:px-5"
         aria-label="Sticky WhatsApp order button"
       >
         <MessageCircle size={22} />
         <span className="font-brand ml-2 hidden text-sm font-bold uppercase tracking-[.14em] sm:inline">Order</span>
-      </a>
+      </motion.a>
+
+      {/* Image Preview Lightbox Modal */}
+      {selectedImage && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-xl"
+          onClick={() => setSelectedImage(null)}
+        >
+          <motion.div
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={springQuick}
+            className="relative max-h-[90vh] max-w-4xl overflow-hidden rounded-3xl border border-white/20 bg-carbon p-2 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute right-4 top-4 z-10 rounded-full border border-white/20 bg-black/60 p-2 text-white transition hover:bg-white/20"
+            >
+              <X size={20} />
+            </button>
+            <div className="relative aspect-[4/5] w-full max-w-2xl overflow-hidden rounded-2xl sm:aspect-square">
+              <Image src={selectedImage} alt="Driftwear visual preview" fill className="object-cover" />
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-4 p-4">
+              <span className="font-brand text-xs font-bold uppercase tracking-wider text-gold">
+                Driftwear Clo. Visual Spec
+              </span>
+              <a
+                href={whatsappLink('Hi Driftwear Clo., I saw this design in the gallery and want to order.')}
+                target="_blank"
+                rel="noreferrer"
+                className="cta-primary text-xs"
+              >
+                Order this design
+              </a>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </>
   );
 }
@@ -42,8 +118,11 @@ function Hero() {
   return (
     <section className="relative min-h-screen overflow-hidden bg-[#130A18] px-5 pb-12 pt-28 sm:px-8 lg:px-14 lg:pt-24" aria-labelledby="hero-title">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_52%,rgba(168,74,196,.52),transparent_24rem),radial-gradient(circle_at_22%_24%,rgba(200,205,210,.12),transparent_18rem),linear-gradient(105deg,#130A18_0%,#0D0711_48%,#190B20_100%)]" />
-      <div className="absolute bottom-[-12rem] right-[-8rem] h-[34rem] w-[34rem] rounded-full bg-[#A44CC6]/55 blur-3xl sm:right-[2rem] sm:h-[48rem] sm:w-[48rem]" />
-      <div className="absolute bottom-[8%] right-[3%] h-[18rem] w-[18rem] rounded-full bg-[#A44CC6]/55 sm:h-[32rem] sm:w-[32rem]" />
+      <motion.div
+        animate={{ scale: [1, 1.15, 1], opacity: [0.45, 0.65, 0.45] }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute bottom-[-12rem] right-[-8rem] h-[34rem] w-[34rem] rounded-full bg-[#A44CC6]/55 blur-3xl sm:right-[2rem] sm:h-[48rem] sm:w-[48rem]"
+      />
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(13,7,17,.96)_0%,rgba(13,7,17,.78)_36%,rgba(13,7,17,.2)_100%)] lg:bg-[linear-gradient(90deg,rgba(13,7,17,.96)_0%,rgba(13,7,17,.82)_39%,rgba(13,7,17,.12)_100%)]" />
 
       <motion.div className="shell relative z-10 grid min-h-[calc(100vh-7rem)] content-between gap-8" variants={stagger} initial="hidden" animate="show">
@@ -60,16 +139,18 @@ function Hero() {
             </motion.p>
 
             <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center gap-4">
-              <a
-                href={whatsappLink('Hi Driftwear Clo., I want to order a custom T-shirt.')}
-                className="group inline-flex h-14 w-14 items-center justify-center rounded-full border border-white/25 bg-white/[.04] text-white transition hover:border-white hover:bg-white hover:text-[#130A18]"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Order Now"
-              >
-                <ArrowUpRight size={22} className="transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </a>
-              <a href={whatsappLink('Hi Driftwear Clo., I want to order a custom T-shirt.')} target="_blank" rel="noreferrer" className="font-brand text-sm font-bold text-white">
+              <Magnetic>
+                <a
+                  href={whatsappLink('Hi Driftwear Clo., I want to order a custom T-shirt.')}
+                  className="group inline-flex h-14 w-14 items-center justify-center rounded-full border border-white/25 bg-white/[.04] text-white transition hover:border-white hover:bg-white hover:text-[#130A18]"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Order Now"
+                >
+                  <ArrowUpRight size={22} className="transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </a>
+              </Magnetic>
+              <a href={whatsappLink('Hi Driftwear Clo., I want to order a custom T-shirt.')} target="_blank" rel="noreferrer" className="font-brand text-sm font-bold text-white transition hover:text-gold">
                 Order Now
               </a>
               <a href="#shop" className="font-brand inline-flex items-center gap-2 text-sm font-bold text-white/70 transition hover:text-white">
@@ -80,7 +161,9 @@ function Hero() {
 
           <motion.div variants={fadeUp} className="relative min-h-[420px] lg:min-h-[690px]">
             <div className="absolute left-[18%] top-[12%] h-[20rem] w-[20rem] rounded-full bg-[#A44CC6]/45 blur-xl sm:left-[26%] sm:h-[32rem] sm:w-[32rem]" />
-            <video
+            <motion.video
+              animate={{ y: [0, -12, 0] }}
+              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
               className="absolute bottom-[-4rem] left-1/2 z-10 h-[112%] w-[130%] max-w-none -translate-x-1/2 object-contain object-bottom drop-shadow-[0_34px_80px_rgba(0,0,0,.72)] sm:bottom-[-6rem] lg:left-[56%] lg:h-[118%] lg:w-[118%]"
               autoPlay
               muted
@@ -91,7 +174,7 @@ function Hero() {
               aria-label="Driftwear T-shirt cinematic showcase"
             >
               <source src="/assets/driftwear-showcase.mp4" type="video/mp4" />
-            </video>
+            </motion.video>
             <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 h-28 bg-gradient-to-t from-[#130A18] to-transparent" />
           </motion.div>
         </div>
@@ -128,27 +211,38 @@ function SectionTitle({ eyebrow, title, copy }: { eyebrow: string; title: string
   );
 }
 
-function FeaturedProducts() {
+function FeaturedProducts({ onPreview }: { onPreview: (img: string) => void }) {
   return (
     <section id="shop" className="section-pad">
       <div className="shell">
         <SectionTitle eyebrow="Shop / Designs" title="Featured T-shirt designs." copy="Modern DTF-ready pieces with a premium streetwear presentation. Prices are confirmed per garment, print size, and quantity." />
         <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           {products.map((product) => (
-            <motion.article key={product.name} variants={fadeUp} whileHover={{ rotateX: 4, rotateY: -5, y: -10 }} className="group gold-border overflow-hidden rounded-[1.5rem]">
-              <div className="relative aspect-[4/5] overflow-hidden bg-carbon">
-                <Image src={product.image} alt={`${product.name} mockup`} fill sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
-              </div>
-              <div className="p-5">
-                <p className="font-grande text-xs font-bold uppercase tracking-[.2em] text-gold">{product.category}</p>
-                <h3 className="font-calista mt-3 text-3xl font-semibold text-white">{product.name}</h3>
-                <p className="mt-2 text-sm text-white/58">{product.price}</p>
-                <a href={whatsappLink(`Hi Driftwear Clo., I want to order: ${product.name}.`)} target="_blank" rel="noreferrer" className="cta-secondary mt-5 w-full">
-                  Order on WhatsApp
-                </a>
-              </div>
-            </motion.article>
+            <motion.div key={product.name} variants={fadeUp}>
+              <TiltCard className="group gold-border overflow-hidden rounded-[1.5rem]">
+                <div className="relative aspect-[4/5] overflow-hidden bg-carbon">
+                  <Image src={product.image} alt={`${product.name} mockup`} fill sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
+                  <button
+                    onClick={() => onPreview(product.image)}
+                    className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white opacity-0 transition duration-300 group-hover:opacity-100"
+                    title="Zoom Preview"
+                  >
+                    <Maximize2 size={16} />
+                  </button>
+                </div>
+                <div className="p-5">
+                  <p className="font-grande text-xs font-bold uppercase tracking-[.2em] text-gold">{product.category}</p>
+                  <h3 className="font-calista mt-3 text-3xl font-semibold text-white">{product.name}</h3>
+                  <p className="mt-2 text-sm text-white/58">{product.price}</p>
+                  <Magnetic>
+                    <a href={whatsappLink(`Hi Driftwear Clo., I want to order: ${product.name}.`)} target="_blank" rel="noreferrer" className="cta-secondary mt-5 w-full">
+                      Order on WhatsApp
+                    </a>
+                  </Magnetic>
+                </div>
+              </TiltCard>
+            </motion.div>
           ))}
         </motion.div>
       </div>
@@ -160,19 +254,23 @@ function Process() {
   return (
     <section id="dtf" className="section-pad">
       <div className="shell grid gap-10 lg:grid-cols-[.85fr_1.15fr] lg:items-center">
-        <div>
+        <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}>
           <SectionTitle eyebrow="Custom DTF Printing" title="From design file to premium apparel." copy="A clean order flow for personal tees, fashion drops, teams, events, and branded clothing." />
-          <a href={whatsappLink('Hi Driftwear Clo., I want to start a DTF printing order.')} className="cta-primary" target="_blank" rel="noreferrer">Start DTF Order</a>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+          <Magnetic>
+            <a href={whatsappLink('Hi Driftwear Clo., I want to start a DTF printing order.')} className="cta-primary" target="_blank" rel="noreferrer">Start DTF Order</a>
+          </Magnetic>
+        </motion.div>
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-4 sm:grid-cols-2">
           {processSteps.map(([number, title, copy]) => (
-            <motion.article key={number} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="gold-border rounded-[1.5rem] p-6">
-              <span className="font-brand text-6xl text-gold">{number}</span>
-              <h3 className="font-calista mt-4 text-3xl font-semibold text-white">{title}</h3>
-              <p className="mt-3 text-sm leading-7 text-white/60">{copy}</p>
-            </motion.article>
+            <motion.div key={number} variants={fadeUp}>
+              <TiltCard className="gold-border rounded-[1.5rem] p-6 h-full">
+                <span className="font-brand text-6xl text-gold">{number}</span>
+                <h3 className="font-calista mt-4 text-3xl font-semibold text-white">{title}</h3>
+                <p className="mt-3 text-sm leading-7 text-white/60">{copy}</p>
+              </TiltCard>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -181,7 +279,13 @@ function Process() {
 function WhyChoose() {
   return (
     <section className="section-pad">
-      <div className="shell overflow-hidden rounded-[2rem] border border-gold/20 bg-[radial-gradient(circle_at_20%_20%,rgba(200,205,210,.2),transparent_28rem)] p-6 sm:p-10 lg:p-14">
+      <motion.div
+        variants={fadeInScale}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        className="shell overflow-hidden rounded-[2rem] border border-gold/20 bg-[radial-gradient(circle_at_20%_20%,rgba(200,205,210,.2),transparent_28rem)] p-6 sm:p-10 lg:p-14"
+      >
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
           <div>
             <p className="eyebrow">Why choose Driftwear</p>
@@ -189,30 +293,45 @@ function WhyChoose() {
           </div>
           <div className="grid gap-4">
             {reasons.map((reason) => (
-              <div key={reason} className="flex gap-4 rounded-2xl border border-white/10 bg-black/35 p-5">
+              <motion.div
+                key={reason}
+                whileHover={{ scale: 1.02, x: 6 }}
+                transition={springQuick}
+                className="flex gap-4 rounded-2xl border border-white/10 bg-black/35 p-5 transition hover:border-gold/40"
+              >
                 <Check className="mt-1 shrink-0 text-gold" />
                 <p className="font-lucky m-0 text-white/72">{reason}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
 
-function Gallery() {
+function Gallery({ onPreview }: { onPreview: (img: string) => void }) {
   return (
     <section id="gallery" className="section-pad">
       <div className="shell">
         <SectionTitle eyebrow="Gallery / Latest Work" title="Real product energy." copy="A visual feed inspired by the current Facebook brand presence, refined into a premium global streetwear look." />
-        <div className="columns-1 gap-5 sm:columns-2 lg:columns-3">
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="columns-1 gap-5 sm:columns-2 lg:columns-3">
           {gallery.map((image, index) => (
-            <motion.div key={image} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mb-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/[.04]">
-              <Image src={image} alt={`Driftwear gallery item ${index + 1}`} width={800} height={1000} className="w-full object-cover transition duration-700 hover:scale-105" />
+            <motion.div
+              key={image}
+              variants={fadeUp}
+              onClick={() => onPreview(image)}
+              className="group relative mb-5 cursor-pointer overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/[.04]"
+            >
+              <Image src={image} alt={`Driftwear gallery item ${index + 1}`} width={800} height={1000} className="w-full object-cover transition duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-black/40 opacity-0 transition duration-300 group-hover:opacity-100 flex items-center justify-center">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-black/60 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md">
+                  <Maximize2 size={14} /> Preview
+                </span>
+              </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -223,15 +342,17 @@ function Testimonials() {
     <section className="section-pad">
       <div className="shell">
         <SectionTitle eyebrow="Testimonials" title="Built for people who want clothing with identity." />
-        <div className="grid gap-5 md:grid-cols-3">
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-5 md:grid-cols-3">
           {['Clean print quality and the design looked exactly like the mockup.', 'Fast WhatsApp communication and a premium feel for our team tees.', 'The midnight and silver brand style feels unique and bold.'].map((quote, index) => (
-            <article key={quote} className="gold-border rounded-[1.5rem] p-6">
-              <div className="flex gap-1 text-gold">{Array.from({ length: 5 }).map((_, star) => <Sparkles key={star} size={16} fill="currentColor" />)}</div>
-              <p className="font-lucky mt-5 text-xl italic text-white/70">{quote}</p>
-              <p className="font-brand mt-5 text-xs font-bold uppercase tracking-[.18em] text-white/45">Demo review {index + 1}</p>
-            </article>
+            <motion.div key={quote} variants={fadeUp}>
+              <TiltCard className="gold-border rounded-[1.5rem] p-6 h-full">
+                <div className="flex gap-1 text-gold">{Array.from({ length: 5 }).map((_, star) => <Sparkles key={star} size={16} fill="currentColor" />)}</div>
+                <p className="font-lucky mt-5 text-xl italic text-white/70">{quote}</p>
+                <p className="font-brand mt-5 text-xs font-bold uppercase tracking-[.18em] text-white/45">Verified order {index + 1}</p>
+              </TiltCard>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -242,14 +363,14 @@ function FAQ() {
     <section className="section-pad">
       <div className="shell">
         <SectionTitle eyebrow="FAQ" title="Before you order." />
-        <div className="grid gap-4 lg:grid-cols-2">
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-4 lg:grid-cols-2">
           {faqs.map(([question, answer]) => (
-            <article key={question} className="gold-border rounded-[1.25rem] p-6">
+            <motion.article key={question} variants={fadeUp} className="gold-border rounded-[1.25rem] p-6">
               <h3 className="font-calista text-2xl font-semibold text-white">{question}</h3>
               <p className="mt-3 text-white/62">{answer}</p>
-            </article>
+            </motion.article>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -258,13 +379,21 @@ function FAQ() {
 function Contact() {
   return (
     <section id="contact" className="section-pad">
-      <div className="shell grid min-w-0 gap-8 overflow-hidden rounded-[2rem] border border-gold/20 bg-gold-radial p-4 sm:p-10 lg:grid-cols-[1fr_.8fr] lg:p-14">
+      <motion.div
+        variants={fadeInScale}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        className="shell grid min-w-0 gap-8 overflow-hidden rounded-[2rem] border border-gold/20 bg-gold-radial p-4 sm:p-10 lg:grid-cols-[1fr_.8fr] lg:p-14"
+      >
         <div className="min-w-0">
           <p className="eyebrow">Contact / Order Now</p>
           <h2 className="display-title mt-4 text-[clamp(3.5rem,8vw,8rem)] text-white">Ready to wear your vibe?</h2>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-white/68">Message Driftwear Clo. with your idea, artwork, T-shirt color, size, and quantity. We will confirm the print details before production.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a href={whatsappLink('Hi Driftwear Clo., I want to place an order.')} className="cta-primary" target="_blank" rel="noreferrer">Order on WhatsApp</a>
+            <Magnetic>
+              <a href={whatsappLink('Hi Driftwear Clo., I want to place an order.')} className="cta-primary" target="_blank" rel="noreferrer">Order on WhatsApp</a>
+            </Magnetic>
             <a href="mailto:nipunsathsara203@gmail.com" className="cta-secondary">Email Us</a>
           </div>
         </div>
@@ -274,17 +403,21 @@ function Contact() {
           <ContactLine icon={<MapPin />} text={contact.location} />
           <ContactLine icon={<Facebook />} text={contact.facebook} />
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
 
 function ContactLine({ icon, text }: { icon: ReactNode; text: string }) {
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-white/10 bg-black/35 p-4 text-white/78 sm:gap-4 sm:p-5">
+    <motion.div
+      whileHover={{ scale: 1.03, x: 4 }}
+      transition={springQuick}
+      className="flex min-w-0 items-center gap-3 rounded-2xl border border-white/10 bg-black/35 p-4 text-white/78 sm:gap-4 sm:p-5"
+    >
       <span className="text-gold [&_svg]:h-5 [&_svg]:w-5">{icon}</span>
       <span className="font-lucky min-w-0 break-words font-semibold">{text}</span>
-    </div>
+    </motion.div>
   );
 }
 
@@ -364,9 +497,11 @@ function Footer() {
                   <p>{contact.phone}</p>
                   <p className="break-words">{contact.email}</p>
                 </div>
-                <a href={whatsappLink('Hi Driftwear Clo., I want to send a design and start an order.')} target="_blank" rel="noreferrer" className="cta-primary mt-6">
-                  <Send size={16} /> Send a message
-                </a>
+                <Magnetic>
+                  <a href={whatsappLink('Hi Driftwear Clo., I want to send a design and start an order.')} target="_blank" rel="noreferrer" className="cta-primary mt-6">
+                    <Send size={16} /> Send a message
+                  </a>
+                </Magnetic>
               </div>
             </div>
 

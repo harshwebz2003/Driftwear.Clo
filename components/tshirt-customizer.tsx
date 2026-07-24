@@ -30,11 +30,11 @@ type DesignState = {
 };
 
 const colors: ShirtColor[] = [
-  { label: 'Black', value: '#07111F', text: 'text-white' },
-  { label: 'White', value: '#f2efe8', text: 'text-black' },
-  { label: 'Ash', value: '#9d9d96', text: 'text-black' },
-  { label: 'Beige', value: '#cdbb97', text: 'text-black' },
-  { label: 'Navy', value: '#071429', text: 'text-white' }
+  { label: 'Black', value: '#050607', text: 'text-white' },
+  { label: 'White', value: '#F4F2EC', text: 'text-black' },
+  { label: 'Ash', value: '#B8BAB6', text: 'text-black' },
+  { label: 'Beige', value: '#C8B793', text: 'text-black' },
+  { label: 'Navy', value: '#061126', text: 'text-white' }
 ];
 
 const samples = [
@@ -65,6 +65,18 @@ const CHEST_LIMITS = {
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
+}
+
+function materialLightingFor(color: ShirtColor) {
+  if (color.label === 'Black') {
+    return { envMapIntensity: 0.68, roughness: 0.95, bumpScale: 0.014 };
+  }
+
+  if (color.label === 'White') {
+    return { envMapIntensity: 0.5, roughness: 0.88, bumpScale: 0.011 };
+  }
+
+  return { envMapIntensity: 0.82, roughness: 0.91, bumpScale: 0.013 };
 }
 
 function supportsWebGL() {
@@ -207,21 +219,22 @@ function TshirtModel({ state }: { state: DesignState }) {
     model.traverse((node) => {
       if ('isMesh' in node && node.isMesh) {
         const mesh = node as THREE.Mesh;
+        const lighting = materialLightingFor(state.color);
         shirtMeshRef.current = mesh;
         const material = new THREE.MeshStandardMaterial({
           color: new THREE.Color(state.color.value),
-          roughness: 0.92,
+          roughness: lighting.roughness,
           metalness: 0,
-          envMapIntensity: 1.15,
+          envMapIntensity: lighting.envMapIntensity,
           bumpMap: fabricBump ?? undefined,
-          bumpScale: 0.018
+          bumpScale: lighting.bumpScale
         });
         mesh.material = material;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
       }
     });
-  }, [fabricBump, model, state.color.value]);
+  }, [fabricBump, model, state.color]);
 
   useFrame((_, delta) => {
     if (!group.current) return;
@@ -236,7 +249,7 @@ function TshirtModel({ state }: { state: DesignState }) {
   return (
     <group ref={group}>
       <Center>
-        <group scale={2.1} rotation={[0, Math.PI, 0]}>
+        <group scale={1.76} rotation={[0, Math.PI, 0]}>
           <primitive object={model} />
           {hasDesign && shirtMeshRef.current ? <PrintedDesign state={state} shirtMeshRef={shirtMeshRef} fabricBump={fabricBump} /> : null}
         </group>
@@ -279,8 +292,6 @@ function PrintedDesign({ state, shirtMeshRef, fabricBump }: { state: DesignState
         loaded.flipY = false;
         loaded.wrapS = THREE.ClampToEdgeWrapping;
         loaded.wrapT = THREE.ClampToEdgeWrapping;
-        loaded.offset.x = 1;
-        loaded.repeat.x = -1;
         loaded.anisotropy = 8;
         loaded.needsUpdate = true;
         setTexture((current) => {
@@ -347,24 +358,25 @@ function Scene({ state, onReady }: { state: DesignState; onReady: () => void }) 
 
   useEffect(() => {
     gl.toneMapping = THREE.ACESFilmicToneMapping;
+    gl.toneMappingExposure = 0.94;
     gl.outputColorSpace = THREE.SRGBColorSpace;
   }, [gl]);
 
   return (
     <>
-      <PerspectiveCamera makeDefault position={[0, 0.55, 4.1]} fov={38} />
-      <color attach="background" args={['#0A1422']} />
-      <fog attach="fog" args={['#0A1422', 7, 13]} />
-      <ambientLight intensity={1.75} />
-      <directionalLight position={[3, 5, 5]} intensity={3.4} castShadow shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
-      <spotLight position={[-4, 3, 4]} angle={0.42} intensity={9.5} color="#FFFFFF" penumbra={0.72} />
-      <pointLight position={[2.8, 1.2, -2.4]} intensity={3.2} color="#C8CDD2" />
-      <Environment preset="studio" environmentIntensity={0.85} />
-      <Bounds fit clip observe margin={1.1}>
+      <PerspectiveCamera makeDefault position={[0, 0.45, 5.35]} fov={34} />
+      <color attach="background" args={['#080B10']} />
+      <fog attach="fog" args={['#080B10', 7.5, 14]} />
+      <ambientLight intensity={1.25} />
+      <directionalLight position={[3, 5, 5]} intensity={2.45} castShadow shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
+      <spotLight position={[-4, 3, 4]} angle={0.42} intensity={6.3} color="#FFFFFF" penumbra={0.72} />
+      <pointLight position={[2.8, 1.2, -2.4]} intensity={1.75} color="#C8CDD2" />
+      <Environment preset="studio" environmentIntensity={0.62} />
+      <Bounds fit clip observe margin={1.42}>
         <TshirtModel state={state} />
       </Bounds>
-      <ContactShadows position={[0, -1.72, 0]} opacity={0.48} scale={5.4} blur={2.4} far={3.8} color="#02050A" />
-      <OrbitControls enableDamping dampingFactor={0.08} minDistance={2.4} maxDistance={6} autoRotate={false} />
+      <ContactShadows position={[0, -1.72, 0]} opacity={0.42} scale={5.8} blur={2.4} far={3.8} color="#02050A" />
+      <OrbitControls enableDamping dampingFactor={0.08} minDistance={3.25} maxDistance={8} autoRotate={false} />
     </>
   );
 }
@@ -475,7 +487,7 @@ Please confirm price and order details.`;
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="relative h-[560px] overflow-hidden rounded-[2rem] border border-gold/20 bg-[radial-gradient(circle_at_50%_32%,rgba(255,255,255,.2),transparent_25rem),radial-gradient(circle_at_72%_22%,rgba(200,205,210,.22),transparent_24rem),linear-gradient(145deg,#101B2A,#0B1523_52%,#07111F)] shadow-gold sm:h-[640px] xl:h-[760px]"
+            className="relative h-[560px] overflow-hidden rounded-[2rem] border border-gold/20 bg-[radial-gradient(circle_at_50%_30%,rgba(255,255,255,.16),transparent_25rem),radial-gradient(circle_at_72%_22%,rgba(200,205,210,.16),transparent_24rem),linear-gradient(145deg,#0E1115,#090D12_52%,#050607)] shadow-gold sm:h-[640px] xl:h-[760px]"
           >
             <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_22%,transparent,rgba(0,0,0,.08)_54%,rgba(0,0,0,.58))]" />
             <AnimatePresence>

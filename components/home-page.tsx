@@ -1,6 +1,8 @@
 'use client';
 
 import Image from 'next/image';
+import { AnimatePresence } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ArrowUpRight, Check, ChevronRight, Facebook, Instagram, Mail, MapPin, MessageCircle, Phone, Send, Sparkles } from 'lucide-react';
 import Navbar from '@/components/navbar';
@@ -11,6 +13,7 @@ import { contact, faqs, gallery, navItems, processSteps, products, reasons, what
 export default function HomePage() {
   return (
     <>
+      <MediaIntro />
       <Navbar />
       <main id="home">
         <Hero />
@@ -34,6 +37,77 @@ export default function HomePage() {
         <MessageCircle size={22} />
         <span className="font-brand ml-2 hidden text-sm font-bold uppercase tracking-[.14em] sm:inline">Order</span>
       </a>
+    </>
+  );
+}
+
+function MediaIntro() {
+  const [visible, setVisible] = useState(true);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    const hideTimer = window.setTimeout(() => setVisible(false), 3200);
+    return () => window.clearTimeout(hideTimer);
+  }, []);
+
+  useEffect(() => {
+    if (visible || typeof window === 'undefined') return undefined;
+    const playedKey = 'driftwear-intro-voice-played';
+    if (window.localStorage.getItem(playedKey) === 'true') return undefined;
+
+    const audio = audioRef.current;
+    if (!audio) return undefined;
+
+    const markPlayed = () => window.localStorage.setItem(playedKey, 'true');
+    const tryPlay = async () => {
+      try {
+        audio.volume = 0.55;
+        await audio.play();
+        markPlayed();
+      } catch {
+        window.addEventListener('pointerdown', tryPlay, { once: true });
+        window.addEventListener('keydown', tryPlay, { once: true });
+      }
+    };
+
+    void tryPlay();
+
+    return () => {
+      window.removeEventListener('pointerdown', tryPlay);
+      window.removeEventListener('keydown', tryPlay);
+    };
+  }, [visible]);
+
+  return (
+    <>
+      <AnimatePresence>
+        {visible ? (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: 'easeInOut' }}
+            className="fixed inset-0 z-[100] grid place-items-center overflow-hidden bg-obsidian"
+            aria-label="Driftwear loading screen"
+          >
+            <video
+              className="absolute inset-0 h-full w-full object-cover opacity-70"
+              autoPlay
+              muted
+              playsInline
+              preload="auto"
+              onEnded={() => setVisible(false)}
+            >
+              <source src="/assets/preloader.mp4" type="video/mp4" />
+            </video>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(200,205,210,.14),transparent_24rem),linear-gradient(180deg,rgba(7,17,31,.38),rgba(7,17,31,.88))]" />
+            <div className="relative z-10 text-center">
+              <p className="font-brand text-xs font-bold uppercase tracking-[.42em] text-gold">Driftwear Clo.</p>
+              <p className="display-title mt-4 text-[clamp(3.5rem,11vw,10rem)] text-white">Wear Your Vibe.</p>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+      <audio ref={audioRef} src="/assets/voice.mp3" preload="auto" />
     </>
   );
 }
@@ -76,7 +150,21 @@ function Hero() {
             Galle, Sri Lanka
           </div>
           <motion.div animate={{ y: [0, -18, 0], rotate: [0, 1.6, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }} className="relative overflow-hidden rounded-[2rem] border border-gold/20 bg-white/[.04] p-4 shadow-gold">
-            <Image src="/assets/tshirt_black_oversized.jpg" alt="Black oversized Driftwear T-shirt mockup" width={900} height={1100} className="aspect-[4/5] rounded-[1.5rem] object-cover object-top" priority />
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[1.5rem] bg-carbon">
+              <video
+                className="h-full w-full object-cover object-center"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                poster="/assets/tshirt_black_oversized.jpg"
+                aria-label="Driftwear clothing video preview"
+              >
+                <source src="/assets/video.mp4" type="video/mp4" />
+              </video>
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_25%,transparent,rgba(7,17,31,.28)_58%,rgba(7,17,31,.68))]" />
+            </div>
           </motion.div>
           <div className="font-grande pointer-events-none absolute -bottom-10 left-0 right-0 text-center text-[clamp(5rem,12vw,9rem)] uppercase leading-none text-white/[.035]">Driftwear</div>
         </motion.div>

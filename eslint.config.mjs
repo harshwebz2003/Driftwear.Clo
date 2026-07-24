@@ -23,6 +23,7 @@ export default [
         document: 'readonly',
         window: 'readonly',
         HTMLDivElement: 'readonly',
+        HTMLAudioElement: 'readonly',
         File: 'readonly'
       }
     },

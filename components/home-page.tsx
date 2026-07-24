@@ -19,6 +19,7 @@ import {
   Maximize2
 } from 'lucide-react';
 import Navbar from '@/components/navbar';
+import Preloader from '@/components/preloader';
 import {
   fadeUp,
   fadeInScale,
@@ -72,6 +73,7 @@ export default function HomePage() {
 
   return (
     <>
+      <Preloader />
       <Navbar />
       <main id="home" className="overflow-x-hidden">
         <Hero />

@@ -2,11 +2,11 @@
 
 import Image from 'next/image';
 import type { ReactNode } from 'react';
-import { ArrowUpRight, Check, ChevronRight, Facebook, Mail, MapPin, MessageCircle, Phone, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Check, ChevronRight, Facebook, Instagram, Mail, MapPin, MessageCircle, Phone, Send, Sparkles } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import { fadeUp, motion, stagger } from '@/components/motion';
 import TshirtCustomizer from '@/components/tshirt-customizer';
-import { contact, faqs, gallery, processSteps, products, reasons, whatsappLink } from '@/lib/site-data';
+import { contact, faqs, gallery, navItems, processSteps, products, reasons, whatsappLink } from '@/lib/site-data';
 
 export default function HomePage() {
   return (
@@ -256,15 +256,105 @@ function ContactLine({ icon, text }: { icon: ReactNode; text: string }) {
 }
 
 function Footer() {
+  const resources = [
+    { label: '3D Customizer', href: '#customizer' },
+    { label: 'DTF Process', href: '#dtf' },
+    { label: 'Gallery', href: '#gallery' },
+    { label: 'FAQ', href: '#contact' }
+  ];
+
+  const socials = [
+    { label: 'Facebook', href: whatsappLink('Hi Driftwear Clo., please send me the official Facebook page link.'), icon: <Facebook size={15} /> },
+    { label: 'Instagram', href: whatsappLink('Hi Driftwear Clo., please send me your Instagram page link.'), icon: <Instagram size={15} /> },
+    { label: 'WhatsApp', href: whatsappLink('Hi Driftwear Clo., I want to ask about a custom T-shirt order.'), icon: <MessageCircle size={15} /> }
+  ];
+
   return (
-    <footer className="border-t border-white/10 px-5 py-12 sm:px-8 lg:px-14">
-      <div className="shell flex flex-col justify-between gap-6 md:flex-row md:items-center">
-        <div>
-          <p className="text-xl font-black uppercase tracking-[.18em] text-white">Driftwear Clo.</p>
-          <p className="mt-2 text-white/52">Custom T-shirts, unique designs, and premium DTF printing from Galle, Sri Lanka.</p>
-        </div>
-        <a href={whatsappLink('Hi Driftwear Clo., I want to order.')} className="cta-secondary" target="_blank" rel="noreferrer">WhatsApp</a>
+    <footer className="px-5 pb-8 pt-10 sm:px-8 lg:px-14 xl:px-20">
+      <div className="shell">
+        <motion.div
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7 }}
+          className="relative overflow-hidden rounded-[2rem] border border-white/12 bg-[#070707] shadow-[0_32px_100px_rgba(0,0,0,.55)]"
+        >
+          <Image
+            src="/assets/tshirt_printing_press.jpg"
+            alt="Driftwear DTF printing studio footer visual"
+            fill
+            sizes="100vw"
+            className="object-cover opacity-[.42]"
+          />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_12%,rgba(246,179,38,.32),transparent_24rem),linear-gradient(180deg,rgba(5,5,5,.18),rgba(5,5,5,.74)_48%,rgba(5,5,5,.95))]" />
+          <div className="absolute inset-x-0 bottom-0 z-0 translate-y-[19%] overflow-hidden whitespace-nowrap text-center font-display text-[clamp(5.3rem,18vw,18rem)] uppercase leading-none text-white/[.09]">
+            Driftwear
+          </div>
+
+          <div className="relative z-10 flex min-h-[520px] flex-col justify-between p-5 sm:min-h-[560px] sm:p-8 lg:p-10">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+              <a href="#home" className="inline-flex items-center gap-3 self-start" aria-label="Driftwear Clo. home">
+                <Image src="/assets/logo.png" alt="" width={54} height={54} className="h-12 w-12 rounded-full border border-gold/30 object-cover" />
+                <span className="font-display text-2xl uppercase leading-none text-white">Driftwear Clo.</span>
+              </a>
+              <p className="max-w-xs text-left text-xs font-black uppercase leading-5 tracking-[.22em] text-gold sm:text-right">
+                Wear fast. Print premium.
+              </p>
+            </div>
+
+            <div className="grid gap-10 border-y border-white/15 py-8 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1.15fr]">
+              <FooterColumn title="Menu">
+                {navItems.map((item) => (
+                  <a key={item.href} href={item.href} className="footer-link">{item.label}</a>
+                ))}
+              </FooterColumn>
+
+              <FooterColumn title="Socials">
+                {socials.map((item) => (
+                  <a key={item.label} href={item.href} target="_blank" rel="noreferrer" className="footer-link inline-flex items-center gap-2">
+                    {item.icon}
+                    {item.label}
+                  </a>
+                ))}
+              </FooterColumn>
+
+              <FooterColumn title="Resources">
+                {resources.map((item) => (
+                  <a key={item.href} href={item.href} className="footer-link">{item.label}</a>
+                ))}
+              </FooterColumn>
+
+              <div>
+                <p className="text-xs font-black uppercase tracking-[.22em] text-white">Order Studio</p>
+                <div className="mt-4 space-y-3 text-sm leading-6 text-white/60">
+                  <p>{contact.location}</p>
+                  <p>{contact.phone}</p>
+                  <p className="break-words">{contact.email}</p>
+                </div>
+                <a href={whatsappLink('Hi Driftwear Clo., I want to send a design and start an order.')} target="_blank" rel="noreferrer" className="cta-primary mt-6">
+                  <Send size={16} /> Send a message
+                </a>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 text-xs font-bold uppercase tracking-[.16em] text-white/40 sm:flex-row sm:items-center sm:justify-between">
+              <p>© {new Date().getFullYear()} Driftwear Clo. All rights reserved.</p>
+              <p>Custom T-shirts and DTF printing in Galle, Sri Lanka.</p>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </footer>
+  );
+}
+
+function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div>
+      <p className="text-xs font-black uppercase tracking-[.22em] text-white">{title}</p>
+      <div className="mt-4 grid gap-2 text-sm text-white/60">
+        {children}
+      </div>
+    </div>
   );
 }

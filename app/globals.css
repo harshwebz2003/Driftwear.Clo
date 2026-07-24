@@ -69,6 +69,10 @@ body::before {
   .cta-secondary {
     @apply inline-flex min-h-12 max-w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[.06] px-5 py-3 text-center text-xs font-black uppercase tracking-[.13em] text-white transition hover:-translate-y-0.5 hover:border-gold hover:text-gold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-obsidian sm:px-6 sm:text-sm sm:tracking-[.16em];
   }
+
+  .footer-link {
+    @apply w-fit text-white/60 transition hover:translate-x-1 hover:text-gold focus:outline-none focus:text-gold;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

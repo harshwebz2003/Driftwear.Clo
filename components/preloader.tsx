@@ -4,17 +4,25 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
-import { springQuick } from '@/components/motion';
 
 export default function Preloader({ onComplete }: { onComplete?: () => void }) {
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    // Check if preloader was already shown in this session
-    const shown = typeof window !== 'undefined' ? sessionStorage.getItem('driftwear_preloaded') : null;
-    if (shown === 'true') {
+    setMounted(true);
+    let shown = false;
+    try {
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        shown = sessionStorage.getItem('driftwear_preloaded') === 'true';
+      }
+    } catch {
+      shown = false;
+    }
+
+    if (shown) {
       setLoading(false);
       onComplete?.();
       return;
@@ -31,10 +39,10 @@ export default function Preloader({ onComplete }: { onComplete?: () => void }) {
       });
     }, 60);
 
-    // Auto dismiss preloader after 3.2 seconds max
+    // Auto dismiss preloader after 3 seconds max
     const timer = setTimeout(() => {
       finishPreloader();
-    }, 3200);
+    }, 3000);
 
     return () => {
       clearInterval(interval);
@@ -43,10 +51,18 @@ export default function Preloader({ onComplete }: { onComplete?: () => void }) {
   }, []);
 
   const finishPreloader = () => {
-    sessionStorage.setItem('driftwear_preloaded', 'true');
+    try {
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        sessionStorage.setItem('driftwear_preloaded', 'true');
+      }
+    } catch {
+      // Ignore storage restrictions
+    }
     setLoading(false);
     onComplete?.();
   };
+
+  if (!mounted) return null;
 
   return (
     <AnimatePresence>
@@ -68,6 +84,7 @@ export default function Preloader({ onComplete }: { onComplete?: () => void }) {
               playsInline
               loop
               onEnded={finishPreloader}
+              onError={finishPreloader}
               className="h-full w-full object-cover opacity-50 filter brightness-90 contrast-110"
             />
             {/* Dark Vignette & Gold Atmospheric Overlay */}
@@ -79,7 +96,7 @@ export default function Preloader({ onComplete }: { onComplete?: () => void }) {
           <div className="relative z-10 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative flex h-10 w-10 items-center justify-center rounded-full border border-gold/50 bg-gold/10 p-0.5 shadow-[0_0_20px_rgba(216,180,95,0.4)]">
-                <Image src="/assets/logo.png" alt="Driftwear Logo" width={32} height={32} className="rounded-full object-cover" />
+                <Image src="/assets/logo.png" alt="Driftwear Logo" width={32} height={32} className="rounded-full object-cover" priority />
               </div>
               <span className="font-brand text-sm font-bold uppercase tracking-[.24em] text-white">
                 Driftwear <span className="text-gold">Clo.</span>

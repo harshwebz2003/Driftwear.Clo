@@ -540,4 +540,11 @@ function NudgeButton({ label, icon, onClick }: { label: string; icon: ReactNode;
   );
 }
 
-useGLTF.preload('/models/tshirt.glb');
+if (typeof window !== 'undefined') {
+  try {
+    useGLTF.preload('/models/tshirt.glb');
+  } catch {
+    // Ignore GLTF preload failure
+  }
+}
+

@@ -1,11 +1,11 @@
 'use client';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Bounds, Center, Environment, Html, OrbitControls, PerspectiveCamera, useGLTF } from '@react-three/drei';
+import { Bounds, Center, ContactShadows, Decal, Environment, Html, OrbitControls, PerspectiveCamera, useGLTF } from '@react-three/drei';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Download, Maximize2, MessageCircle, MoveDown, MoveLeft, MoveRight, MoveUp, RotateCcw, Upload } from 'lucide-react';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
+import type { ReactNode, RefObject } from 'react';
 import * as THREE from 'three';
 import { whatsappLink } from '@/lib/site-data';
 
@@ -26,6 +26,7 @@ type DesignState = {
   rotation: number;
   positionX: number;
   positionY: number;
+  processedBackground: boolean;
 };
 
 const colors: ShirtColor[] = [
@@ -49,11 +50,22 @@ const initialState: DesignState = {
   color: colors[0],
   size: 'M',
   note: '',
-  scale: 0.72,
+  scale: 0.42,
   rotation: 0,
   positionX: 0,
-  positionY: 0
+  positionY: 0,
+  processedBackground: false
 };
+
+const CHEST_POSITION = new THREE.Vector3(0, 0.16, -0.405);
+const CHEST_LIMITS = {
+  x: { min: -0.34, max: 0.34 },
+  y: { min: -0.36, max: 0.38 }
+};
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
 
 function supportsWebGL() {
   if (typeof window === 'undefined') return true;
@@ -65,44 +77,175 @@ function supportsWebGL() {
   }
 }
 
+function createFabricBumpTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const context = canvas.getContext('2d');
+
+  if (!context) return null;
+
+  context.fillStyle = '#808080';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  for (let y = 0; y < canvas.height; y += 2) {
+    context.fillStyle = y % 4 === 0 ? '#8d8d8d' : '#737373';
+    context.fillRect(0, y, canvas.width, 1);
+  }
+
+  for (let x = 0; x < canvas.width; x += 3) {
+    context.fillStyle = x % 6 === 0 ? 'rgba(255,255,255,.24)' : 'rgba(0,0,0,.18)';
+    context.fillRect(x, 0, 1, canvas.height);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(18, 18);
+  texture.colorSpace = THREE.NoColorSpace;
+  texture.needsUpdate = true;
+
+  return texture;
+}
+
+function isNearBlack(red: number, green: number, blue: number) {
+  return red < 58 && green < 58 && blue < 58 && red + green + blue < 132;
+}
+
+function imageFromUrl(url: string) {
+  return new Promise<InstanceType<typeof globalThis.Image>>((resolve, reject) => {
+    const image = new globalThis.Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error('Unable to load uploaded artwork.'));
+    image.src = url;
+  });
+}
+
+function canvasToBlob(canvas: { toBlob: (callback: (blob: globalThis.Blob | null) => void, type?: string) => void }) {
+  return new Promise<globalThis.Blob>((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error('Unable to process uploaded artwork.'));
+    }, 'image/png');
+  });
+}
+
+async function removeBlackArtworkBackground(file: File) {
+  const sourceUrl = URL.createObjectURL(file);
+
+  try {
+    const image = await imageFromUrl(sourceUrl);
+    const maxSize = 2048;
+    const ratio = Math.min(1, maxSize / Math.max(image.naturalWidth, image.naturalHeight));
+    const width = Math.max(1, Math.round(image.naturalWidth * ratio));
+    const height = Math.max(1, Math.round(image.naturalHeight * ratio));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+
+    if (!context) return { url: sourceUrl, processedBackground: false, revokeSource: false };
+
+    context.drawImage(image, 0, 0, width, height);
+    const imageData = context.getImageData(0, 0, width, height);
+    const { data } = imageData;
+    let edgePixels = 0;
+    let blackEdgePixels = 0;
+
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        if (x > 3 && y > 3 && x < width - 4 && y < height - 4) continue;
+        const index = (y * width + x) * 4;
+        edgePixels += 1;
+        if (isNearBlack(data[index], data[index + 1], data[index + 2])) {
+          blackEdgePixels += 1;
+        }
+      }
+    }
+
+    const shouldRemoveBlack = edgePixels > 0 && blackEdgePixels / edgePixels > 0.34;
+
+    if (!shouldRemoveBlack) {
+      return { url: sourceUrl, processedBackground: false, revokeSource: false };
+    }
+
+    for (let index = 0; index < data.length; index += 4) {
+      const red = data[index];
+      const green = data[index + 1];
+      const blue = data[index + 2];
+      const luminance = red * 0.2126 + green * 0.7152 + blue * 0.0722;
+
+      if (isNearBlack(red, green, blue)) {
+        data[index + 3] = 0;
+      } else if (luminance < 82) {
+        data[index + 3] = Math.min(data[index + 3], Math.round(((luminance - 34) / 48) * 255));
+      }
+    }
+
+    context.putImageData(imageData, 0, 0);
+    const blob = await canvasToBlob(canvas);
+    const processedUrl = URL.createObjectURL(blob);
+    URL.revokeObjectURL(sourceUrl);
+
+    return { url: processedUrl, processedBackground: true, revokeSource: true };
+  } catch {
+    return { url: sourceUrl, processedBackground: false, revokeSource: false };
+  }
+}
+
 function TshirtModel({ state }: { state: DesignState }) {
   const group = useRef<THREE.Group>(null);
+  const shirtMeshRef = useRef<THREE.Mesh>(null!);
   const { scene } = useGLTF('/models/tshirt.glb');
   const model = useMemo(() => scene.clone(true), [scene]);
   const hasDesign = Boolean(state.textureUrl);
+  const fabricBump = useMemo(() => (typeof document === 'undefined' ? null : createFabricBumpTexture()), []);
+
+  useEffect(() => () => fabricBump?.dispose(), [fabricBump]);
 
   useEffect(() => {
     model.traverse((node) => {
       if ('isMesh' in node && node.isMesh) {
         const mesh = node as THREE.Mesh;
+        shirtMeshRef.current = mesh;
         const material = new THREE.MeshStandardMaterial({
           color: new THREE.Color(state.color.value),
-          roughness: 0.78,
-          metalness: 0.05,
-          envMapIntensity: 0.7
+          roughness: 0.92,
+          metalness: 0,
+          envMapIntensity: 1.15,
+          bumpMap: fabricBump ?? undefined,
+          bumpScale: 0.018
         });
-        material.normalScale = new THREE.Vector2(0.35, 0.35);
         mesh.material = material;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
       }
     });
-  }, [model, state.color.value]);
+  }, [fabricBump, model, state.color.value]);
 
   useFrame((_, delta) => {
     if (!group.current) return;
-    group.current.rotation.y += delta * 0.16;
+    if (hasDesign) {
+      group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, 0, 2.6, delta);
+      return;
+    }
+
+    group.current.rotation.y += delta * 0.14;
   });
 
   return (
     <group ref={group}>
       <Center>
-        <primitive object={model} scale={2.1} rotation={[0, Math.PI, 0]} />
-        {hasDesign ? <PrintedDesign state={state} /> : null}
+        <group scale={2.1} rotation={[0, Math.PI, 0]}>
+          <primitive object={model} />
+          {hasDesign && shirtMeshRef.current ? <PrintedDesign state={state} shirtMeshRef={shirtMeshRef} fabricBump={fabricBump} /> : null}
+        </group>
       </Center>
     </group>
   );
 }
 
-function PrintedDesign({ state }: { state: DesignState }) {
+function PrintedDesign({ state, shirtMeshRef, fabricBump }: { state: DesignState; shirtMeshRef: RefObject<THREE.Mesh>; fabricBump: THREE.Texture | null }) {
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
 
   useEffect(() => {
@@ -133,6 +276,11 @@ function PrintedDesign({ state }: { state: DesignState }) {
 
         loaded = loadedTexture;
         loaded.colorSpace = THREE.SRGBColorSpace;
+        loaded.flipY = false;
+        loaded.wrapS = THREE.ClampToEdgeWrapping;
+        loaded.wrapT = THREE.ClampToEdgeWrapping;
+        loaded.offset.x = 1;
+        loaded.repeat.x = -1;
         loaded.anisotropy = 8;
         loaded.needsUpdate = true;
         setTexture((current) => {
@@ -154,19 +302,39 @@ function PrintedDesign({ state }: { state: DesignState }) {
 
   if (!texture) return null;
 
+  const position = [
+    clamp(state.positionX, CHEST_LIMITS.x.min, CHEST_LIMITS.x.max),
+    clamp(CHEST_POSITION.y + state.positionY, CHEST_LIMITS.y.min, CHEST_LIMITS.y.max),
+    CHEST_POSITION.z
+  ] as [number, number, number];
+  const decalScale = clamp(state.scale, 0.16, 0.72);
+
   return (
-    <mesh position={[state.positionX, state.positionY + 0.34, 0.82]} rotation={[0, 0, state.rotation]} renderOrder={10}>
-      <planeGeometry args={[state.scale, state.scale]} />
-      <meshBasicMaterial
+    <Decal
+      mesh={shirtMeshRef}
+      position={position}
+      rotation={state.rotation}
+      scale={[decalScale, decalScale, 0.16]}
+      polygonOffsetFactor={-12}
+      depthTest
+      renderOrder={20}
+    >
+      <meshStandardMaterial
         map={texture}
+        bumpMap={fabricBump ?? undefined}
+        bumpScale={0.01}
         transparent
-        opacity={0.94}
+        alphaTest={0.15}
+        opacity={0.9}
+        roughness={0.96}
+        metalness={0}
+        polygonOffset
+        polygonOffsetFactor={-12}
         depthWrite={false}
-        depthTest={false}
         toneMapped={false}
-        side={THREE.DoubleSide}
+        side={THREE.FrontSide}
       />
-    </mesh>
+    </Decal>
   );
 }
 
@@ -185,15 +353,17 @@ function Scene({ state, onReady }: { state: DesignState; onReady: () => void }) 
   return (
     <>
       <PerspectiveCamera makeDefault position={[0, 0.55, 4.1]} fov={38} />
-      <color attach="background" args={['#07111F']} />
-      <fog attach="fog" args={['#07111F', 6, 12]} />
-      <ambientLight intensity={1.4} />
-      <directionalLight position={[3, 4, 5]} intensity={2.8} />
-      <spotLight position={[-4, 2, 4]} angle={0.38} intensity={8} color="#C8CDD2" penumbra={0.7} />
-      <Environment preset="city" />
+      <color attach="background" args={['#0A1422']} />
+      <fog attach="fog" args={['#0A1422', 7, 13]} />
+      <ambientLight intensity={1.75} />
+      <directionalLight position={[3, 5, 5]} intensity={3.4} castShadow shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
+      <spotLight position={[-4, 3, 4]} angle={0.42} intensity={9.5} color="#FFFFFF" penumbra={0.72} />
+      <pointLight position={[2.8, 1.2, -2.4]} intensity={3.2} color="#C8CDD2" />
+      <Environment preset="studio" environmentIntensity={0.85} />
       <Bounds fit clip observe margin={1.1}>
         <TshirtModel state={state} />
       </Bounds>
+      <ContactShadows position={[0, -1.72, 0]} opacity={0.48} scale={5.4} blur={2.4} far={3.8} color="#02050A" />
       <OrbitControls enableDamping dampingFactor={0.08} minDistance={2.4} maxDistance={6} autoRotate={false} />
     </>
   );
@@ -227,28 +397,30 @@ export default function TshirtCustomizer() {
     setState((current) => ({ ...current, ...patch }));
   }, []);
 
-  const handleUpload = (file: File | undefined) => {
+  const handleUpload = async (file: File | undefined) => {
     if (!file) return;
     if (!['image/png', 'image/jpeg', 'image/svg+xml'].includes(file.type)) return;
-    const url = URL.createObjectURL(file);
+    const processed = file.type === 'image/svg+xml'
+      ? { url: URL.createObjectURL(file), processedBackground: false }
+      : await removeBlackArtworkBackground(file);
     setState((current) => {
       if (current.textureUrl?.startsWith('blob:')) URL.revokeObjectURL(current.textureUrl);
-      return { ...current, textureUrl: url, fileName: file.name, sampleName: 'Uploaded artwork' };
+      return { ...current, textureUrl: processed.url, fileName: file.name, sampleName: 'Uploaded artwork', processedBackground: processed.processedBackground };
     });
   };
 
   const chooseSample = (url: string, name: string) => {
     setState((current) => {
       if (current.textureUrl?.startsWith('blob:')) URL.revokeObjectURL(current.textureUrl);
-      return { ...current, textureUrl: url || null, fileName: url ? `${name}.svg` : 'No uploaded design', sampleName: name };
+      return { ...current, textureUrl: url || null, fileName: url ? `${name}.svg` : 'No uploaded design', sampleName: name, processedBackground: false };
     });
   };
 
   const nudge = (axis: 'x' | 'y', amount: number) => {
     setState((current) => ({
       ...current,
-      positionX: axis === 'x' ? Number((current.positionX + amount).toFixed(2)) : current.positionX,
-      positionY: axis === 'y' ? Number((current.positionY + amount).toFixed(2)) : current.positionY
+      positionX: axis === 'x' ? Number(clamp(current.positionX + amount, CHEST_LIMITS.x.min, CHEST_LIMITS.x.max).toFixed(2)) : current.positionX,
+      positionY: axis === 'y' ? Number(clamp(current.positionY + amount, CHEST_LIMITS.y.min - CHEST_POSITION.y, CHEST_LIMITS.y.max - CHEST_POSITION.y).toFixed(2)) : current.positionY
     }));
   };
 
@@ -303,9 +475,9 @@ Please confirm price and order details.`;
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="relative h-[560px] overflow-hidden rounded-[2rem] border border-gold/20 bg-[radial-gradient(circle_at_50%_35%,rgba(200,205,210,.22),transparent_30rem),linear-gradient(145deg,#07111F,#0B1523)] shadow-gold sm:h-[640px] xl:h-[760px]"
+            className="relative h-[560px] overflow-hidden rounded-[2rem] border border-gold/20 bg-[radial-gradient(circle_at_50%_32%,rgba(255,255,255,.2),transparent_25rem),radial-gradient(circle_at_72%_22%,rgba(200,205,210,.22),transparent_24rem),linear-gradient(145deg,#101B2A,#0B1523_52%,#07111F)] shadow-gold sm:h-[640px] xl:h-[760px]"
           >
-            <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_20%,transparent,rgba(0,0,0,.18)_52%,rgba(0,0,0,.72))]" />
+            <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_22%,transparent,rgba(0,0,0,.08)_54%,rgba(0,0,0,.58))]" />
             <AnimatePresence>
               {!ready && webgl ? (
                 <motion.div initial={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-20 grid place-items-center bg-obsidian/80">
@@ -343,6 +515,11 @@ Please confirm price and order details.`;
                 </label>
                 <input id="design-upload" type="file" accept="image/png,image/jpeg,image/svg+xml" className="sr-only" onChange={(event) => handleUpload(event.target.files?.[0])} />
                 <p className="mt-2 break-words text-sm text-white/55">{state.fileName}</p>
+                {state.processedBackground ? (
+                  <p className="mt-2 rounded-xl border border-gold/20 bg-gold/10 px-3 py-2 text-xs leading-5 text-gold">
+                    Black artwork background removed for a clean printed preview.
+                  </p>
+                ) : null}
               </div>
 
               <div>
@@ -385,10 +562,10 @@ Please confirm price and order details.`;
                 </select>
               </label>
 
-              <ControlSlider label="Design size" min={0.28} max={1.35} step={0.01} value={state.scale} onChange={(scale) => update({ scale })} />
+              <ControlSlider label="Design size" min={0.16} max={0.72} step={0.01} value={state.scale} onChange={(scale) => update({ scale })} />
               <ControlSlider label="Design rotation" min={-3.14} max={3.14} step={0.01} value={state.rotation} onChange={(rotation) => update({ rotation })} />
-              <ControlSlider label="Horizontal position" min={-0.75} max={0.75} step={0.01} value={state.positionX} onChange={(positionX) => update({ positionX })} />
-              <ControlSlider label="Vertical position" min={-0.55} max={0.85} step={0.01} value={state.positionY} onChange={(positionY) => update({ positionY })} />
+              <ControlSlider label="Horizontal position" min={CHEST_LIMITS.x.min} max={CHEST_LIMITS.x.max} step={0.01} value={state.positionX} onChange={(positionX) => update({ positionX })} />
+              <ControlSlider label="Vertical position" min={CHEST_LIMITS.y.min - CHEST_POSITION.y} max={CHEST_LIMITS.y.max - CHEST_POSITION.y} step={0.01} value={state.positionY} onChange={(positionY) => update({ positionY })} />
 
               <div className="grid grid-cols-4 gap-2">
                 <NudgeButton label="Left" icon={<MoveLeft size={17} />} onClick={() => nudge('x', -0.05)} />

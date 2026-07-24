@@ -158,19 +158,34 @@ export default function HomePage() {
 }
 
 /* ==========================================================================
-   HERO SECTION - Enlarged Logo, Gold Gradient Branding & Seamless Floating Tee
+   HERO SECTION - Video Background, Enlarged Logo, Gold Gradient Branding
    ========================================================================== */
 function Hero() {
   return (
     <section className="relative min-h-screen overflow-hidden px-4 pb-12 pt-28 sm:px-8 sm:pt-32 lg:px-14 lg:pt-28" aria-labelledby="hero-title">
+      {/* Background Showcase Video */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <video
+          src="/assets/driftwear-showcase.mp4"
+          autoPlay
+          muted
+          playsInline
+          loop
+          className="h-full w-full object-cover opacity-35 filter brightness-85 contrast-110"
+        />
+        {/* Dark Vignette & Gold Ambient Overlays */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_15%,rgba(6,4,10,0.85)_85%)]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#06040A] via-transparent to-[#06040A]/80" />
+      </div>
+
       {/* Golden & Purple Ambient Lighting Gradients */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_45%,rgba(245,194,66,0.25),transparent_35rem),radial-gradient(circle_at_25%_65%,rgba(168,74,196,0.18),transparent_28rem)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_45%,rgba(245,194,66,0.25),transparent_35rem),radial-gradient(circle_at_25%_65%,rgba(168,74,196,0.18),transparent_28rem)] pointer-events-none z-0" />
 
       {/* Pulsating Gold Light Glow behind T-Shirt */}
       <motion.div
         animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
         transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute right-[-4rem] top-[15%] h-[32rem] w-[32rem] rounded-full bg-radial-gold blur-[130px] sm:right-[5%] sm:h-[48rem] sm:w-[48rem]"
+        className="absolute right-[-4rem] top-[15%] h-[32rem] w-[32rem] rounded-full bg-radial-gold blur-[130px] sm:right-[5%] sm:h-[48rem] sm:w-[48rem] z-0"
       />
 
       <motion.div className="shell relative z-10 grid min-h-[calc(100vh-8rem)] items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12" variants={stagger} initial="hidden" animate="show">

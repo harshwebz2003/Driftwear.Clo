@@ -89,7 +89,7 @@ export default function HomePage() {
 
       <Footer />
 
-      {/* WhatsApp Sticky Floating Button with Pulsating Animation */}
+      {/* WhatsApp Sticky Floating Button */}
       <div className="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-6 select-none">
         <AnimatedWhatsAppButton
           text="Order"
@@ -141,7 +141,7 @@ export default function HomePage() {
 }
 
 /* ==========================================================================
-   HERO SECTION - Fully Responsive & Animated WhatsApp CTA
+   HERO SECTION - Clean Luxury Apparel Showcase (Figma Blueprint Overlays Removed)
    ========================================================================== */
 function Hero() {
   const [activeVariantIndex, setActiveVariantIndex] = useState(0);
@@ -218,53 +218,43 @@ function Hero() {
             </motion.div>
           </div>
 
-          {/* Right Column: Figma Interactive Prototype Showcase Stage */}
+          {/* Right Column: Clean Premium Garment Showcase (No Figma Blue Borders or Pointer Badges) */}
           <motion.div variants={fadeRight} className="relative z-10 w-full">
-            <TiltCard className="relative overflow-hidden rounded-2xl border-2 border-[#1ABCFE] bg-[#0C0816]/90 p-4 shadow-[0_30px_90px_rgba(0,0,0,0.8),0_0_40px_rgba(26,188,254,0.25)] backdrop-blur-2xl sm:rounded-[2rem] sm:p-7">
-              {/* Figma Corner Resize Handles */}
-              <div className="absolute -left-1 -top-1 h-2.5 w-2.5 border border-white bg-[#1ABCFE] sm:h-3 sm:w-3" />
-              <div className="absolute -right-1 -top-1 h-2.5 w-2.5 border border-white bg-[#1ABCFE] sm:h-3 sm:w-3" />
-              <div className="absolute -bottom-1 -left-1 h-2.5 w-2.5 border border-white bg-[#1ABCFE] sm:h-3 sm:w-3" />
-              <div className="absolute -bottom-1 -right-1 h-2.5 w-2.5 border border-white bg-[#1ABCFE] sm:h-3 sm:w-3" />
+            <TiltCard className="relative overflow-hidden rounded-2xl border border-gold/25 bg-white/[0.04] p-4 shadow-[0_30px_90px_rgba(0,0,0,0.8),0_0_40px_rgba(216,180,95,0.15)] backdrop-blur-2xl sm:rounded-[2.2rem] sm:p-6">
+              {/* Top Variant Selector Pills */}
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+                <span className="font-brand text-xs font-bold uppercase tracking-[.18em] text-gold">
+                  Driftwear Apparel Drop
+                </span>
 
-              {/* Top Figma Header Tag Bar */}
-              <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="rounded bg-[#1ABCFE] px-2 py-0.5 font-mono text-[9px] font-bold text-slate-950 sm:text-[10px]">
-                    #Hero_Apparel_Canvas
-                  </span>
-                  <span className="font-mono text-[10px] text-white/50 sm:text-xs">Smart Animate</span>
-                </div>
-
-                {/* Variant Switcher Pills */}
-                <div className="flex items-center gap-1 rounded-full border border-white/10 bg-white/5 p-0.5 sm:p-1">
+                <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 p-1">
                   {apparelVariants.map((v, idx) => (
                     <button
                       key={v.name}
                       onClick={() => setActiveVariantIndex(idx)}
-                      className={`relative rounded-full px-2.5 py-0.5 text-[10px] font-bold transition sm:px-3 sm:py-1 sm:text-[11px] ${
+                      className={`relative rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider transition ${
                         activeVariantIndex === idx ? 'text-slate-950' : 'text-white/60 hover:text-white'
                       }`}
                     >
                       {activeVariantIndex === idx && (
                         <motion.div
-                          layoutId="heroVariantPill"
+                          layoutId="heroCleanVariantPill"
                           transition={springQuick}
                           className="absolute inset-0 rounded-full bg-gradient-to-r from-gold via-ambergold to-gold shadow-md"
                         />
                       )}
-                      <span className="relative z-10">V{idx + 1}</span>
+                      <span className="relative z-10">{v.name.split(' ')[0]}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Main Garment Mockup Showcase Card */}
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-[#07050E] sm:aspect-[1.1/1] sm:rounded-2xl">
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-carbon sm:aspect-[1.15/1] sm:rounded-2xl">
                 <motion.div
                   key={currentVariant.name}
-                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   transition={springGentle}
                   className="relative h-full w-full"
                 >
@@ -273,47 +263,27 @@ function Hero() {
                     alt={currentVariant.name}
                     fill
                     priority
-                    className="object-cover object-center"
+                    className="object-cover object-center transition duration-700 hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/20" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
 
-                  {/* Floating Badges */}
+                  {/* Floating Badge */}
                   <div className="absolute left-3 top-3 flex flex-col gap-1.5 sm:left-4 sm:top-4">
-                    <span className="inline-flex items-center gap-1 rounded-full border border-gold/40 bg-black/60 px-2.5 py-0.5 font-mono text-[10px] font-bold text-gold backdrop-blur-md sm:px-3 sm:py-1 sm:text-xs">
-                      <Sparkles size={12} />
+                    <span className="inline-flex items-center gap-1 rounded-full border border-gold/40 bg-black/60 px-3 py-1 font-brand text-xs font-bold text-gold backdrop-blur-md">
+                      <Sparkles size={13} />
                       {currentVariant.badge}
-                    </span>
-                    <span className="inline-flex items-center gap-1 font-mono text-[9px] text-white/80 bg-black/50 px-2 py-0.5 rounded backdrop-blur-md sm:text-[11px]">
-                      {currentVariant.tag}
                     </span>
                   </div>
 
-                  {/* Simulated Figma Animated Cursor */}
-                  <motion.div
-                    animate={{
-                      x: [20, 140, 70, 20],
-                      y: [20, 70, 120, 20]
-                    }}
-                    transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-                    className="pointer-events-none absolute left-0 top-0 z-30"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#A259FF" stroke="#FFF" strokeWidth="1.2">
-                      <path d="M5.65376 12.3673H5.46026L5.31717 12.4976L0.500002 16.8829L0.500002 1.19841L11.7841 12.3673H5.65376Z" />
-                    </svg>
-                    <div className="ml-2.5 -mt-1 rounded-full bg-[#A259FF] px-2 py-0.5 font-mono text-[8px] font-bold text-white shadow-md">
-                      ✨ Figma Motion
-                    </div>
-                  </motion.div>
-
-                  {/* Bottom Product Info Bar */}
-                  <div className="absolute bottom-3 left-3 right-3 flex flex-col gap-2 rounded-lg border border-white/20 bg-black/70 p-3 backdrop-blur-xl sm:bottom-4 sm:left-4 sm:right-4 sm:flex-row sm:items-center sm:justify-between sm:rounded-xl sm:p-3.5">
+                  {/* Bottom Info Bar */}
+                  <div className="absolute bottom-3 left-3 right-3 flex flex-col gap-2 rounded-xl border border-white/15 bg-black/70 p-3.5 backdrop-blur-xl sm:bottom-4 sm:left-4 sm:right-4 sm:flex-row sm:items-center sm:justify-between sm:p-4">
                     <div>
-                      <h3 className="font-calista text-base font-bold text-white sm:text-xl">{currentVariant.name}</h3>
-                      <p className="font-mono text-[10px] text-gold sm:text-xs">High DPI DTF Print • Galle Studio</p>
+                      <h3 className="font-calista text-lg font-semibold text-white sm:text-2xl">{currentVariant.name}</h3>
+                      <p className="font-brand text-xs font-bold uppercase tracking-wider text-gold/80">{currentVariant.tag}</p>
                     </div>
                     <AnimatedWhatsAppButton
                       text="Order Tee"
-                      message={`Hi Driftwear Clo., I want to order variant: ${currentVariant.name}`}
+                      message={`Hi Driftwear Clo., I want to order: ${currentVariant.name}`}
                       size="sm"
                     />
                   </div>

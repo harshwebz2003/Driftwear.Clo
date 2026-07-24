@@ -3,7 +3,7 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bounds, Center, ContactShadows, Decal, Environment, Html, OrbitControls, PerspectiveCamera, useGLTF } from '@react-three/drei';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Download, Maximize2, MessageCircle, MoveDown, MoveLeft, MoveRight, MoveUp, RotateCcw, Upload } from 'lucide-react';
+import { Download, Maximize2, MessageCircle, MoveDown, MoveLeft, MoveRight, MoveUp, RotateCcw, Upload, Scaling } from 'lucide-react';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode, RefObject } from 'react';
 import * as THREE from 'three';
@@ -38,16 +38,23 @@ const colors: ShirtColor[] = [
   { label: 'Navy', value: '#061126', text: 'text-white' }
 ];
 
+const printSizePresets = [
+  { label: 'Chest Logo', scale: 0.24, desc: 'Small' },
+  { label: 'A4 Standard', scale: 0.42, desc: 'Medium' },
+  { label: 'A3 Large', scale: 0.55, desc: 'Large' },
+  { label: 'Full Oversized', scale: 0.65, desc: 'Jumbo' }
+];
+
 const samples = [
-  { name: 'No design', url: '' },
   { name: 'Drift Flame', url: '/designs/drift-flame.svg' },
-  { name: 'Galle Vibe', url: '/designs/galle-vibe.svg' }
+  { name: 'Galle Vibe', url: '/designs/galle-vibe.svg' },
+  { name: 'DW Emblem', url: '/assets/logo.png' }
 ];
 
 const initialState: DesignState = {
-  textureUrl: null,
-  fileName: 'No uploaded design',
-  sampleName: 'No design',
+  textureUrl: '/designs/drift-flame.svg',
+  fileName: 'Drift Flame Design',
+  sampleName: 'Drift Flame',
   color: colors[0],
   size: 'M',
   note: '',
@@ -375,6 +382,7 @@ export default function TshirtCustomizer() {
       'Hi Driftwear Clo., I built a custom design in your 3D fitting studio:',
       `- Garment Color: ${state.color.label}`,
       `- Size: ${state.size}`,
+      `- Design Print Scale: ${state.scale.toFixed(2)}`,
       `- Design File: ${state.fileName}`
     ];
 
@@ -384,7 +392,7 @@ export default function TshirtCustomizer() {
 
     lines.push('Please confirm print pricing and dispatch timeframe.');
     return lines.join('\n');
-  }, [state.color.label, state.fileName, state.note, state.size]);
+  }, [state.color.label, state.fileName, state.note, state.scale, state.size]);
 
   return (
     <section id="customizer" className="section-pad relative z-10">
@@ -393,7 +401,7 @@ export default function TshirtCustomizer() {
           <p className="eyebrow">Interactive 3D Studio</p>
           <h2 className="display-title mt-3 text-[clamp(2.6rem,6.5vw,7rem)] text-white">Fit your design on 3D T-shirts.</h2>
           <p className="mt-4 max-w-2xl text-base leading-7 text-white/68 sm:text-lg sm:leading-8">
-            Upload your artwork, adjust placement, scale, and color in real-time. Experience industrial DTF transfer fitting before ordering.
+            Upload your artwork, adjust placement, design print size, and color in real-time. Experience industrial DTF transfer fitting before ordering.
           </p>
         </div>
 
@@ -445,7 +453,7 @@ export default function TshirtCustomizer() {
           <motion.aside initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col justify-between rounded-[2.2rem] sm:rounded-[2.8rem] gold-gradient-border bg-[#0B0813]/90 p-5 sm:p-7 backdrop-blur-2xl">
             <div className="grid gap-5">
               <div>
-                <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">1. Upload Artwork</span>
+                <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">1. Upload Artwork / Select Sample</span>
                 <div className="mt-2.5 flex flex-col gap-2">
                   <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" onChange={handleFileUpload} className="hidden" id="design-upload-input" />
                   <label htmlFor="design-upload-input" className="cta-secondary cursor-pointer w-full text-center">
@@ -453,10 +461,45 @@ export default function TshirtCustomizer() {
                   </label>
                   <p className="truncate text-center font-brand text-[11px] font-medium text-white/50">{state.fileName}</p>
                 </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {samples.map((s) => (
+                    <button
+                      key={s.name}
+                      type="button"
+                      onClick={() => selectSample(s)}
+                      className={`rounded-full border px-3 py-1 text-[11px] font-bold transition ${
+                        state.sampleName === s.name ? 'border-gold bg-gold/20 text-gold' : 'border-white/15 bg-black/40 text-white/60 hover:text-white'
+                      }`}
+                    >
+                      {s.name}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div>
-                <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">2. Select Garment Color</span>
+                <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">2. Design Print Size</span>
+                <div className="mt-2.5 grid grid-cols-2 gap-2">
+                  {printSizePresets.map((preset) => (
+                    <button
+                      key={preset.label}
+                      type="button"
+                      onClick={() => update({ scale: preset.scale })}
+                      className={`flex flex-col items-center justify-center rounded-xl border py-2.5 px-2 transition ${
+                        Math.abs(state.scale - preset.scale) < 0.03
+                          ? 'border-gold bg-gold text-black font-extrabold shadow-md'
+                          : 'border-white/15 bg-black/40 text-white/70 hover:border-gold/50'
+                      }`}
+                    >
+                      <span className="font-brand text-xs uppercase tracking-wider">{preset.label}</span>
+                      <span className="text-[10px] opacity-75">{preset.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">3. Select Garment Color</span>
                 <div className="mt-2.5 flex flex-wrap gap-2.5">
                   {colors.map((c) => (
                     <button
@@ -475,7 +518,7 @@ export default function TshirtCustomizer() {
               </div>
 
               <div>
-                <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">3. Select Garment Size</span>
+                <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">4. Select Garment Size</span>
                 <div className="mt-2.5 flex gap-2">
                   {['S', 'M', 'L', 'XL', 'XXL'].map((sz) => (
                     <button
@@ -494,9 +537,9 @@ export default function TshirtCustomizer() {
 
               {state.textureUrl ? (
                 <div className="grid gap-3.5 border-t border-white/10 pt-4">
-                  <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">4. Fine-Tune Position & Scale</span>
+                  <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">5. Fine-Tune Position & Scale</span>
 
-                  <ControlSlider label="Print Scale" min={0.2} max={0.7} step={0.01} value={state.scale} onChange={(scale) => update({ scale })} />
+                  <ControlSlider label="Custom Scale" min={0.2} max={0.7} step={0.01} value={state.scale} onChange={(scale) => update({ scale })} />
                   <ControlSlider label="Rotation" min={-Math.PI} max={Math.PI} step={0.05} value={state.rotation} onChange={(rotation) => update({ rotation })} />
 
                   <div className="grid gap-2">

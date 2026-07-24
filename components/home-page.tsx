@@ -22,8 +22,7 @@ import {
   Zap,
   Ruler,
   Layers,
-  Award,
-  Box
+  Award
 } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import { SafeErrorBoundary } from '@/components/error-boundary';
@@ -160,7 +159,7 @@ export default function HomePage() {
 }
 
 /* ==========================================================================
-   HERO SECTION - Centered Clean Hero with Video Background & Animated Title
+   HERO SECTION - Video Background, Animated Title, Direct Action Order Button
    ========================================================================== */
 function Hero() {
   return (
@@ -234,10 +233,10 @@ function Hero() {
                 size="lg"
               />
               <a
-                href="#customizer"
+                href="#shop"
                 className="font-brand inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-gold/50 bg-gold/10 px-7 py-3.5 text-xs font-bold uppercase tracking-[.18em] text-white transition duration-300 hover:border-gold hover:bg-gold/20 hover:text-gold sm:text-sm shadow-[0_0_20px_rgba(245,194,66,0.25)]"
               >
-                <Box size={18} className="text-gold animate-pulse" /> 3D Fitting Studio
+                View Designs <ArrowRight size={17} />
               </a>
             </motion.div>
           </div>

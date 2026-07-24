@@ -43,6 +43,33 @@ body::before {
   color: #07111F;
 }
 
+@layer utilities {
+  .bg-radial-gold {
+    background: radial-gradient(circle, rgba(226, 166, 59, 0.38) 0%, rgba(0, 0, 0, 0) 70%);
+  }
+  .bg-radial-purple {
+    background: radial-gradient(circle, rgba(168, 74, 196, 0.35) 0%, rgba(0, 0, 0, 0) 70%);
+  }
+  .bg-radial-cyan {
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.32) 0%, rgba(0, 0, 0, 0) 70%);
+  }
+  .animate-gradient-shift {
+    animation: gradient-shift 6s ease infinite;
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 @layer components {
   .section-pad {
     @apply px-5 py-20 sm:px-8 lg:px-14 xl:px-20;

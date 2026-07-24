@@ -16,7 +16,13 @@ import {
   Send,
   Sparkles,
   X,
-  Maximize2
+  Maximize2,
+  Truck,
+  ShieldCheck,
+  Zap,
+  Ruler,
+  Layers,
+  Award
 } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import Preloader from '@/components/preloader';
@@ -31,6 +37,9 @@ import {
   TiltCard,
   AnimatedWhatsAppButton,
   HorizontalMarquee,
+  AnimatedColorBackground,
+  AnimatedTextReveal,
+  ShimmeringTextGradient,
   springQuick,
   springGentle,
   springBouncy
@@ -74,14 +83,20 @@ export default function HomePage() {
   return (
     <>
       <Preloader />
+      {/* Dynamic Animated Ambient Color Background Orbs */}
+      <AnimatedColorBackground />
+
       <Navbar />
-      <main id="home" className="overflow-x-hidden">
+
+      <main id="home" className="relative z-10 overflow-x-hidden">
         <Hero />
         <HorizontalMarquee items={tickerItems1} speed={24} direction="left" />
         <TshirtCustomizer />
         <FeaturedProducts onPreview={(img) => setSelectedImage(img)} />
+        <PrintSpecsAndDelivery />
         <HorizontalMarquee items={tickerItems2} speed={28} direction="right" />
         <Process />
+        <GarmentSizeGuide />
         <WhyChoose />
         <Gallery onPreview={(img) => setSelectedImage(img)} />
         <Testimonials />
@@ -160,38 +175,36 @@ function Hero() {
       />
 
       <motion.div className="shell relative z-10 grid min-h-[calc(100vh-8rem)] items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12" variants={stagger} initial="hidden" animate="show">
-        {/* Left Column: Layered Frosted Glass Card (Matching Image 1) */}
+        {/* Left Column: Layered Frosted Glass Card */}
         <motion.div variants={fadeLeft} className="relative z-20 w-full max-w-xl">
           {/* Layer 1: Background Offset Glass Frame */}
           <div className="absolute -inset-2.5 rounded-[2.8rem] border border-gold/20 bg-white/[0.02] backdrop-blur-md translate-x-3.5 translate-y-3.5 hidden sm:block pointer-events-none" />
 
           {/* Layer 2: Main Layered Frosted Glass Card */}
           <div className="relative rounded-[2.2rem] sm:rounded-[2.8rem] border border-gold/35 bg-[#0B0813]/75 p-6 sm:p-10 lg:p-12 shadow-[0_30px_90px_rgba(0,0,0,0.92),0_0_60px_rgba(226,166,59,0.2)] backdrop-blur-2xl">
-            {/* Title */}
+            {/* Animated Title */}
             <motion.h1
               id="hero-title"
               variants={fadeUp}
               className="font-body font-extrabold uppercase leading-[0.92] tracking-tight text-white"
             >
               <span className="block text-[clamp(3.2rem,6.8vw,5.6rem)]">Wear Your</span>
-              <span className="block bg-gradient-to-r from-[#FCE182] via-[#E2A63B] to-[#B07B1D] bg-clip-text text-transparent text-[clamp(3.5rem,7.5vw,6.4rem)]">
-                Vibe.
-              </span>
+              <ShimmeringTextGradient text="Vibe." className="block text-[clamp(3.5rem,7.5vw,6.4rem)] font-body font-extrabold" />
             </motion.h1>
 
             {/* DW Logo Emblem & Divider */}
             <motion.div variants={fadeUp} className="my-5 sm:my-6 flex items-center gap-3">
               <span className="h-[1px] w-12 sm:w-16 bg-gradient-to-r from-gold/60 to-transparent" />
-              <div className="flex h-7 w-7 items-center justify-center rounded-full border border-gold/50 bg-gold/10 p-0.5">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full border border-gold/50 bg-gold/10 p-0.5 shadow-[0_0_12px_rgba(216,180,95,0.4)]">
                 <Image src="/assets/logo.png" alt="DW Logo Emblem" width={22} height={22} className="rounded-full object-cover" />
               </div>
               <span className="h-[1px] w-12 sm:w-16 bg-gradient-to-l from-gold/60 to-transparent" />
             </motion.div>
 
-            {/* Subtitle */}
-            <motion.p variants={fadeUp} className="font-brand text-sm sm:text-base font-medium leading-6 text-white/72">
-              Custom T-shirts & Premium DTF Printing
-            </motion.p>
+            {/* Subtitle with Character Entrance Animation */}
+            <motion.div variants={fadeUp}>
+              <AnimatedTextReveal text="Custom T-shirts & Premium DTF Printing" className="font-brand text-sm sm:text-base font-medium leading-6 text-white/80" />
+            </motion.div>
 
             {/* Action Buttons */}
             <motion.div variants={fadeUp} className="mt-7 flex flex-wrap items-center gap-4 sm:mt-8">
@@ -238,7 +251,9 @@ function SectionTitle({ eyebrow, title, copy }: { eyebrow: string; title: string
   return (
     <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} className="mb-8 max-w-4xl sm:mb-10">
       <p className="eyebrow">{eyebrow}</p>
-      <h2 className="display-title mt-3 text-[clamp(2.6rem,6.5vw,7rem)] text-white">{title}</h2>
+      <h2 className="display-title mt-3 text-[clamp(2.6rem,6.5vw,7rem)] text-white">
+        <AnimatedTextReveal text={title} />
+      </h2>
       {copy ? <p className="mt-4 max-w-2xl text-base leading-7 text-white/62 sm:text-lg sm:leading-8">{copy}</p> : null}
     </motion.div>
   );
@@ -282,6 +297,98 @@ function FeaturedProducts({ onPreview }: { onPreview: (img: string) => void }) {
               </TiltCard>
             </motion.div>
           ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* NEW SECTION: Print Specs, Fabric Quality & Delivery Details */
+function PrintSpecsAndDelivery() {
+  const specs = [
+    {
+      icon: <Layers className="text-gold" size={24} />,
+      title: 'High DPI DTF Transfers',
+      description: 'Ultra-vibrant 1440 DPI Direct-to-Film transfer technology for crisp graphic edges and micro-details.'
+    },
+    {
+      icon: <ShieldCheck className="text-gold" size={24} />,
+      title: '50+ Wash Durability',
+      description: 'Strengthened polymer ink layer that will not crack, peel, or fade even after 50+ machine washes.'
+    },
+    {
+      icon: <Award className="text-gold" size={24} />,
+      title: '240 GSM Heavy Cotton',
+      description: '100% Premium combed cotton fabric. Pre-shrunk, soft hand-feel with dense weave construction.'
+    },
+    {
+      icon: <Truck className="text-gold" size={24} />,
+      title: 'Islandwide Express Dispatch',
+      description: 'Fast 24-hour dispatch in Galle, 48-hour Colombo delivery, and secure islandwide Sri Lanka shipping.'
+    }
+  ];
+
+  return (
+    <section className="section-pad">
+      <div className="shell">
+        <SectionTitle eyebrow="Quality Guarantee" title="Unmatched print standards." copy="Built with top-tier industrial DTF printing equipment and premium luxury garments for lasting streetwear quality." />
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {specs.map((item) => (
+            <motion.div key={item.title} variants={fadeUp}>
+              <TiltCard className="gold-border rounded-[1.5rem] p-6 h-full flex flex-col justify-between">
+                <div>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-gold/30 bg-gold/10">
+                    {item.icon}
+                  </div>
+                  <h3 className="font-calista mt-4 text-xl font-bold text-white sm:text-2xl">{item.title}</h3>
+                  <p className="mt-2.5 text-xs sm:text-sm leading-6 text-white/60">{item.description}</p>
+                </div>
+              </TiltCard>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* NEW SECTION: Interactive Garment Size & Fitting Guide Table */
+function GarmentSizeGuide() {
+  const sizes = [
+    { size: 'S', chest: '38 inches', length: '27 inches', sleeve: '8 inches' },
+    { size: 'M', chest: '40 inches', length: '28 inches', sleeve: '8.5 inches' },
+    { size: 'L', chest: '42 inches', length: '29 inches', sleeve: '9 inches' },
+    { size: 'XL', chest: '44 inches', length: '30 inches', sleeve: '9.5 inches' },
+    { size: 'XXL', chest: '46 inches', length: '31 inches', sleeve: '10 inches' }
+  ];
+
+  return (
+    <section className="section-pad">
+      <div className="shell">
+        <SectionTitle eyebrow="Sizing & Fit Guide" title="Find your perfect fit." copy="Streetwear oversized cut or classic regular fit. Measure your favorite tee to select the ideal size." />
+        <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="overflow-hidden rounded-[2rem] border border-gold/30 bg-black/50 p-6 sm:p-8 backdrop-blur-xl">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left font-brand text-xs sm:text-sm">
+              <thead>
+                <tr className="border-b border-white/15 text-gold uppercase tracking-[.18em]">
+                  <th className="py-3.5 px-4 font-bold">Size</th>
+                  <th className="py-3.5 px-4 font-bold">Chest (Inches)</th>
+                  <th className="py-3.5 px-4 font-bold">Length (Inches)</th>
+                  <th className="py-3.5 px-4 font-bold">Sleeve (Inches)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/10 text-white/80">
+                {sizes.map((row) => (
+                  <tr key={row.size} className="transition hover:bg-white/[0.04]">
+                    <td className="py-4 px-4 font-bold text-gold">{row.size}</td>
+                    <td className="py-4 px-4">{row.chest}</td>
+                    <td className="py-4 px-4">{row.length}</td>
+                    <td className="py-4 px-4">{row.sleeve}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </motion.div>
       </div>
     </section>

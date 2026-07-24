@@ -61,6 +61,95 @@ export const stagger: Variants = {
   }
 };
 
+// Background Dynamic Color Orbs Component
+export function AnimatedColorBackground() {
+  return (
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+      {/* Dynamic Floating Color Orb 1 (Gold/Amber Glow) */}
+      <motion.div
+        animate={{
+          x: [0, 80, -60, 0],
+          y: [0, -90, 70, 0],
+          scale: [1, 1.25, 0.9, 1],
+          opacity: [0.25, 0.45, 0.25]
+        }}
+        transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute -left-20 top-1/4 h-[35rem] w-[35rem] rounded-full bg-radial-gold blur-[130px]"
+      />
+
+      {/* Dynamic Floating Color Orb 2 (Royal Purple/Magenta Glow) */}
+      <motion.div
+        animate={{
+          x: [0, -100, 70, 0],
+          y: [0, 110, -80, 0],
+          scale: [1, 1.3, 0.95, 1],
+          opacity: [0.2, 0.4, 0.2]
+        }}
+        transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute -right-24 top-1/3 h-[40rem] w-[40rem] rounded-full bg-radial-purple blur-[140px]"
+      />
+
+      {/* Dynamic Floating Color Orb 3 (Cyan/Emerald Accents) */}
+      <motion.div
+        animate={{
+          x: [0, 60, -80, 0],
+          y: [0, -70, 90, 0],
+          scale: [0.9, 1.2, 0.95, 0.9],
+          opacity: [0.15, 0.35, 0.15]
+        }}
+        transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute left-1/3 bottom-10 h-[30rem] w-[30rem] rounded-full bg-radial-cyan blur-[120px]"
+      />
+    </div>
+  );
+}
+
+// Word-by-Word Animated Text Reveal Component
+export function AnimatedTextReveal({ text, className = '' }: { text: string; className?: string }) {
+  const words = text.split(' ');
+
+  const containerVariants: Variants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.06
+      }
+    }
+  };
+
+  const wordVariants: Variants = {
+    hidden: { opacity: 0, y: 24, filter: 'blur(8px)' },
+    show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: springGentle }
+  };
+
+  return (
+    <motion.span
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, margin: '-40px' }}
+      className={`inline-block ${className}`}
+    >
+      {words.map((word, idx) => (
+        <motion.span key={idx} variants={wordVariants} className="inline-block mr-[0.25em] last:mr-0">
+          {word}
+        </motion.span>
+      ))}
+    </motion.span>
+  );
+}
+
+// Shimmering Text Gradient Title Component
+export function ShimmeringTextGradient({ text, className = '' }: { text: string; className?: string }) {
+  return (
+    <span
+      className={`bg-gradient-to-r from-[#FCE182] via-[#E2A63B] to-[#FCE182] bg-[length:200%_auto] bg-clip-text text-transparent animate-gradient-shift ${className}`}
+    >
+      {text}
+    </span>
+  );
+}
+
 // Magnetic Button Wrapper
 export function Magnetic({ children }: { children: React.ReactNode }) {
   const x = useMotionValue(0);
@@ -142,90 +231,97 @@ export function TiltCard({
         rotateY: springRotateY,
         transformStyle: 'preserve-3d'
       }}
-      className={`relative overflow-hidden transition-shadow duration-300 ${className}`}
+      className={`relative transition-shadow duration-300 ${className}`}
     >
+      {/* Dynamic Cursor Light Spotlight */}
       <div
-        className="pointer-events-none absolute -inset-px transition-opacity duration-500"
+        className="pointer-events-none absolute -inset-px rounded-[inherit] transition-opacity duration-300 z-10"
         style={{
           opacity: glowPos.opacity,
-          background: `radial-gradient(400px circle at ${glowPos.x}% ${glowPos.y}%, rgba(216, 180, 95, 0.25), transparent 80%)`
+          background: `radial-gradient(400px circle at ${glowPos.x}% ${glowPos.y}%, rgba(216, 180, 95, 0.18), transparent 80%)`
         }}
       />
-      <div style={{ transform: 'translateZ(20px)' }}>{children}</div>
+      {children}
     </motion.div>
   );
 }
 
-// Animated WhatsApp Order Button
+// Glowing Animated WhatsApp Order Button
 export function AnimatedWhatsAppButton({
+  text = 'Order on WhatsApp',
   message = 'Hi Driftwear Clo., I want to place a custom T-shirt order.',
-  text = 'WhatsApp Order',
   className = '',
   size = 'md'
 }: {
-  message?: string;
   text?: string;
+  message?: string;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
 }) {
-  const sizeClasses = {
-    sm: 'px-4 py-2 text-xs gap-1.5 min-h-10',
-    md: 'px-6 py-3 text-xs sm:text-sm gap-2 min-h-12',
-    lg: 'px-8 py-4 text-sm sm:text-base gap-2.5 min-h-14'
+  const paddingMap = {
+    sm: 'px-4 py-2 text-xs',
+    md: 'px-5 py-3 text-xs sm:text-sm',
+    lg: 'px-6 py-3.5 text-sm sm:text-base'
   };
 
   return (
     <Magnetic>
       <motion.a
-        whileHover={{ scale: 1.05, y: -2 }}
-        whileTap={{ scale: 0.95 }}
-        transition={springBouncy}
         href={whatsappLink(message)}
         target="_blank"
         rel="noreferrer"
-        className={`group relative inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#25D366] via-[#20BA5A] to-[#128C7E] font-brand font-bold uppercase tracking-wider text-slate-950 shadow-[0_0_25px_rgba(37,211,102,0.4)] transition-all duration-300 hover:shadow-[0_0_40px_rgba(37,211,102,0.7)] ${sizeClasses[size]} ${className}`}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        transition={springQuick}
+        className={`relative inline-flex items-center justify-center gap-2.5 rounded-full font-brand font-bold uppercase tracking-[.18em] text-white shadow-lg overflow-hidden group ${paddingMap[size]} ${className}`}
+        style={{
+          background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)'
+        }}
       >
-        {/* Pulsating Aura Ring */}
-        <span className="absolute -inset-1 rounded-full bg-[#25D366] opacity-40 blur-md transition duration-500 group-hover:opacity-80" />
+        {/* Pulsating Aura Outer Glow Ring */}
+        <span className="absolute -inset-1 rounded-full bg-[#10B981] opacity-70 blur-md transition duration-500 group-hover:opacity-100 animate-pulse" />
 
-        <span className="relative z-10 flex items-center gap-2">
-          <motion.span
-            animate={{ rotate: [0, -10, 10, -5, 0] }}
-            transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 1.5 }}
-          >
-            <MessageCircle size={size === 'lg' ? 22 : size === 'md' ? 18 : 15} className="fill-slate-950/20" />
-          </motion.span>
-          <span>{text}</span>
-          <Sparkles size={size === 'lg' ? 16 : 14} className="transition group-hover:rotate-12" />
-        </span>
+        {/* Shimmer Light Reflection Effect */}
+        <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
+
+        <MessageCircle className="relative z-10 animate-bounce text-white" size={size === 'sm' ? 16 : size === 'md' ? 18 : 20} />
+        <span className="relative z-10 drop-shadow-sm">{text}</span>
       </motion.a>
     </Magnetic>
   );
 }
 
-// Smooth Infinite Horizontal Marquee Component
+// Infinite Horizontal Scroll Marquee Ticker
 export function HorizontalMarquee({
   items,
-  speed = 25,
+  speed = 30,
   direction = 'left'
 }: {
   items: string[];
   speed?: number;
   direction?: 'left' | 'right';
 }) {
+  const marqueeItems = [...items, ...items, ...items, ...items];
+
   return (
-    <div className="relative flex w-full overflow-hidden border-y border-white/10 bg-white/[0.03] py-4 select-none backdrop-blur-md">
+    <div className="relative w-full overflow-hidden border-y border-white/10 bg-black/40 py-3.5 backdrop-blur-md select-none">
       <motion.div
-        animate={{ x: direction === 'left' ? ['0%', '-50%'] : ['-50%', '0%'] }}
-        transition={{ duration: speed, ease: 'linear', repeat: Infinity }}
-        className="flex min-w-full shrink-0 items-center justify-around gap-8 whitespace-nowrap"
+        animate={{
+          x: direction === 'left' ? ['0%', '-50%'] : ['-50%', '0%']
+        }}
+        transition={{
+          duration: speed,
+          repeat: Infinity,
+          ease: 'linear'
+        }}
+        className="flex w-max items-center gap-8"
       >
-        {items.concat(items).map((item, idx) => (
-          <div key={idx} className="flex items-center gap-6">
-            <span className="font-brand text-xs font-bold uppercase tracking-[0.28em] text-white/80 sm:text-sm">
+        {marqueeItems.map((item, idx) => (
+          <div key={idx} className="flex items-center gap-8">
+            <span className="font-brand text-xs font-bold uppercase tracking-[.28em] text-white/80 transition hover:text-gold">
               {item}
             </span>
-            <span className="h-2 w-2 rounded-full bg-gold/70 shadow-[0_0_10px_rgba(216,180,95,0.8)]" />
+            <Sparkles size={14} className="text-gold shrink-0" />
           </div>
         ))}
       </motion.div>

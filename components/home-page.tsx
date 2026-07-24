@@ -160,36 +160,11 @@ export default function HomePage() {
 }
 
 /* ==========================================================================
-   HERO SECTION - Video Background, Animated Title, 3D Garment Studio Showcase
+   HERO SECTION - Centered Clean Hero with Video Background & Animated Title
    ========================================================================== */
 function Hero() {
-  const [activeVariantIndex, setActiveVariantIndex] = useState(0);
-
-  const apparelVariants = [
-    {
-      name: 'All Eyes On Me Black Tee',
-      tag: 'Oversized 240 GSM Streetwear',
-      image: '/assets/tshirt_black_oversized.jpg',
-      badge: '🔥 Best Seller'
-    },
-    {
-      name: 'Studio White Custom Tee',
-      tag: 'Minimal DTF Print',
-      image: '/assets/tshirt_white_regular.jpg',
-      badge: '✨ Studio Pick'
-    },
-    {
-      name: 'Urban Streetwear Look',
-      tag: 'Custom DTF Graphic',
-      image: '/assets/tshirt_model_urban_black.jpg',
-      badge: '💎 Premium Release'
-    }
-  ];
-
-  const currentVariant = apparelVariants[activeVariantIndex];
-
   return (
-    <section className="relative min-h-screen overflow-hidden px-4 pb-12 pt-28 sm:px-8 sm:pt-32 lg:px-14 lg:pt-28" aria-labelledby="hero-title">
+    <section className="relative min-h-screen overflow-hidden px-4 pb-12 pt-28 sm:px-8 sm:pt-32 lg:px-14 lg:pt-36 flex items-center justify-center" aria-labelledby="hero-title">
       {/* Background Showcase Video */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <video
@@ -206,141 +181,66 @@ function Hero() {
       </div>
 
       {/* Golden & Purple Ambient Lighting Gradients */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_45%,rgba(245,194,66,0.25),transparent_35rem),radial-gradient(circle_at_25%_65%,rgba(168,74,196,0.18),transparent_28rem)] pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,194,66,0.28),transparent_38rem),radial-gradient(circle_at_20%_80%,rgba(168,74,196,0.2),transparent_30rem)] pointer-events-none z-0" />
 
-      {/* Pulsating Gold Light Glow behind Garment Showcase */}
+      {/* Pulsating Gold Light Glow */}
       <motion.div
-        animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
+        animate={{ scale: [1, 1.25, 1], opacity: [0.4, 0.75, 0.4] }}
         transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute right-[-4rem] top-[15%] h-[32rem] w-[32rem] rounded-full bg-radial-gold blur-[130px] sm:right-[5%] sm:h-[48rem] sm:w-[48rem] z-0"
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[40rem] w-[40rem] rounded-full bg-radial-gold blur-[140px] z-0"
       />
 
-      <motion.div className="shell relative z-10 grid min-h-[calc(100vh-8rem)] items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12" variants={stagger} initial="hidden" animate="show">
-        {/* Left Column: Layered Gold-Bordered Frosted Glass Card */}
-        <motion.div variants={fadeLeft} className="relative z-20 w-full max-w-xl">
+      <motion.div className="shell relative z-10 flex flex-col items-center text-center justify-center min-h-[calc(100vh-10rem)]" variants={stagger} initial="hidden" animate="show">
+        {/* Centered Layered Gold-Bordered Frosted Glass Card */}
+        <motion.div variants={fadeUp} className="relative z-20 w-full max-w-2xl">
           {/* Layer 1: Background Offset Glass Frame */}
-          <div className="absolute -inset-2.5 rounded-[2.8rem] border border-gold/25 bg-gold/5 backdrop-blur-md translate-x-3.5 translate-y-3.5 hidden sm:block pointer-events-none" />
+          <div className="absolute -inset-3 rounded-[3rem] border border-gold/25 bg-gold/5 backdrop-blur-md translate-y-3 hidden sm:block pointer-events-none" />
 
           {/* Layer 2: Main Layered Frosted Glass Card */}
-          <div className="relative rounded-[2.2rem] sm:rounded-[2.8rem] gold-gradient-border p-6 sm:p-10 lg:p-12 shadow-[0_30px_90px_rgba(0,0,0,0.92),0_0_60px_rgba(245,194,66,0.22)] backdrop-blur-2xl">
+          <div className="relative rounded-[2.2rem] sm:rounded-[3rem] gold-gradient-border p-6 sm:p-12 lg:p-14 shadow-[0_30px_100px_rgba(0,0,0,0.95),0_0_70px_rgba(245,194,66,0.25)] backdrop-blur-2xl flex flex-col items-center">
             {/* ANIMATED HERO TITLE: WEAR YOUR VIBE. */}
-            <motion.div variants={fadeUp}>
+            <motion.div variants={fadeUp} className="flex justify-center">
               <AnimatedHeroTitle />
             </motion.div>
 
             {/* ENLARGED LOGO & DRIFTWEAR CLO. BRAND BADGE DIVIDER */}
-            <motion.div variants={fadeUp} className="my-6 flex items-center justify-center gap-3">
-              <span className="h-[1px] flex-1 max-w-[50px] sm:max-w-[70px] bg-gradient-to-r from-transparent to-gold/70" />
-              <div className="flex items-center gap-3 rounded-full border border-gold/50 bg-black/60 px-4 py-2 shadow-[0_0_25px_rgba(245,194,66,0.35)] backdrop-blur-md">
+            <motion.div variants={fadeUp} className="my-7 flex items-center justify-center gap-3 w-full">
+              <span className="h-[1px] flex-1 max-w-[60px] sm:max-w-[100px] bg-gradient-to-r from-transparent to-gold/70" />
+              <div className="flex items-center gap-3 rounded-full border border-gold/50 bg-black/70 px-5 py-2.5 shadow-[0_0_30px_rgba(245,194,66,0.4)] backdrop-blur-md">
                 <Image
                   src="/assets/logo.png"
                   alt="Driftwear Clo. Logo"
-                  width={48}
-                  height={48}
-                  className="h-11 w-11 sm:h-12 sm:w-12 rounded-full object-cover border border-gold/70 shadow-md"
+                  width={52}
+                  height={52}
+                  className="h-11 w-11 sm:h-13 sm:w-13 rounded-full object-cover border border-gold/70 shadow-md"
                 />
-                <span className="font-brand text-sm sm:text-base font-extrabold uppercase tracking-[.24em] gold-gradient-text">
+                <span className="font-brand text-sm sm:text-lg font-extrabold uppercase tracking-[.26em] gold-gradient-text">
                   Driftwear <span className="text-white">Clo.</span>
                 </span>
               </div>
-              <span className="h-[1px] flex-1 max-w-[50px] sm:max-w-[70px] bg-gradient-to-l from-transparent to-gold/70" />
+              <span className="h-[1px] flex-1 max-w-[60px] sm:max-w-[100px] bg-gradient-to-l from-transparent to-gold/70" />
             </motion.div>
 
             {/* Subtitle with Character Entrance Animation */}
-            <motion.div variants={fadeUp}>
-              <AnimatedTextReveal text="Custom T-shirts & Premium DTF Printing" className="font-brand text-sm sm:text-base font-medium leading-6 text-white/85" />
+            <motion.div variants={fadeUp} className="max-w-md">
+              <AnimatedTextReveal text="Custom T-shirts & Premium DTF Printing" className="font-brand text-base sm:text-lg font-medium leading-7 text-white/88" />
             </motion.div>
 
             {/* Action Buttons */}
-            <motion.div variants={fadeUp} className="mt-7 flex flex-wrap items-center gap-4 sm:mt-8">
+            <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:mt-9">
               <AnimatedWhatsAppButton
                 text="Order Now"
                 message="Hi Driftwear Clo., I want to order a custom T-shirt."
-                size="md"
+                size="lg"
               />
               <a
                 href="#customizer"
-                className="font-brand inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-gold/50 bg-gold/10 px-6 py-3 text-xs font-bold uppercase tracking-[.18em] text-white transition duration-300 hover:border-gold hover:bg-gold/20 hover:text-gold sm:text-sm shadow-[0_0_15px_rgba(245,194,66,0.2)]"
+                className="font-brand inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-gold/50 bg-gold/10 px-7 py-3.5 text-xs font-bold uppercase tracking-[.18em] text-white transition duration-300 hover:border-gold hover:bg-gold/20 hover:text-gold sm:text-sm shadow-[0_0_20px_rgba(245,194,66,0.25)]"
               >
-                <Box size={17} className="text-gold animate-pulse" /> 3D Fitting Studio
+                <Box size={18} className="text-gold animate-pulse" /> 3D Fitting Studio
               </a>
             </motion.div>
           </div>
-        </motion.div>
-
-        {/* Right Column: High-End Interactive Garment Showcase (No Box Container Border around Image) */}
-        <motion.div variants={fadeRight} className="relative z-10 w-full max-w-lg">
-          <TiltCard className="relative overflow-hidden rounded-[2.2rem] sm:rounded-[2.5rem] gold-gradient-border bg-[#0A0712]/85 p-5 sm:p-7 shadow-[0_30px_90px_rgba(0,0,0,0.92),0_0_50px_rgba(245,194,66,0.2)] backdrop-blur-2xl">
-            {/* Top Variant Selector Tabs */}
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
-              <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">
-                Apparel Showcase
-              </span>
-
-              <div className="flex items-center gap-1 rounded-full border border-gold/30 bg-black/60 p-1">
-                {apparelVariants.map((v, idx) => (
-                  <button
-                    key={v.name}
-                    onClick={() => setActiveVariantIndex(idx)}
-                    className={`relative rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition sm:px-3 sm:text-[11px] ${
-                      activeVariantIndex === idx ? 'text-slate-950' : 'text-white/60 hover:text-white'
-                    }`}
-                  >
-                    {activeVariantIndex === idx && (
-                      <motion.div
-                        layoutId="heroGarmentVariantPill"
-                        transition={springQuick}
-                        className="absolute inset-0 rounded-full bg-gradient-to-r from-gold via-ambergold to-gold shadow-md"
-                      />
-                    )}
-                    <span className="relative z-10">V{idx + 1}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Main High-Res Garment Photography Showcase */}
-            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-carbon sm:aspect-[1.15/1]">
-              <motion.div
-                key={currentVariant.name}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={springGentle}
-                className="relative h-full w-full"
-              >
-                <Image
-                  src={currentVariant.image}
-                  alt={currentVariant.name}
-                  fill
-                  priority
-                  className="object-cover object-center transition duration-700 hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-
-                {/* Floating Badge */}
-                <div className="absolute left-3 top-3 flex flex-col gap-1.5 sm:left-4 sm:top-4">
-                  <span className="inline-flex items-center gap-1 rounded-full border border-gold/40 bg-black/70 px-3 py-1 font-brand text-xs font-bold text-gold backdrop-blur-md shadow-lg">
-                    <Sparkles size={13} />
-                    {currentVariant.badge}
-                  </span>
-                </div>
-
-                {/* Bottom Product Info & Order Action */}
-                <div className="absolute bottom-3 left-3 right-3 flex flex-col gap-2 rounded-xl border border-gold/30 bg-black/80 p-3.5 backdrop-blur-xl sm:bottom-4 sm:left-4 sm:right-4 sm:flex-row sm:items-center sm:justify-between sm:p-4">
-                  <div>
-                    <h3 className="font-calista text-lg font-bold text-white sm:text-2xl">{currentVariant.name}</h3>
-                    <p className="font-brand text-xs font-bold uppercase tracking-wider gold-gradient-text">{currentVariant.tag}</p>
-                  </div>
-                  <a
-                    href="#customizer"
-                    className="inline-flex items-center gap-1.5 rounded-full border border-gold/50 bg-gold/20 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-gold hover:bg-gold hover:text-black transition"
-                  >
-                    Fit Design <ArrowRight size={14} />
-                  </a>
-                </div>
-              </motion.div>
-            </div>
-          </TiltCard>
         </motion.div>
       </motion.div>
     </section>

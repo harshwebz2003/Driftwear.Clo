@@ -29,7 +29,7 @@ type DesignState = {
 };
 
 const colors: ShirtColor[] = [
-  { label: 'Black', value: '#070707', text: 'text-white' },
+  { label: 'Black', value: '#07111F', text: 'text-white' },
   { label: 'White', value: '#f2efe8', text: 'text-black' },
   { label: 'Ash', value: '#9d9d96', text: 'text-black' },
   { label: 'Beige', value: '#cdbb97', text: 'text-black' },
@@ -129,11 +129,11 @@ function Scene({ state, onReady }: { state: DesignState; onReady: () => void }) 
   return (
     <>
       <PerspectiveCamera makeDefault position={[0, 0.55, 4.1]} fov={38} />
-      <color attach="background" args={['#050505']} />
-      <fog attach="fog" args={['#050505', 6, 12]} />
+      <color attach="background" args={['#07111F']} />
+      <fog attach="fog" args={['#07111F', 6, 12]} />
       <ambientLight intensity={1.4} />
       <directionalLight position={[3, 4, 5]} intensity={2.8} />
-      <spotLight position={[-4, 2, 4]} angle={0.38} intensity={8} color="#f6b326" penumbra={0.7} />
+      <spotLight position={[-4, 2, 4]} angle={0.38} intensity={8} color="#C8CDD2" penumbra={0.7} />
       <Environment preset="city" />
       <Bounds fit clip observe margin={1.1}>
         <TshirtModel state={state} />
@@ -247,7 +247,7 @@ Please confirm price and order details.`;
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="relative h-[560px] overflow-hidden rounded-[2rem] border border-gold/20 bg-[radial-gradient(circle_at_50%_35%,rgba(246,179,38,.22),transparent_30rem),linear-gradient(145deg,#080808,#141414)] shadow-gold sm:h-[640px] xl:h-[760px]"
+            className="relative h-[560px] overflow-hidden rounded-[2rem] border border-gold/20 bg-[radial-gradient(circle_at_50%_35%,rgba(200,205,210,.22),transparent_30rem),linear-gradient(145deg,#07111F,#0B1523)] shadow-gold sm:h-[640px] xl:h-[760px]"
           >
             <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_20%,transparent,rgba(0,0,0,.18)_52%,rgba(0,0,0,.72))]" />
             <AnimatePresence>

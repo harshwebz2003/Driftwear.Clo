@@ -41,7 +41,7 @@ export default function HomePage() {
 function Hero() {
   return (
     <section className="relative min-h-screen overflow-hidden px-5 pb-20 pt-32 sm:px-8 lg:px-14 lg:pt-24" aria-labelledby="hero-title">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_42%,rgba(246,179,38,.28),transparent_28rem)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_42%,rgba(200,205,210,.26),transparent_28rem)]" />
       <div className="absolute left-1/2 top-1/2 h-[22rem] w-[22rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-gold/20 blur-sm sm:h-[42rem] sm:w-[42rem]" />
       <motion.div className="shell relative grid min-h-[calc(100vh-6rem)] items-center gap-12 lg:grid-cols-[.95fr_1.05fr]" variants={stagger} initial="hidden" animate="show">
         <div>
@@ -148,7 +148,7 @@ function Process() {
 function WhyChoose() {
   return (
     <section className="section-pad">
-      <div className="shell overflow-hidden rounded-[2rem] border border-gold/20 bg-[radial-gradient(circle_at_20%_20%,rgba(246,179,38,.2),transparent_28rem)] p-6 sm:p-10 lg:p-14">
+      <div className="shell overflow-hidden rounded-[2rem] border border-gold/20 bg-[radial-gradient(circle_at_20%_20%,rgba(200,205,210,.2),transparent_28rem)] p-6 sm:p-10 lg:p-14">
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
           <div>
             <p className="eyebrow">Why choose Driftwear</p>
@@ -191,7 +191,7 @@ function Testimonials() {
       <div className="shell">
         <SectionTitle eyebrow="Testimonials" title="Built for people who want clothing with identity." />
         <div className="grid gap-5 md:grid-cols-3">
-          {['Clean print quality and the design looked exactly like the mockup.', 'Fast WhatsApp communication and a premium feel for our team tees.', 'The black and gold brand style feels unique and bold.'].map((quote, index) => (
+          {['Clean print quality and the design looked exactly like the mockup.', 'Fast WhatsApp communication and a premium feel for our team tees.', 'The midnight and silver brand style feels unique and bold.'].map((quote, index) => (
             <article key={quote} className="gold-border rounded-[1.5rem] p-6">
               <div className="flex gap-1 text-gold">{Array.from({ length: 5 }).map((_, star) => <Sparkles key={star} size={16} fill="currentColor" />)}</div>
               <p className="mt-5 text-white/70">{quote}</p>
@@ -277,7 +277,7 @@ function Footer() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.7 }}
-          className="relative overflow-hidden rounded-[2rem] border border-white/12 bg-[#070707] shadow-[0_32px_100px_rgba(0,0,0,.55)]"
+          className="relative overflow-hidden rounded-[2rem] border border-white/12 bg-[#07111F] shadow-[0_32px_100px_rgba(0,0,0,.55)]"
         >
           <Image
             src="/assets/tshirt_printing_press.jpg"
@@ -286,7 +286,7 @@ function Footer() {
             sizes="100vw"
             className="object-cover opacity-[.42]"
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_12%,rgba(246,179,38,.32),transparent_24rem),linear-gradient(180deg,rgba(5,5,5,.18),rgba(5,5,5,.74)_48%,rgba(5,5,5,.95))]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_12%,rgba(200,205,210,.3),transparent_24rem),linear-gradient(180deg,rgba(7,17,31,.18),rgba(7,17,31,.74)_48%,rgba(7,17,31,.96))]" />
           <div className="absolute inset-x-0 bottom-0 z-0 translate-y-[19%] overflow-hidden whitespace-nowrap text-center font-display text-[clamp(5.3rem,18vw,18rem)] uppercase leading-none text-white/[.09]">
             Driftwear
           </div>

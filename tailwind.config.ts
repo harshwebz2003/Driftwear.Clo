@@ -5,23 +5,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        obsidian: '#050505',
-        carbon: '#111111',
-        charcoal: '#191919',
-        gold: '#f6b326',
-        ambergold: '#ffcf66',
-        smoke: '#a4a4a4'
+        obsidian: '#07111F',
+        carbon: '#0B1523',
+        charcoal: '#141C28',
+        gold: '#C8CDD2',
+        ambergold: '#FFFFFF',
+        smoke: '#C8CDD2'
       },
       fontFamily: {
         display: ['var(--font-display)', 'Impact', 'sans-serif'],
         body: ['var(--font-body)', 'system-ui', 'sans-serif']
       },
       boxShadow: {
-        gold: '0 24px 90px rgba(246, 179, 38, 0.22)',
+        gold: '0 24px 90px rgba(200, 205, 210, 0.22)',
         card: '0 24px 80px rgba(0,0,0,.38)'
       },
       backgroundImage: {
-        'gold-radial': 'radial-gradient(circle at center, rgba(246,179,38,.28), transparent 38rem)'
+        'gold-radial': 'radial-gradient(circle at center, rgba(200,205,210,.24), transparent 38rem)'
       }
     }
   },

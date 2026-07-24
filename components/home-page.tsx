@@ -25,7 +25,7 @@ import {
   Award
 } from 'lucide-react';
 import Navbar from '@/components/navbar';
-import Preloader from '@/components/preloader';
+import { SafeErrorBoundary } from '@/components/error-boundary';
 import {
   fadeUp,
   fadeInScale,
@@ -45,6 +45,8 @@ import {
   springBouncy
 } from '@/components/motion';
 import { contact, faqs, gallery, navItems, processSteps, products, reasons, whatsappLink } from '@/lib/site-data';
+
+const Preloader = dynamic(() => import('@/components/preloader'), { ssr: false });
 
 const TshirtCustomizer = dynamic(() => import('@/components/tshirt-customizer'), {
   ssr: false,
@@ -82,16 +84,23 @@ export default function HomePage() {
 
   return (
     <>
-      <Preloader />
+      <SafeErrorBoundary>
+        <Preloader />
+      </SafeErrorBoundary>
+
       {/* Dynamic Animated Ambient Color Background Orbs */}
-      <AnimatedColorBackground />
+      <SafeErrorBoundary>
+        <AnimatedColorBackground />
+      </SafeErrorBoundary>
 
       <Navbar />
 
       <main id="home" className="relative z-10 overflow-x-hidden">
         <Hero />
         <HorizontalMarquee items={tickerItems1} speed={24} direction="left" />
-        <TshirtCustomizer />
+        <SafeErrorBoundary>
+          <TshirtCustomizer />
+        </SafeErrorBoundary>
         <FeaturedProducts onPreview={(img) => setSelectedImage(img)} />
         <PrintSpecsAndDelivery />
         <HorizontalMarquee items={tickerItems2} speed={28} direction="right" />

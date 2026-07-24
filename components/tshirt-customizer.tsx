@@ -8,6 +8,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'rea
 import type { ReactNode, RefObject } from 'react';
 import * as THREE from 'three';
 import { whatsappLink } from '@/lib/site-data';
+import { AnimatedWhatsAppButton } from '@/components/motion';
 
 type ShirtColor = {
   label: string;
@@ -98,285 +99,171 @@ function createFabricBumpTexture() {
   if (!context) return null;
 
   context.fillStyle = '#808080';
-  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.fillRect(0, 0, 128, 128);
 
-  for (let y = 0; y < canvas.height; y += 2) {
-    context.fillStyle = y % 4 === 0 ? '#8d8d8d' : '#737373';
-    context.fillRect(0, y, canvas.width, 1);
+  const imageData = context.getImageData(0, 0, 128, 128);
+  const data = imageData.data;
+
+  for (let x = 0; x < 128; x += 1) {
+    for (let y = 0; y < 128; y += 1) {
+      const index = (y * 128 + x) * 4;
+      const noise = (Math.sin(x * 0.45) + Math.cos(y * 0.45)) * 14;
+      const value = clamp(128 + noise, 0, 255);
+      data[index] = value;
+      data[index + 1] = value;
+      data[index + 2] = value;
+    }
   }
 
-  for (let x = 0; x < canvas.width; x += 3) {
-    context.fillStyle = x % 6 === 0 ? 'rgba(255,255,255,.24)' : 'rgba(0,0,0,.18)';
-    context.fillRect(x, 0, 1, canvas.height);
-  }
+  context.putImageData(imageData, 0, 0);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(18, 18);
-  texture.colorSpace = THREE.NoColorSpace;
-  texture.needsUpdate = true;
-
+  texture.repeat.set(24, 24);
   return texture;
 }
 
-function isNearBlack(red: number, green: number, blue: number) {
-  return red < 58 && green < 58 && blue < 58 && red + green + blue < 132;
-}
+function processDarkBackground(image: HTMLImageElement) {
+  const canvas = document.createElement('canvas');
+  canvas.width = image.naturalWidth || image.width;
+  canvas.height = image.naturalHeight || image.height;
+  const context = canvas.getContext('2d');
 
-function imageFromUrl(url: string) {
-  return new Promise<InstanceType<typeof globalThis.Image>>((resolve, reject) => {
-    const image = new globalThis.Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error('Unable to load uploaded artwork.'));
-    image.src = url;
-  });
-}
+  if (!context) return { dataUrl: image.src, processed: false };
 
-function canvasToBlob(canvas: { toBlob: (callback: (blob: globalThis.Blob | null) => void, type?: string) => void }) {
-  return new Promise<globalThis.Blob>((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error('Unable to process uploaded artwork.'));
-    }, 'image/png');
-  });
-}
+  context.drawImage(image, 0, 0);
+  const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  let modified = false;
 
-async function removeBlackArtworkBackground(file: File) {
-  const sourceUrl = URL.createObjectURL(file);
+  for (let i = 0; i < data.length; i += 4) {
+    const red = data[i];
+    const green = data[i + 1];
+    const blue = data[i + 2];
+    const alpha = data[i + 3];
 
-  try {
-    const image = await imageFromUrl(sourceUrl);
-    const maxSize = 2048;
-    const ratio = Math.min(1, maxSize / Math.max(image.naturalWidth, image.naturalHeight));
-    const width = Math.max(1, Math.round(image.naturalWidth * ratio));
-    const height = Math.max(1, Math.round(image.naturalHeight * ratio));
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const context = canvas.getContext('2d', { willReadFrequently: true });
-
-    if (!context) return { url: sourceUrl, processedBackground: false, revokeSource: false };
-
-    context.drawImage(image, 0, 0, width, height);
-    const imageData = context.getImageData(0, 0, width, height);
-    const { data } = imageData;
-    let edgePixels = 0;
-    let blackEdgePixels = 0;
-
-    for (let y = 0; y < height; y += 1) {
-      for (let x = 0; x < width; x += 1) {
-        if (x > 3 && y > 3 && x < width - 4 && y < height - 4) continue;
-        const index = (y * width + x) * 4;
-        edgePixels += 1;
-        if (isNearBlack(data[index], data[index + 1], data[index + 2])) {
-          blackEdgePixels += 1;
-        }
-      }
+    if (alpha > 0 && red < 34 && green < 34 && blue < 34) {
+      data[i + 3] = 0;
+      modified = true;
     }
-
-    const shouldRemoveBlack = edgePixels > 0 && blackEdgePixels / edgePixels > 0.34;
-
-    if (!shouldRemoveBlack) {
-      return { url: sourceUrl, processedBackground: false, revokeSource: false };
-    }
-
-    for (let index = 0; index < data.length; index += 4) {
-      const red = data[index];
-      const green = data[index + 1];
-      const blue = data[index + 2];
-      const luminance = red * 0.2126 + green * 0.7152 + blue * 0.0722;
-
-      if (isNearBlack(red, green, blue)) {
-        data[index + 3] = 0;
-      } else if (luminance < 82) {
-        data[index + 3] = Math.min(data[index + 3], Math.round(((luminance - 34) / 48) * 255));
-      }
-    }
-
-    context.putImageData(imageData, 0, 0);
-    const blob = await canvasToBlob(canvas);
-    const processedUrl = URL.createObjectURL(blob);
-    URL.revokeObjectURL(sourceUrl);
-
-    return { url: processedUrl, processedBackground: true, revokeSource: true };
-  } catch {
-    return { url: sourceUrl, processedBackground: false, revokeSource: false };
   }
+
+  if (!modified) {
+    return { dataUrl: image.src, processed: false };
+  }
+
+  context.putImageData(imageData, 0, 0);
+  return { dataUrl: canvas.toDataURL('image/png'), processed: true };
 }
 
-function TshirtModel({ state }: { state: DesignState }) {
-  const group = useRef<THREE.Group>(null);
-  const shirtMeshRef = useRef<THREE.Mesh>(null!);
-  const { scene } = useGLTF('/models/tshirt.glb');
-  const model = useMemo(() => scene.clone(true), [scene]);
-  const hasDesign = Boolean(state.textureUrl);
-  const fabricBump = useMemo(() => (typeof document === 'undefined' ? null : createFabricBumpTexture()), []);
+function ShirtModel({ state }: { state: DesignState }) {
+  const { nodes, materials } = useGLTF('/models/tshirt.glb') as unknown as {
+    nodes: { T_Shirt: THREE.Mesh };
+    materials: { 'FABRIC_1_FRONT_4193.001': THREE.MeshStandardMaterial };
+  };
 
-  useEffect(() => () => fabricBump?.dispose(), [fabricBump]);
-
-  useEffect(() => {
-    model.traverse((node) => {
-      if ('isMesh' in node && node.isMesh) {
-        const mesh = node as THREE.Mesh;
-        const lighting = materialLightingFor(state.color);
-        shirtMeshRef.current = mesh;
-        const material = new THREE.MeshStandardMaterial({
-          color: new THREE.Color(state.color.value),
-          roughness: lighting.roughness,
-          metalness: 0,
-          envMapIntensity: lighting.envMapIntensity,
-          bumpMap: fabricBump ?? undefined,
-          bumpScale: lighting.bumpScale
-        });
-        mesh.material = material;
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-      }
-    });
-  }, [fabricBump, model, state.color]);
-
-  useFrame((_, delta) => {
-    if (!group.current) return;
-    if (hasDesign) {
-      group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, 0, 2.6, delta);
-      return;
-    }
-
-    group.current.rotation.y += delta * 0.14;
-  });
-
-  return (
-    <group ref={group}>
-      <Center>
-        <group scale={1.76} rotation={[0, Math.PI, 0]}>
-          <primitive object={model} />
-          {hasDesign && shirtMeshRef.current ? <PrintedDesign state={state} shirtMeshRef={shirtMeshRef} fabricBump={fabricBump} /> : null}
-        </group>
-      </Center>
-    </group>
-  );
-}
-
-function PrintedDesign({ state, shirtMeshRef, fabricBump }: { state: DesignState; shirtMeshRef: RefObject<THREE.Mesh>; fabricBump: THREE.Texture | null }) {
-  const [texture, setTexture] = useState<THREE.Texture | null>(null);
+  const [decalTexture, setDecalTexture] = useState<THREE.Texture | null>(null);
+  const fabricBumpMap = useMemo(() => createFabricBumpTexture(), []);
 
   useEffect(() => {
     if (!state.textureUrl) {
-      setTexture((current) => {
-        current?.dispose();
-        return null;
-      });
-      return undefined;
+      setDecalTexture(null);
+      return;
     }
 
-    setTexture((current) => {
-      current?.dispose();
-      return null;
-    });
-
-    let active = true;
-    let loaded: THREE.Texture | null = null;
     const loader = new THREE.TextureLoader();
+    let isCurrent = true;
 
     loader.load(
       state.textureUrl,
       (loadedTexture) => {
-        if (!active) {
-          loadedTexture.dispose();
-          return;
-        }
-
-        loaded = loadedTexture;
-        loaded.colorSpace = THREE.SRGBColorSpace;
-        loaded.flipY = false;
-        loaded.wrapS = THREE.ClampToEdgeWrapping;
-        loaded.wrapT = THREE.ClampToEdgeWrapping;
-        loaded.anisotropy = 8;
-        loaded.needsUpdate = true;
-        setTexture((current) => {
-          current?.dispose();
-          return loadedTexture;
-        });
+        if (!isCurrent) return;
+        loadedTexture.colorSpace = THREE.SRGBColorSpace;
+        loadedTexture.needsUpdate = true;
+        setDecalTexture(loadedTexture);
       },
       undefined,
       () => {
-        if (active) setTexture(null);
+        if (isCurrent) {
+          setDecalTexture(null);
+        }
       }
     );
 
     return () => {
-      active = false;
-      loaded?.dispose();
+      isCurrent = false;
     };
   }, [state.textureUrl]);
 
-  if (!texture) return null;
+  useFrame((_, delta) => {
+    const targetColor = new THREE.Color(state.color.value);
+    const material = materials['FABRIC_1_FRONT_4193.001'];
+    const lighting = materialLightingFor(state.color);
 
-  const position = [
-    clamp(state.positionX, CHEST_LIMITS.x.min, CHEST_LIMITS.x.max),
-    clamp(CHEST_POSITION.y + state.positionY, CHEST_LIMITS.y.min, CHEST_LIMITS.y.max),
-    CHEST_POSITION.z
-  ] as [number, number, number];
-  const decalScale = clamp(state.scale, 0.16, 0.72);
+    material.color.lerp(targetColor, delta * 6);
+    material.roughness = THREE.MathUtils.lerp(material.roughness, lighting.roughness, delta * 4);
+
+    if (fabricBumpMap) {
+      material.bumpMap = fabricBumpMap;
+      material.bumpScale = lighting.bumpScale;
+    }
+
+    material.needsUpdate = true;
+  });
+
+  const decalPosition = useMemo(
+    () => new THREE.Vector3(CHEST_POSITION.x + state.positionX, CHEST_POSITION.y + state.positionY, CHEST_POSITION.z),
+    [state.positionX, state.positionY]
+  );
 
   return (
-    <Decal
-      mesh={shirtMeshRef}
-      position={position}
-      rotation={state.rotation}
-      scale={[decalScale, decalScale, 0.16]}
-      polygonOffsetFactor={-12}
-      depthTest
-      renderOrder={20}
-    >
-      <meshStandardMaterial
-        map={texture}
-        bumpMap={fabricBump ?? undefined}
-        bumpScale={0.01}
-        transparent
-        alphaTest={0.15}
-        opacity={0.9}
-        roughness={0.96}
-        metalness={0}
-        polygonOffset
-        polygonOffsetFactor={-12}
-        depthWrite={false}
-        toneMapped={false}
-        side={THREE.FrontSide}
-      />
-    </Decal>
+    <group>
+      <mesh castShadow receiveShadow geometry={nodes.T_Shirt.geometry} material={materials['FABRIC_1_FRONT_4193.001']}>
+        {decalTexture ? (
+          <Decal
+            position={decalPosition}
+            rotation={[0, 0, state.rotation]}
+            scale={[state.scale, state.scale, 0.45]}
+            map={decalTexture}
+          />
+        ) : null}
+      </mesh>
+    </group>
   );
 }
 
+function CameraRig({ isReady }: { isReady: boolean }) {
+  const { camera } = useThree();
+
+  useEffect(() => {
+    if (!isReady) return;
+    camera.position.set(0, 0.22, 2.55);
+    camera.lookAt(0, 0.05, 0);
+  }, [camera, isReady]);
+
+  return null;
+}
+
 function Scene({ state, onReady }: { state: DesignState; onReady: () => void }) {
-  const gl = useThree((threeState) => threeState.gl);
-
-  useEffect(() => {
-    onReady();
-  }, [onReady]);
-
-  useEffect(() => {
-    gl.toneMapping = THREE.ACESFilmicToneMapping;
-    gl.toneMappingExposure = 0.94;
-    gl.outputColorSpace = THREE.SRGBColorSpace;
-  }, [gl]);
+  const lighting = useMemo(() => materialLightingFor(state.color), [state.color]);
 
   return (
     <>
-      <PerspectiveCamera makeDefault position={[0, 0.45, 5.35]} fov={34} />
-      <color attach="background" args={['#080B10']} />
-      <fog attach="fog" args={['#080B10', 7.5, 14]} />
-      <ambientLight intensity={1.25} />
-      <directionalLight position={[3, 5, 5]} intensity={2.45} castShadow shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
-      <spotLight position={[-4, 3, 4]} angle={0.42} intensity={6.3} color="#FFFFFF" penumbra={0.72} />
-      <pointLight position={[2.8, 1.2, -2.4]} intensity={1.75} color="#C8CDD2" />
-      <Environment preset="studio" environmentIntensity={0.62} />
-      <Bounds fit clip observe margin={1.42}>
-        <TshirtModel state={state} />
+      <PerspectiveCamera makeDefault position={[0, 0.22, 2.55]} fov={34} />
+      <CameraRig isReady />
+      <ambientLight intensity={0.78} />
+      <directionalLight position={[3, 4, 3]} intensity={1.35} castShadow shadow-mapSize={[1024, 1024]} shadow-bias={-0.0001} />
+      <directionalLight position={[-3, 2, -2]} intensity={0.55} color="#d8b45f" />
+      <pointLight position={[0, -2, 2]} intensity={0.35} color="#ffffff" />
+      <Environment preset="studio" environmentIntensity={lighting.envMapIntensity} />
+      <Bounds fit clip observe margin={1.15}>
+        <Center onCentered={onReady}>
+          <ShirtModel state={state} />
+        </Center>
       </Bounds>
-      <ContactShadows position={[0, -1.72, 0]} opacity={0.42} scale={5.8} blur={2.4} far={3.8} color="#02050A" />
-      <OrbitControls enableDamping dampingFactor={0.08} minDistance={3.25} maxDistance={8} autoRotate={false} />
+      <ContactShadows position={[0, -0.92, 0]} opacity={0.62} scale={4} blur={2.2} far={2.5} />
+      <OrbitControls makeDefault enablePan={false} enableZoom minDistance={1.4} maxDistance={3.4} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI / 1.75} />
     </>
   );
 }
@@ -384,8 +271,9 @@ function Scene({ state, onReady }: { state: DesignState; onReady: () => void }) 
 function CanvasFallback() {
   return (
     <Html center>
-      <div className="rounded-2xl border border-gold/30 bg-black/80 px-5 py-4 text-center text-sm font-bold text-white">
-        Loading 3D T-shirt model...
+      <div className="font-brand flex flex-col items-center gap-3 text-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-gold border-t-transparent" />
+        <p className="text-xs font-bold uppercase tracking-[.2em] text-gold">Loading 3D T-Shirt Studio</p>
       </div>
     </Html>
   );
@@ -394,108 +282,132 @@ function CanvasFallback() {
 export default function TshirtCustomizer() {
   const [state, setState] = useState<DesignState>(initialState);
   const [ready, setReady] = useState(false);
-  const [webgl, setWebgl] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
-  const viewerRef = useRef<HTMLDivElement>(null);
+  const [webgl, setWebgl] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setWebgl(supportsWebGL());
-    return () => {
-      if (state.textureUrl?.startsWith('blob:')) URL.revokeObjectURL(state.textureUrl);
-    };
-  }, [state.textureUrl]);
-
-  const update = useCallback((patch: Partial<DesignState>) => {
-    setState((current) => ({ ...current, ...patch }));
   }, []);
 
-  const handleUpload = async (file: File | undefined) => {
-    if (!file) return;
-    if (!['image/png', 'image/jpeg', 'image/svg+xml'].includes(file.type)) return;
-    const processed = file.type === 'image/svg+xml'
-      ? { url: URL.createObjectURL(file), processedBackground: false }
-      : await removeBlackArtworkBackground(file);
-    setState((current) => {
-      if (current.textureUrl?.startsWith('blob:')) URL.revokeObjectURL(current.textureUrl);
-      return { ...current, textureUrl: processed.url, fileName: file.name, sampleName: 'Uploaded artwork', processedBackground: processed.processedBackground };
-    });
-  };
+  const update = useCallback((slice: Partial<DesignState>) => {
+    setState((current) => ({ ...current, ...slice }));
+  }, []);
 
-  const chooseSample = (url: string, name: string) => {
-    setState((current) => {
-      if (current.textureUrl?.startsWith('blob:')) URL.revokeObjectURL(current.textureUrl);
-      return { ...current, textureUrl: url || null, fileName: url ? `${name}.svg` : 'No uploaded design', sampleName: name, processedBackground: false };
-    });
-  };
+  const handleUpload = useCallback(
+    (file?: File) => {
+      if (!file) return;
 
-  const nudge = (axis: 'x' | 'y', amount: number) => {
-    setState((current) => ({
-      ...current,
-      positionX: axis === 'x' ? Number(clamp(current.positionX + amount, CHEST_LIMITS.x.min, CHEST_LIMITS.x.max).toFixed(2)) : current.positionX,
-      positionY: axis === 'y' ? Number(clamp(current.positionY + amount, CHEST_LIMITS.y.min - CHEST_POSITION.y, CHEST_LIMITS.y.max - CHEST_POSITION.y).toFixed(2)) : current.positionY
-    }));
-  };
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const rawUrl = event.target?.result as string;
+        if (!rawUrl) return;
 
-  const reset = () => {
-    setState((current) => {
-      if (current.textureUrl?.startsWith('blob:')) URL.revokeObjectURL(current.textureUrl);
-      return initialState;
-    });
-  };
+        const image = new window.Image();
+        image.crossOrigin = 'anonymous';
+        image.onload = () => {
+          const { dataUrl, processed } = processDarkBackground(image);
+          update({
+            textureUrl: dataUrl,
+            fileName: file.name,
+            sampleName: 'Custom Upload',
+            processedBackground: processed
+          });
+        };
+        image.src = rawUrl;
+      };
+      reader.readAsDataURL(file);
+    },
+    [update]
+  );
 
-  const toggleFullscreen = async () => {
-    if (!viewerRef.current) return;
+  const chooseSample = useCallback(
+    (url: string, name: string) => {
+      update({
+        textureUrl: url || null,
+        fileName: url ? name : 'No uploaded design',
+        sampleName: name,
+        processedBackground: false
+      });
+    },
+    [update]
+  );
+
+  const nudge = useCallback(
+    (axis: 'x' | 'y', amount: number) => {
+      if (axis === 'x') {
+        const nextX = clamp(state.positionX + amount, CHEST_LIMITS.x.min, CHEST_LIMITS.x.max);
+        update({ positionX: nextX });
+        return;
+      }
+
+      const minY = CHEST_LIMITS.y.min - CHEST_POSITION.y;
+      const maxY = CHEST_LIMITS.y.max - CHEST_POSITION.y;
+      const nextY = clamp(state.positionY + amount, minY, maxY);
+      update({ positionY: nextY });
+    },
+    [state.positionX, state.positionY, update]
+  );
+
+  const reset = useCallback(() => {
+    setState(initialState);
+  }, []);
+
+  const toggleFullscreen = useCallback(() => {
+    if (!containerRef.current) return;
+
     if (!document.fullscreenElement) {
-      await viewerRef.current.requestFullscreen();
+      containerRef.current.requestFullscreen?.();
       setFullscreen(true);
-    } else {
-      await document.exitFullscreen();
-      setFullscreen(false);
+      return;
     }
-  };
 
-  const downloadPreview = () => {
-    const canvas = viewerRef.current?.querySelector('canvas');
+    document.exitFullscreen?.();
+    setFullscreen(false);
+  }, []);
+
+  const orderMessage = useMemo(() => {
+    const details = [
+      'Hi Driftwear Clo., I styled a T-shirt in the 3D customizer studio.',
+      `Color: ${state.color.label}`,
+      `Size: ${state.size}`,
+      `Design: ${state.sampleName === 'Custom Upload' ? `Custom uploaded design (${state.fileName})` : state.sampleName}`,
+      `Placement: X ${(state.positionX * 100).toFixed(0)}%, Y ${(state.positionY * 100).toFixed(0)}%, Scale ${(state.scale * 100).toFixed(0)}%`
+    ];
+
+    if (state.note.trim()) {
+      details.push(`Note: ${state.note.trim()}`);
+    }
+
+    return details.join('\n');
+  }, [state]);
+
+  const downloadPreview = useCallback(() => {
+    const canvas = containerRef.current?.querySelector('canvas');
     if (!canvas) return;
     const link = document.createElement('a');
-    link.download = `driftwear-${state.color.label.toLowerCase()}-custom-preview.png`;
+    link.download = `driftwear-custom-tshirt-${state.color.label.toLowerCase()}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
-  };
-
-  const orderMessage = `Hi Driftwear Clo., I want to order this 3D custom T-shirt design.
-Selected T-shirt color: ${state.color.label}
-Selected size: ${state.size}
-Uploaded design name: ${state.fileName}
-Custom note: ${state.note || 'None'}
-Please confirm price and order details.`;
+  }, [state.color.label]);
 
   return (
     <section id="customizer" className="section-pad">
       <div className="shell">
-        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="mb-10 max-w-4xl">
-          <p className="eyebrow">3D T-shirt customizer</p>
-          <h2 className="display-title mt-4 text-[clamp(3.1rem,7vw,7rem)] text-white">Preview your print on the shirt.</h2>
-          <p className="mt-5 max-w-2xl text-lg leading-8 text-white/62">
-            Upload your logo, artwork, or clothing design and position it on the 3D Driftwear T-shirt before ordering.
+        <div className="mb-10 max-w-4xl">
+          <p className="eyebrow">Interactive 3D Studio</p>
+          <h2 className="display-title mt-4 text-[clamp(3.2rem,7vw,7rem)] text-white">Create your custom T-shirt.</h2>
+          <p className="mt-5 max-w-2xl text-base sm:text-lg leading-7 sm:leading-8 text-white/62">
+            Upload your artwork, adjust the print position, choose your tee color, and place your order directly on WhatsApp.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_420px]">
-          <motion.div
-            ref={viewerRef}
-            initial={{ opacity: 0, scale: 0.98 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="relative h-[560px] overflow-hidden rounded-[2rem] border border-gold/20 bg-[radial-gradient(circle_at_50%_30%,rgba(255,255,255,.16),transparent_25rem),radial-gradient(circle_at_72%_22%,rgba(200,205,210,.16),transparent_24rem),linear-gradient(145deg,#0E1115,#090D12_52%,#050607)] shadow-gold sm:h-[640px] xl:h-[760px]"
-          >
-            <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_22%,transparent,rgba(0,0,0,.08)_54%,rgba(0,0,0,.58))]" />
+        <div ref={containerRef} className={`grid gap-8 lg:grid-cols-[1.2fr_.8fr] lg:items-start ${fullscreen ? 'fixed inset-0 z-50 overflow-y-auto bg-obsidian p-6' : ''}`}>
+          <motion.div initial={{ opacity: 0, scale: 0.96 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="gold-border relative aspect-square w-full overflow-hidden rounded-[2rem] bg-carbon sm:aspect-[4/3] lg:aspect-[1.1/1]">
             <AnimatePresence>
               {!ready && webgl ? (
-                <motion.div initial={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-20 grid place-items-center bg-obsidian/80">
-                  <div className="font-brand rounded-2xl border border-gold/30 bg-black/70 px-5 py-4 text-sm font-bold uppercase tracking-[.14em] text-gold">
-                    Loading 3D model
-                  </div>
+                <motion.div exit={{ opacity: 0 }} className="absolute inset-0 z-20 grid place-items-center bg-obsidian">
+                  <CanvasFallback />
                 </motion.div>
               ) : null}
             </AnimatePresence>
@@ -506,27 +418,27 @@ Please confirm price and order details.`;
                 </Suspense>
               </Canvas>
             ) : (
-              <div className="grid h-full min-h-[540px] place-items-center p-8 text-center">
+              <div className="grid h-full min-h-[400px] place-items-center p-8 text-center sm:min-h-[540px]">
                 <div>
-                  <h3 className="font-calista text-3xl font-semibold text-white">WebGL is not supported.</h3>
-                  <p className="mt-3 text-white/60">Please open this page in a modern browser with hardware acceleration enabled.</p>
+                  <h3 className="font-calista text-2xl font-semibold text-white sm:text-3xl">WebGL is not supported.</h3>
+                  <p className="mt-3 text-sm text-white/60">Please open this page in a modern browser with hardware acceleration enabled.</p>
                 </div>
               </div>
             )}
-            <div className="font-brand pointer-events-none absolute bottom-5 left-5 z-20 rounded-full border border-white/10 bg-black/55 px-4 py-2 text-xs font-bold uppercase tracking-[.14em] text-white/70 backdrop-blur-xl">
+            <div className="font-brand pointer-events-none absolute bottom-4 left-4 z-20 rounded-full border border-white/10 bg-black/55 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.14em] text-white/70 backdrop-blur-xl sm:bottom-5 sm:left-5 sm:px-4 sm:py-2 sm:text-xs">
               Drag to orbit / scroll to zoom
             </div>
           </motion.div>
 
-          <motion.aside initial={{ opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="gold-border rounded-[2rem] p-5 sm:p-6">
-            <div className="grid gap-5">
+          <motion.aside initial={{ opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="gold-border rounded-[2rem] p-4 sm:p-6">
+            <div className="grid gap-4 sm:gap-5">
               <div>
                 <label className="font-brand text-xs font-bold uppercase tracking-[.18em] text-white/60" htmlFor="design-upload">Upload PNG, JPG, or SVG</label>
-                <label htmlFor="design-upload" className="font-brand mt-3 flex cursor-pointer items-center justify-center gap-3 rounded-2xl border border-dashed border-gold/40 bg-gold/10 px-4 py-5 text-sm font-bold uppercase tracking-[.13em] text-gold transition hover:bg-gold/15">
+                <label htmlFor="design-upload" className="font-brand mt-3 flex cursor-pointer items-center justify-center gap-3 rounded-2xl border border-dashed border-gold/40 bg-gold/10 px-4 py-4 text-xs font-bold uppercase tracking-[.13em] text-gold transition hover:bg-gold/15 sm:py-5 sm:text-sm">
                   <Upload size={18} /> Upload artwork
                 </label>
                 <input id="design-upload" type="file" accept="image/png,image/jpeg,image/svg+xml" className="sr-only" onChange={(event) => handleUpload(event.target.files?.[0])} />
-                <p className="mt-2 break-words text-sm text-white/55">{state.fileName}</p>
+                <p className="mt-2 break-words text-xs text-white/55 sm:text-sm">{state.fileName}</p>
                 {state.processedBackground ? (
                   <p className="mt-2 rounded-xl border border-gold/20 bg-gold/10 px-3 py-2 text-xs leading-5 text-gold">
                     Black artwork background removed for a clean printed preview.
@@ -542,7 +454,7 @@ Please confirm price and order details.`;
                       key={sample.name}
                       type="button"
                       onClick={() => chooseSample(sample.url, sample.name)}
-                      className={`font-grande rounded-2xl border px-3 py-3 text-xs font-bold uppercase tracking-[.14em] transition ${state.sampleName === sample.name ? 'border-gold bg-gold text-black' : 'border-white/10 bg-white/[.05] text-white/70 hover:border-gold/60'}`}
+                      className={`font-grande rounded-2xl border px-2 py-2.5 text-[11px] font-bold uppercase tracking-[.14em] transition sm:px-3 sm:py-3 sm:text-xs ${state.sampleName === sample.name ? 'border-gold bg-gold text-black' : 'border-white/10 bg-white/[.05] text-white/70 hover:border-gold/60'}`}
                     >
                       {sample.name}
                     </button>
@@ -558,9 +470,9 @@ Please confirm price and order details.`;
                       key={color.label}
                       type="button"
                       onClick={() => update({ color })}
-                      className={`font-grande flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-bold uppercase tracking-[.14em] ${state.color.label === color.label ? 'border-gold text-gold' : 'border-white/10 text-white/60'}`}
+                      className={`font-grande flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.14em] sm:py-2 sm:text-xs ${state.color.label === color.label ? 'border-gold text-gold' : 'border-white/10 text-white/60'}`}
                     >
-                      <span className="h-5 w-5 rounded-full border border-white/30" style={{ backgroundColor: color.value }} />
+                      <span className="h-4 w-4 rounded-full border border-white/30 sm:h-5 sm:w-5" style={{ backgroundColor: color.value }} />
                       {color.label}
                     </button>
                   ))}
@@ -580,26 +492,29 @@ Please confirm price and order details.`;
               <ControlSlider label="Vertical position" min={CHEST_LIMITS.y.min - CHEST_POSITION.y} max={CHEST_LIMITS.y.max - CHEST_POSITION.y} step={0.01} value={state.positionY} onChange={(positionY) => update({ positionY })} />
 
               <div className="grid grid-cols-4 gap-2">
-                <NudgeButton label="Left" icon={<MoveLeft size={17} />} onClick={() => nudge('x', -0.05)} />
-                <NudgeButton label="Right" icon={<MoveRight size={17} />} onClick={() => nudge('x', 0.05)} />
-                <NudgeButton label="Up" icon={<MoveUp size={17} />} onClick={() => nudge('y', 0.05)} />
-                <NudgeButton label="Down" icon={<MoveDown size={17} />} onClick={() => nudge('y', -0.05)} />
+                <NudgeButton label="Left" icon={<MoveLeft size={16} />} onClick={() => nudge('x', -0.05)} />
+                <NudgeButton label="Right" icon={<MoveRight size={16} />} onClick={() => nudge('x', 0.05)} />
+                <NudgeButton label="Up" icon={<MoveUp size={16} />} onClick={() => nudge('y', 0.05)} />
+                <NudgeButton label="Down" icon={<MoveDown size={16} />} onClick={() => nudge('y', -0.05)} />
               </div>
 
               <label className="font-brand grid gap-2 text-xs font-bold uppercase tracking-[.18em] text-white/60">
                 Custom note
-                <textarea value={state.note} onChange={(event) => update({ note: event.target.value })} placeholder="Add print size, deadline, or delivery notes" className="min-h-24 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none placeholder:text-white/30 focus:border-gold" />
+                <textarea value={state.note} onChange={(event) => update({ note: event.target.value })} placeholder="Add print size, deadline, or delivery notes" className="min-h-20 sm:min-h-24 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm normal-case tracking-normal text-white outline-none placeholder:text-white/30 focus:border-gold" />
               </label>
 
-              <div className="grid gap-2 sm:grid-cols-3">
-                <button type="button" className="cta-secondary px-4" onClick={reset}><RotateCcw size={17} /> Reset</button>
-                <button type="button" className="cta-secondary px-4" onClick={toggleFullscreen}><Maximize2 size={17} /> {fullscreen ? 'Exit' : 'Full'}</button>
-                <button type="button" className="cta-secondary px-4" onClick={downloadPreview}><Download size={17} /> Save</button>
+              <div className="grid grid-cols-3 gap-2">
+                <button type="button" className="cta-secondary px-2 text-xs" onClick={reset}><RotateCcw size={15} /> Reset</button>
+                <button type="button" className="cta-secondary px-2 text-xs" onClick={toggleFullscreen}><Maximize2 size={15} /> {fullscreen ? 'Exit' : 'Full'}</button>
+                <button type="button" className="cta-secondary px-2 text-xs" onClick={downloadPreview}><Download size={15} /> Save</button>
               </div>
 
-              <a href={whatsappLink(orderMessage)} target="_blank" rel="noreferrer" className="cta-primary w-full">
-                <MessageCircle size={18} /> Order This Design on WhatsApp
-              </a>
+              <AnimatedWhatsAppButton
+                text="Order Custom Design"
+                message={orderMessage}
+                size="md"
+                className="w-full"
+              />
             </div>
           </motion.aside>
         </div>
@@ -619,7 +534,7 @@ function ControlSlider({ label, min, max, step, value, onChange }: { label: stri
 
 function NudgeButton({ label, icon, onClick }: { label: string; icon: ReactNode; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[.06] text-white/75 transition hover:border-gold hover:text-gold" aria-label={`Move design ${label.toLowerCase()}`}>
+    <button type="button" onClick={onClick} className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[.06] text-white/75 transition hover:border-gold hover:text-gold" aria-label={`Move design ${label.toLowerCase()}`}>
       {icon}
     </button>
   );

@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import type { Variants, Transition } from 'framer-motion';
+import { MessageCircle, Sparkles } from 'lucide-react';
+import { whatsappLink } from '@/lib/site-data';
 
 export { motion };
 
@@ -40,12 +42,12 @@ export const fadeInScale: Variants = {
 };
 
 export const fadeLeft: Variants = {
-  hidden: { opacity: 0, x: -40 },
+  hidden: { opacity: 0, x: -50 },
   show: { opacity: 1, x: 0, transition: springGentle }
 };
 
 export const fadeRight: Variants = {
-  hidden: { opacity: 0, x: 40 },
+  hidden: { opacity: 0, x: 50 },
   show: { opacity: 1, x: 0, transition: springGentle }
 };
 
@@ -103,8 +105,8 @@ export function TiltCard({
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  const rotateX = useTransform(y, [-0.5, 0.5], [12, -12]);
-  const rotateY = useTransform(x, [-0.5, 0.5], [-12, 12]);
+  const rotateX = useTransform(y, [-0.5, 0.5], [10, -10]);
+  const rotateY = useTransform(x, [-0.5, 0.5], [-10, 10]);
 
   const springRotateX = useSpring(rotateX, { stiffness: 300, damping: 25 });
   const springRotateY = useSpring(rotateY, { stiffness: 300, damping: 25 });
@@ -142,7 +144,6 @@ export function TiltCard({
       }}
       className={`relative overflow-hidden transition-shadow duration-300 ${className}`}
     >
-      {/* Dynamic Cursor Spotlight Glow */}
       <div
         className="pointer-events-none absolute -inset-px transition-opacity duration-500"
         style={{
@@ -152,5 +153,82 @@ export function TiltCard({
       />
       <div style={{ transform: 'translateZ(20px)' }}>{children}</div>
     </motion.div>
+  );
+}
+
+// Animated WhatsApp Order Button
+export function AnimatedWhatsAppButton({
+  message = 'Hi Driftwear Clo., I want to place a custom T-shirt order.',
+  text = 'WhatsApp Order',
+  className = '',
+  size = 'md'
+}: {
+  message?: string;
+  text?: string;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
+}) {
+  const sizeClasses = {
+    sm: 'px-4 py-2 text-xs gap-1.5 min-h-10',
+    md: 'px-6 py-3 text-xs sm:text-sm gap-2 min-h-12',
+    lg: 'px-8 py-4 text-sm sm:text-base gap-2.5 min-h-14'
+  };
+
+  return (
+    <Magnetic>
+      <motion.a
+        whileHover={{ scale: 1.05, y: -2 }}
+        whileTap={{ scale: 0.95 }}
+        transition={springBouncy}
+        href={whatsappLink(message)}
+        target="_blank"
+        rel="noreferrer"
+        className={`group relative inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#25D366] via-[#20BA5A] to-[#128C7E] font-brand font-bold uppercase tracking-wider text-slate-950 shadow-[0_0_25px_rgba(37,211,102,0.4)] transition-all duration-300 hover:shadow-[0_0_40px_rgba(37,211,102,0.7)] ${sizeClasses[size]} ${className}`}
+      >
+        {/* Pulsating Aura Ring */}
+        <span className="absolute -inset-1 rounded-full bg-[#25D366] opacity-40 blur-md transition duration-500 group-hover:opacity-80" />
+
+        <span className="relative z-10 flex items-center gap-2">
+          <motion.span
+            animate={{ rotate: [0, -10, 10, -5, 0] }}
+            transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 1.5 }}
+          >
+            <MessageCircle size={size === 'lg' ? 22 : size === 'md' ? 18 : 15} className="fill-slate-950/20" />
+          </motion.span>
+          <span>{text}</span>
+          <Sparkles size={size === 'lg' ? 16 : 14} className="transition group-hover:rotate-12" />
+        </span>
+      </motion.a>
+    </Magnetic>
+  );
+}
+
+// Smooth Infinite Horizontal Marquee Component
+export function HorizontalMarquee({
+  items,
+  speed = 25,
+  direction = 'left'
+}: {
+  items: string[];
+  speed?: number;
+  direction?: 'left' | 'right';
+}) {
+  return (
+    <div className="relative flex w-full overflow-hidden border-y border-white/10 bg-white/[0.03] py-4 select-none backdrop-blur-md">
+      <motion.div
+        animate={{ x: direction === 'left' ? ['0%', '-50%'] : ['-50%', '0%'] }}
+        transition={{ duration: speed, ease: 'linear', repeat: Infinity }}
+        className="flex min-w-full shrink-0 items-center justify-around gap-8 whitespace-nowrap"
+      >
+        {items.concat(items).map((item, idx) => (
+          <div key={idx} className="flex items-center gap-6">
+            <span className="font-brand text-xs font-bold uppercase tracking-[0.28em] text-white/80 sm:text-sm">
+              {item}
+            </span>
+            <span className="h-2 w-2 rounded-full bg-gold/70 shadow-[0_0_10px_rgba(216,180,95,0.8)]" />
+          </div>
+        ))}
+      </motion.div>
+    </div>
   );
 }

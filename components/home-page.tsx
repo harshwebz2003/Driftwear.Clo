@@ -15,11 +15,7 @@ import {
   Send,
   Sparkles,
   X,
-  Maximize2,
-  Layers,
-  Zap,
-  MousePointer,
-  Sliders
+  Maximize2
 } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import {
@@ -31,6 +27,8 @@ import {
   stagger,
   Magnetic,
   TiltCard,
+  AnimatedWhatsAppButton,
+  HorizontalMarquee,
   springQuick,
   springGentle,
   springBouncy
@@ -41,13 +39,34 @@ import { contact, faqs, gallery, navItems, processSteps, products, reasons, what
 export default function HomePage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  const tickerItems1 = [
+    'WEAR FAST',
+    'PRINT PREMIUM',
+    'GALLE SRI LANKA',
+    'DTF PRINTING STUDIO',
+    'SINGLE PIECE & BULK ORDERS',
+    'HIGH DEFINITION TRANSFERS',
+    'CUSTOM APPAREL'
+  ];
+
+  const tickerItems2 = [
+    'CUSTOM APPAREL',
+    'STREETWEAR GRAPHICS',
+    'COUPLE TEES',
+    'TEAM UNIFORMS',
+    'INSTANT WHATSAPP DISPATCH',
+    'VIBRANT COLORS'
+  ];
+
   return (
     <>
       <Navbar />
-      <main id="home">
+      <main id="home" className="overflow-x-hidden">
         <Hero />
+        <HorizontalMarquee items={tickerItems1} speed={24} direction="left" />
         <TshirtCustomizer />
         <FeaturedProducts onPreview={(img) => setSelectedImage(img)} />
+        <HorizontalMarquee items={tickerItems2} speed={28} direction="right" />
         <Process />
         <WhyChoose />
         <Gallery onPreview={(img) => setSelectedImage(img)} />
@@ -58,58 +77,49 @@ export default function HomePage() {
 
       <Footer />
 
-      {/* WhatsApp Sticky Floating Button */}
-      <motion.a
-        whileHover={{ scale: 1.1, rotate: 5 }}
-        whileTap={{ scale: 0.95 }}
-        transition={springBouncy}
-        href={whatsappLink('Hi Driftwear Clo., I want to order a custom T-shirt.')}
-        target="_blank"
-        rel="noreferrer"
-        className="fixed bottom-5 right-5 z-50 inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-obsidian shadow-2xl shadow-emerald-950/80 transition sm:w-auto sm:px-5"
-        aria-label="Sticky WhatsApp order button"
-      >
-        <MessageCircle size={22} />
-        <span className="font-brand ml-2 hidden text-sm font-bold uppercase tracking-[.14em] sm:inline">Order</span>
-      </motion.a>
+      {/* WhatsApp Sticky Floating Button with Pulsating Animation */}
+      <div className="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-6 select-none">
+        <AnimatedWhatsAppButton
+          text="Order"
+          message="Hi Driftwear Clo., I want to order a custom T-shirt."
+          size="lg"
+        />
+      </div>
 
-      {/* Image Preview Lightbox Modal */}
+      {/* Image Lightbox Modal */}
       {selectedImage && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-xl"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-3 sm:p-6 backdrop-blur-xl"
           onClick={() => setSelectedImage(null)}
         >
           <motion.div
             initial={{ scale: 0.85, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={springQuick}
-            className="relative max-h-[90vh] max-w-4xl overflow-hidden rounded-3xl border border-white/20 bg-carbon p-2 shadow-2xl"
+            className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-2xl border border-white/20 bg-carbon p-2 shadow-2xl sm:rounded-3xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setSelectedImage(null)}
-              className="absolute right-4 top-4 z-10 rounded-full border border-white/20 bg-black/60 p-2 text-white transition hover:bg-white/20"
+              className="absolute right-3 top-3 z-10 rounded-full border border-white/20 bg-black/60 p-2 text-white transition hover:bg-white/20"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
-            <div className="relative aspect-[4/5] w-full max-w-2xl overflow-hidden rounded-2xl sm:aspect-square">
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl sm:aspect-square sm:rounded-2xl">
               <Image src={selectedImage} alt="Driftwear visual preview" fill className="object-cover" />
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-4 p-4">
+            <div className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
               <span className="font-brand text-xs font-bold uppercase tracking-wider text-gold">
                 Driftwear Clo. Visual Spec
               </span>
-              <a
-                href={whatsappLink('Hi Driftwear Clo., I saw this design in the gallery and want to order.')}
-                target="_blank"
-                rel="noreferrer"
-                className="cta-primary text-xs"
-              >
-                Order this design
-              </a>
+              <AnimatedWhatsAppButton
+                text="Order This Design"
+                message="Hi Driftwear Clo., I saw this design in your showcase gallery and want to order."
+                size="sm"
+              />
             </div>
           </motion.div>
         </motion.div>
@@ -119,7 +129,7 @@ export default function HomePage() {
 }
 
 /* ==========================================================================
-   HERO SECTION - Figma Animated Design (Video Completely Removed)
+   HERO SECTION - Fully Responsive & Animated WhatsApp CTA
    ========================================================================== */
 function Hero() {
   const [activeVariantIndex, setActiveVariantIndex] = useState(0);
@@ -129,21 +139,18 @@ function Hero() {
       name: 'All Eyes On Me Black Tee',
       tag: 'Oversized Streetwear',
       image: '/assets/tshirt_black_oversized.jpg',
-      color: '#121316',
       badge: '🔥 Best Seller'
     },
     {
       name: 'Studio White Custom Tee',
       tag: 'Minimal DTF Print',
       image: '/assets/tshirt_white_regular.jpg',
-      color: '#F4F5F7',
       badge: '✨ Studio Pick'
     },
     {
       name: 'Urban Streetwear Look',
       tag: 'Custom DTF Graphic',
       image: '/assets/Gallery/streetwear_look_01.jpg',
-      color: '#1C1625',
       badge: '💎 Premium Release'
     }
   ];
@@ -151,18 +158,18 @@ function Hero() {
   const currentVariant = apparelVariants[activeVariantIndex];
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#130A18] px-5 pb-12 pt-28 sm:px-8 lg:px-14 lg:pt-24" aria-labelledby="hero-title">
+    <section className="relative min-h-screen overflow-hidden bg-[#130A18] px-4 pb-10 pt-24 sm:px-8 sm:pb-12 sm:pt-28 lg:px-14 lg:pt-24" aria-labelledby="hero-title">
       {/* Background Lighting Gradients */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_52%,rgba(168,74,196,.52),transparent_24rem),radial-gradient(circle_at_22%_24%,rgba(200,205,210,.12),transparent_18rem),linear-gradient(105deg,#130A18_0%,#0D0711_48%,#190B20_100%)]" />
       <motion.div
         animate={{ scale: [1, 1.15, 1], opacity: [0.45, 0.65, 0.45] }}
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute bottom-[-12rem] right-[-8rem] h-[34rem] w-[34rem] rounded-full bg-[#A44CC6]/55 blur-3xl sm:right-[2rem] sm:h-[48rem] sm:w-[48rem]"
+        className="absolute bottom-[-12rem] right-[-8rem] h-[28rem] w-[28rem] rounded-full bg-[#A44CC6]/55 blur-3xl sm:right-[2rem] sm:h-[48rem] sm:w-[48rem]"
       />
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(13,7,17,.96)_0%,rgba(13,7,17,.78)_36%,rgba(13,7,17,.2)_100%)] lg:bg-[linear-gradient(90deg,rgba(13,7,17,.96)_0%,rgba(13,7,17,.82)_39%,rgba(13,7,17,.12)_100%)]" />
 
       <motion.div className="shell relative z-10 grid min-h-[calc(100vh-7rem)] content-between gap-8" variants={stagger} initial="hidden" animate="show">
-        <div className="grid flex-1 items-center gap-12 pt-8 lg:grid-cols-[.85fr_1.15fr] lg:pt-0">
+        <div className="grid flex-1 items-center gap-8 pt-4 lg:grid-cols-[.85fr_1.15fr] lg:gap-12 lg:pt-0">
           {/* Left Column Text Content */}
           <div className="relative z-20 max-w-xl">
             <motion.p variants={fadeUp} className="font-brand text-xs font-bold uppercase tracking-[.22em] text-gold">
@@ -172,72 +179,58 @@ function Hero() {
             <motion.h1
               id="hero-title"
               variants={fadeUp}
-              className="mt-6 font-body text-[clamp(4.2rem,10vw,9rem)] font-light uppercase leading-[.82] tracking-normal text-white"
+              className="mt-4 font-body text-[clamp(3.5rem,9.5vw,9rem)] font-light uppercase leading-[.82] tracking-normal text-white sm:mt-6"
             >
               WEAR<br />
               YOUR<br />
               VIBE
             </motion.h1>
 
-            <motion.p variants={fadeUp} className="mt-7 max-w-md text-sm font-medium leading-7 text-white/76 sm:text-base">
+            <motion.p variants={fadeUp} className="mt-5 max-w-md text-sm font-medium leading-7 text-white/76 sm:mt-7 sm:text-base">
               Custom T-shirts, unique designs, and premium DTF printing made for your style.
             </motion.p>
 
-            <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center gap-4">
-              <Magnetic>
-                <a
-                  href={whatsappLink('Hi Driftwear Clo., I want to order a custom T-shirt.')}
-                  className="group inline-flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-gold/10 text-white transition hover:border-gold hover:bg-gold hover:text-obsidian shadow-[0_0_30px_rgba(216,180,95,0.2)]"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Order Now"
-                >
-                  <ArrowUpRight size={22} className="transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </a>
-              </Magnetic>
-              <a
-                href={whatsappLink('Hi Driftwear Clo., I want to order a custom T-shirt.')}
-                target="_blank"
-                rel="noreferrer"
-                className="font-brand text-sm font-bold text-white transition hover:text-gold"
-              >
-                Order Now
-              </a>
+            {/* Action CTAs */}
+            <motion.div variants={fadeUp} className="mt-6 flex flex-wrap items-center gap-4 sm:mt-8">
+              <AnimatedWhatsAppButton
+                text="Order Now"
+                message="Hi Driftwear Clo., I want to order a custom T-shirt."
+                size="md"
+              />
               <a
                 href="#shop"
-                className="font-brand inline-flex items-center gap-2 text-sm font-bold text-white/70 transition hover:text-white"
+                className="font-brand inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white/70 transition hover:text-white sm:text-sm"
               >
                 View Designs <ChevronRight size={17} />
               </a>
             </motion.div>
           </div>
 
-          {/* Right Column: Figma Interactive Prototype Canvas Stage (Replaces Video) */}
-          <motion.div variants={fadeUp} className="relative z-10 w-full">
-            {/* Figma Selection Outer Frame */}
-            <TiltCard className="relative overflow-hidden rounded-[2rem] border-2 border-[#1ABCFE] bg-[#0C0816]/90 p-5 shadow-[0_30px_90px_rgba(0,0,0,0.8),0_0_40px_rgba(26,188,254,0.25)] backdrop-blur-2xl sm:p-7">
+          {/* Right Column: Figma Interactive Prototype Showcase Stage */}
+          <motion.div variants={fadeRight} className="relative z-10 w-full">
+            <TiltCard className="relative overflow-hidden rounded-2xl border-2 border-[#1ABCFE] bg-[#0C0816]/90 p-4 shadow-[0_30px_90px_rgba(0,0,0,0.8),0_0_40px_rgba(26,188,254,0.25)] backdrop-blur-2xl sm:rounded-[2rem] sm:p-7">
               {/* Figma Corner Resize Handles */}
-              <div className="absolute -left-1 -top-1 h-3 w-3 border border-white bg-[#1ABCFE]" />
-              <div className="absolute -right-1 -top-1 h-3 w-3 border border-white bg-[#1ABCFE]" />
-              <div className="absolute -bottom-1 -left-1 h-3 w-3 border border-white bg-[#1ABCFE]" />
-              <div className="absolute -bottom-1 -right-1 h-3 w-3 border border-white bg-[#1ABCFE]" />
+              <div className="absolute -left-1 -top-1 h-2.5 w-2.5 border border-white bg-[#1ABCFE] sm:h-3 sm:w-3" />
+              <div className="absolute -right-1 -top-1 h-2.5 w-2.5 border border-white bg-[#1ABCFE] sm:h-3 sm:w-3" />
+              <div className="absolute -bottom-1 -left-1 h-2.5 w-2.5 border border-white bg-[#1ABCFE] sm:h-3 sm:w-3" />
+              <div className="absolute -bottom-1 -right-1 h-2.5 w-2.5 border border-white bg-[#1ABCFE] sm:h-3 sm:w-3" />
 
               {/* Top Figma Header Tag Bar */}
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2">
-                  <span className="rounded bg-[#1ABCFE] px-2 py-0.5 font-mono text-[10px] font-bold text-slate-950">
+                  <span className="rounded bg-[#1ABCFE] px-2 py-0.5 font-mono text-[9px] font-bold text-slate-950 sm:text-[10px]">
                     #Hero_Apparel_Canvas
                   </span>
-                  <span className="font-mono text-xs text-white/50">580 × 640 • Smart Animate</span>
+                  <span className="font-mono text-[10px] text-white/50 sm:text-xs">Smart Animate</span>
                 </div>
 
                 {/* Variant Switcher Pills */}
-                <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 p-1">
+                <div className="flex items-center gap-1 rounded-full border border-white/10 bg-white/5 p-0.5 sm:p-1">
                   {apparelVariants.map((v, idx) => (
                     <button
                       key={v.name}
                       onClick={() => setActiveVariantIndex(idx)}
-                      className={`relative rounded-full px-3 py-1 text-[11px] font-bold transition ${
+                      className={`relative rounded-full px-2.5 py-0.5 text-[10px] font-bold transition sm:px-3 sm:py-1 sm:text-[11px] ${
                         activeVariantIndex === idx ? 'text-slate-950' : 'text-white/60 hover:text-white'
                       }`}
                     >
@@ -248,14 +241,14 @@ function Hero() {
                           className="absolute inset-0 rounded-full bg-gradient-to-r from-gold via-ambergold to-gold shadow-md"
                         />
                       )}
-                      <span className="relative z-10">Variant {idx + 1}</span>
+                      <span className="relative z-10">V{idx + 1}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Main Garment Mockup Showcase Card */}
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-[#07050E] sm:aspect-[1.1/1]">
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-[#07050E] sm:aspect-[1.1/1] sm:rounded-2xl">
                 <motion.div
                   key={currentVariant.name}
                   initial={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -270,82 +263,56 @@ function Hero() {
                     priority
                     className="object-cover object-center"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/20" />
 
                   {/* Floating Badges */}
-                  <div className="absolute left-4 top-4 flex flex-col gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-black/60 px-3 py-1 font-mono text-xs font-bold text-gold backdrop-blur-md">
-                      <Sparkles size={13} />
+                  <div className="absolute left-3 top-3 flex flex-col gap-1.5 sm:left-4 sm:top-4">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-gold/40 bg-black/60 px-2.5 py-0.5 font-mono text-[10px] font-bold text-gold backdrop-blur-md sm:px-3 sm:py-1 sm:text-xs">
+                      <Sparkles size={12} />
                       {currentVariant.badge}
                     </span>
-                    <span className="inline-flex items-center gap-1 font-mono text-[11px] text-white/80 bg-black/50 px-2.5 py-0.5 rounded-md backdrop-blur-md">
+                    <span className="inline-flex items-center gap-1 font-mono text-[9px] text-white/80 bg-black/50 px-2 py-0.5 rounded backdrop-blur-md sm:text-[11px]">
                       {currentVariant.tag}
                     </span>
                   </div>
 
-                  {/* Simulated Figma Animated Cursor 1 */}
+                  {/* Simulated Figma Animated Cursor */}
                   <motion.div
                     animate={{
-                      x: [40, 180, 100, 40],
-                      y: [30, 90, 160, 30]
+                      x: [20, 140, 70, 20],
+                      y: [20, 70, 120, 20]
                     }}
                     transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
                     className="pointer-events-none absolute left-0 top-0 z-30"
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#A259FF" stroke="#FFF" strokeWidth="1.2">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#A259FF" stroke="#FFF" strokeWidth="1.2">
                       <path d="M5.65376 12.3673H5.46026L5.31717 12.4976L0.500002 16.8829L0.500002 1.19841L11.7841 12.3673H5.65376Z" />
                     </svg>
-                    <div className="ml-3 -mt-1 rounded-full bg-[#A259FF] px-2 py-0.5 font-mono text-[9px] font-bold text-white shadow-md">
+                    <div className="ml-2.5 -mt-1 rounded-full bg-[#A259FF] px-2 py-0.5 font-mono text-[8px] font-bold text-white shadow-md">
                       ✨ Figma Motion
                     </div>
                   </motion.div>
 
-                  {/* Simulated Figma Animated Cursor 2 */}
-                  <motion.div
-                    animate={{
-                      x: [240, 120, 200, 240],
-                      y: [180, 240, 100, 180]
-                    }}
-                    transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-                    className="pointer-events-none absolute left-0 top-0 z-30"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#1ABCFE" stroke="#FFF" strokeWidth="1.2">
-                      <path d="M5.65376 12.3673H5.46026L5.31717 12.4976L0.500002 16.8829L0.500002 1.19841L11.7841 12.3673H5.65376Z" />
-                    </svg>
-                    <div className="ml-3 -mt-1 rounded-full bg-[#1ABCFE] px-2 py-0.5 font-mono text-[9px] font-bold text-slate-950 shadow-md">
-                      🎨 AI Studio
-                    </div>
-                  </motion.div>
-
                   {/* Bottom Product Info Bar */}
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-xl border border-white/20 bg-black/60 p-3.5 backdrop-blur-xl">
+                  <div className="absolute bottom-3 left-3 right-3 flex flex-col gap-2 rounded-lg border border-white/20 bg-black/70 p-3 backdrop-blur-xl sm:bottom-4 sm:left-4 sm:right-4 sm:flex-row sm:items-center sm:justify-between sm:rounded-xl sm:p-3.5">
                     <div>
-                      <h3 className="font-calista text-xl font-bold text-white">{currentVariant.name}</h3>
-                      <p className="font-mono text-xs text-gold">High DPI DTF Print • Galle Studio</p>
+                      <h3 className="font-calista text-base font-bold text-white sm:text-xl">{currentVariant.name}</h3>
+                      <p className="font-mono text-[10px] text-gold sm:text-xs">High DPI DTF Print • Galle Studio</p>
                     </div>
-                    <a
-                      href={whatsappLink(`Hi Driftwear Clo., I want to order variant: ${currentVariant.name}`)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="cta-primary text-xs px-4 py-2"
-                    >
-                      Order Tee
-                    </a>
+                    <AnimatedWhatsAppButton
+                      text="Order Tee"
+                      message={`Hi Driftwear Clo., I want to order variant: ${currentVariant.name}`}
+                      size="sm"
+                    />
                   </div>
                 </motion.div>
-              </div>
-
-              {/* Bottom Canvas Footer Specs */}
-              <div className="mt-3 flex items-center justify-between font-mono text-[11px] text-white/50">
-                <span>layout: Flex Column (gap: 16px)</span>
-                <span className="text-gold">spring(stiffness: 300, damping: 26)</span>
               </div>
             </TiltCard>
           </motion.div>
         </div>
 
-        {/* Bottom Pagination Stepper Bar */}
-        <motion.div variants={fadeUp} className="relative z-30 grid gap-6 pb-2 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+        {/* Stepper Bar */}
+        <motion.div variants={fadeUp} className="relative z-30 grid gap-4 pb-2 sm:grid-cols-[auto_1fr_auto] sm:items-center">
           <div className="font-brand text-xs font-bold text-white">01</div>
           <div className="grid grid-cols-5 gap-2">
             {[0, 1, 2, 3, 4].map((item) => (
@@ -369,10 +336,10 @@ function Hero() {
 
 function SectionTitle({ eyebrow, title, copy }: { eyebrow: string; title: string; copy?: string }) {
   return (
-    <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} className="mb-10 max-w-4xl">
+    <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} className="mb-8 max-w-4xl sm:mb-10">
       <p className="eyebrow">{eyebrow}</p>
-      <h2 className="display-title mt-4 text-[clamp(3.2rem,7vw,7rem)] text-white">{title}</h2>
-      {copy ? <p className="mt-5 max-w-2xl text-lg leading-8 text-white/62">{copy}</p> : null}
+      <h2 className="display-title mt-3 text-[clamp(2.6rem,6.5vw,7rem)] text-white">{title}</h2>
+      {copy ? <p className="mt-4 max-w-2xl text-base leading-7 text-white/62 sm:text-lg sm:leading-8">{copy}</p> : null}
     </motion.div>
   );
 }
@@ -382,30 +349,35 @@ function FeaturedProducts({ onPreview }: { onPreview: (img: string) => void }) {
     <section id="shop" className="section-pad">
       <div className="shell">
         <SectionTitle eyebrow="Shop / Designs" title="Featured T-shirt designs." copy="Modern DTF-ready pieces with a premium streetwear presentation. Prices are confirmed per garment, print size, and quantity." />
-        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {products.map((product) => (
             <motion.div key={product.name} variants={fadeUp}>
-              <TiltCard className="group gold-border overflow-hidden rounded-[1.5rem]">
-                <div className="relative aspect-[4/5] overflow-hidden bg-carbon">
-                  <Image src={product.image} alt={`${product.name} mockup`} fill sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
-                  <button
-                    onClick={() => onPreview(product.image)}
-                    className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white opacity-0 transition duration-300 group-hover:opacity-100"
-                    title="Zoom Preview"
-                  >
-                    <Maximize2 size={16} />
-                  </button>
+              <TiltCard className="group gold-border overflow-hidden rounded-[1.5rem] h-full flex flex-col justify-between">
+                <div>
+                  <div className="relative aspect-[4/5] overflow-hidden bg-carbon">
+                    <Image src={product.image} alt={`${product.name} mockup`} fill sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
+                    <button
+                      onClick={() => onPreview(product.image)}
+                      className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white opacity-0 transition duration-300 group-hover:opacity-100"
+                      title="Zoom Preview"
+                    >
+                      <Maximize2 size={16} />
+                    </button>
+                  </div>
+                  <div className="p-5">
+                    <p className="font-grande text-xs font-bold uppercase tracking-[.2em] text-gold">{product.category}</p>
+                    <h3 className="font-calista mt-2 text-2xl font-semibold text-white sm:text-3xl">{product.name}</h3>
+                    <p className="mt-1.5 text-xs text-white/58 sm:text-sm">{product.price}</p>
+                  </div>
                 </div>
-                <div className="p-5">
-                  <p className="font-grande text-xs font-bold uppercase tracking-[.2em] text-gold">{product.category}</p>
-                  <h3 className="font-calista mt-3 text-3xl font-semibold text-white">{product.name}</h3>
-                  <p className="mt-2 text-sm text-white/58">{product.price}</p>
-                  <Magnetic>
-                    <a href={whatsappLink(`Hi Driftwear Clo., I want to order: ${product.name}.`)} target="_blank" rel="noreferrer" className="cta-secondary mt-5 w-full">
-                      Order on WhatsApp
-                    </a>
-                  </Magnetic>
+                <div className="px-5 pb-5 pt-2">
+                  <AnimatedWhatsAppButton
+                    text="Order on WhatsApp"
+                    message={`Hi Driftwear Clo., I want to order: ${product.name}.`}
+                    size="sm"
+                    className="w-full"
+                  />
                 </div>
               </TiltCard>
             </motion.div>
@@ -420,19 +392,21 @@ function Process() {
   return (
     <section id="dtf" className="section-pad">
       <div className="shell grid gap-10 lg:grid-cols-[.85fr_1.15fr] lg:items-center">
-        <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}>
+        <motion.div variants={fadeLeft} initial="hidden" whileInView="show" viewport={{ once: true }}>
           <SectionTitle eyebrow="Custom DTF Printing" title="From design file to premium apparel." copy="A clean order flow for personal tees, fashion drops, teams, events, and branded clothing." />
-          <Magnetic>
-            <a href={whatsappLink('Hi Driftwear Clo., I want to start a DTF printing order.')} className="cta-primary" target="_blank" rel="noreferrer">Start DTF Order</a>
-          </Magnetic>
+          <AnimatedWhatsAppButton
+            text="Start DTF Order"
+            message="Hi Driftwear Clo., I want to start a DTF printing order."
+            size="md"
+          />
         </motion.div>
         <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-4 sm:grid-cols-2">
           {processSteps.map(([number, title, copy]) => (
-            <motion.div key={number} variants={fadeUp}>
-              <TiltCard className="gold-border rounded-[1.5rem] p-6 h-full">
-                <span className="font-brand text-6xl text-gold">{number}</span>
-                <h3 className="font-calista mt-4 text-3xl font-semibold text-white">{title}</h3>
-                <p className="mt-3 text-sm leading-7 text-white/60">{copy}</p>
+            <motion.div key={number} variants={fadeRight}>
+              <TiltCard className="gold-border rounded-[1.5rem] p-5 sm:p-6 h-full">
+                <span className="font-brand text-5xl sm:text-6xl text-gold">{number}</span>
+                <h3 className="font-calista mt-3 sm:mt-4 text-2xl sm:text-3xl font-semibold text-white">{title}</h3>
+                <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-6 sm:leading-7 text-white/60">{copy}</p>
               </TiltCard>
             </motion.div>
           ))}
@@ -450,23 +424,23 @@ function WhyChoose() {
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
-        className="shell overflow-hidden rounded-[2rem] border border-gold/20 bg-[radial-gradient(circle_at_20%_20%,rgba(200,205,210,.2),transparent_28rem)] p-6 sm:p-10 lg:p-14"
+        className="shell overflow-hidden rounded-[2rem] border border-gold/20 bg-[radial-gradient(circle_at_20%_20%,rgba(200,205,210,.2),transparent_28rem)] p-5 sm:p-10 lg:p-14"
       >
-        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
           <div>
             <p className="eyebrow">Why choose Driftwear</p>
-            <h2 className="display-title mt-4 text-[clamp(3rem,7vw,6.5rem)] text-white">Print studio energy. Fashion brand finish.</h2>
+            <h2 className="display-title mt-4 text-[clamp(2.5rem,6vw,6.5rem)] text-white">Print studio energy. Fashion brand finish.</h2>
           </div>
-          <div className="grid gap-4">
+          <div className="grid gap-3.5">
             {reasons.map((reason) => (
               <motion.div
                 key={reason}
                 whileHover={{ scale: 1.02, x: 6 }}
                 transition={springQuick}
-                className="flex gap-4 rounded-2xl border border-white/10 bg-black/35 p-5 transition hover:border-gold/40"
+                className="flex gap-3.5 rounded-2xl border border-white/10 bg-black/35 p-4 sm:p-5 transition hover:border-gold/40"
               >
-                <Check className="mt-1 shrink-0 text-gold" />
-                <p className="font-lucky m-0 text-white/72">{reason}</p>
+                <Check className="mt-0.5 shrink-0 text-gold" size={18} />
+                <p className="font-lucky m-0 text-xs sm:text-sm text-white/72">{reason}</p>
               </motion.div>
             ))}
           </div>
@@ -481,13 +455,13 @@ function Gallery({ onPreview }: { onPreview: (img: string) => void }) {
     <section id="gallery" className="section-pad">
       <div className="shell">
         <SectionTitle eyebrow="Gallery / Latest Work" title="Real product energy." copy="A visual feed inspired by the current Facebook brand presence, refined into a premium global streetwear look." />
-        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="columns-1 gap-5 sm:columns-2 lg:columns-3">
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="columns-1 gap-4 sm:columns-2 lg:columns-3">
           {gallery.map((image, index) => (
             <motion.div
               key={image}
               variants={fadeUp}
               onClick={() => onPreview(image)}
-              className="group relative mb-5 cursor-pointer overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/[.04]"
+              className="group relative mb-4 sm:mb-5 cursor-pointer overflow-hidden rounded-[1.25rem] sm:rounded-[1.5rem] border border-white/10 bg-white/[.04]"
             >
               <Image src={image} alt={`Driftwear gallery item ${index + 1}`} width={800} height={1000} className="w-full object-cover transition duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-black/40 opacity-0 transition duration-300 group-hover:opacity-100 flex items-center justify-center">
@@ -511,10 +485,10 @@ function Testimonials() {
         <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-5 md:grid-cols-3">
           {['Clean print quality and the design looked exactly like the mockup.', 'Fast WhatsApp communication and a premium feel for our team tees.', 'The midnight and silver brand style feels unique and bold.'].map((quote, index) => (
             <motion.div key={quote} variants={fadeUp}>
-              <TiltCard className="gold-border rounded-[1.5rem] p-6 h-full">
-                <div className="flex gap-1 text-gold">{Array.from({ length: 5 }).map((_, star) => <Sparkles key={star} size={16} fill="currentColor" />)}</div>
-                <p className="font-lucky mt-5 text-xl italic text-white/70">{quote}</p>
-                <p className="font-brand mt-5 text-xs font-bold uppercase tracking-[.18em] text-white/45">Verified order {index + 1}</p>
+              <TiltCard className="gold-border rounded-[1.5rem] p-5 sm:p-6 h-full">
+                <div className="flex gap-1 text-gold">{Array.from({ length: 5 }).map((_, star) => <Sparkles key={star} size={15} fill="currentColor" />)}</div>
+                <p className="font-lucky mt-4 text-lg sm:text-xl italic text-white/70">{quote}</p>
+                <p className="font-brand mt-4 text-[10px] sm:text-xs font-bold uppercase tracking-[.18em] text-white/45">Verified order {index + 1}</p>
               </TiltCard>
             </motion.div>
           ))}
@@ -531,9 +505,9 @@ function FAQ() {
         <SectionTitle eyebrow="FAQ" title="Before you order." />
         <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-4 lg:grid-cols-2">
           {faqs.map(([question, answer]) => (
-            <motion.article key={question} variants={fadeUp} className="gold-border rounded-[1.25rem] p-6">
-              <h3 className="font-calista text-2xl font-semibold text-white">{question}</h3>
-              <p className="mt-3 text-white/62">{answer}</p>
+            <motion.article key={question} variants={fadeUp} className="gold-border rounded-[1.25rem] p-5 sm:p-6">
+              <h3 className="font-calista text-xl sm:text-2xl font-semibold text-white">{question}</h3>
+              <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-white/62">{answer}</p>
             </motion.article>
           ))}
         </motion.div>
@@ -550,20 +524,22 @@ function Contact() {
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
-        className="shell grid min-w-0 gap-8 overflow-hidden rounded-[2rem] border border-gold/20 bg-gold-radial p-4 sm:p-10 lg:grid-cols-[1fr_.8fr] lg:p-14"
+        className="shell grid min-w-0 gap-8 overflow-hidden rounded-[2rem] border border-gold/20 bg-gold-radial p-5 sm:p-10 lg:grid-cols-[1fr_.8fr] lg:p-14"
       >
         <div className="min-w-0">
           <p className="eyebrow">Contact / Order Now</p>
-          <h2 className="display-title mt-4 text-[clamp(3.5rem,8vw,8rem)] text-white">Ready to wear your vibe?</h2>
-          <p className="mt-5 max-w-2xl text-lg leading-8 text-white/68">Message Driftwear Clo. with your idea, artwork, T-shirt color, size, and quantity. We will confirm the print details before production.</p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Magnetic>
-              <a href={whatsappLink('Hi Driftwear Clo., I want to place an order.')} className="cta-primary" target="_blank" rel="noreferrer">Order on WhatsApp</a>
-            </Magnetic>
-            <a href="mailto:nipunsathsara203@gmail.com" className="cta-secondary">Email Us</a>
+          <h2 className="display-title mt-4 text-[clamp(2.8rem,7vw,8rem)] text-white">Ready to wear your vibe?</h2>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-white/68 sm:text-lg sm:leading-8">Message Driftwear Clo. with your idea, artwork, T-shirt color, size, and quantity. We will confirm the print details before production.</p>
+          <div className="mt-6 flex flex-col gap-3.5 sm:flex-row sm:items-center">
+            <AnimatedWhatsAppButton
+              text="Order on WhatsApp"
+              message="Hi Driftwear Clo., I want to place a custom T-shirt order."
+              size="md"
+            />
+            <a href="mailto:nipunsathsara203@gmail.com" className="cta-secondary text-center">Email Us</a>
           </div>
         </div>
-        <div className="grid min-w-0 content-center gap-4">
+        <div className="grid min-w-0 content-center gap-3.5">
           <ContactLine icon={<Phone />} text={contact.phone} />
           <ContactLine icon={<Mail />} text={contact.email} />
           <ContactLine icon={<MapPin />} text={contact.location} />
@@ -582,7 +558,7 @@ function ContactLine({ icon, text }: { icon: ReactNode; text: string }) {
       className="flex min-w-0 items-center gap-3 rounded-2xl border border-white/10 bg-black/35 p-4 text-white/78 sm:gap-4 sm:p-5"
     >
       <span className="text-gold [&_svg]:h-5 [&_svg]:w-5">{icon}</span>
-      <span className="font-lucky min-w-0 break-words font-semibold">{text}</span>
+      <span className="font-lucky min-w-0 break-words text-xs sm:text-sm font-semibold">{text}</span>
     </motion.div>
   );
 }
@@ -602,7 +578,7 @@ function Footer() {
   ];
 
   return (
-    <footer className="px-5 pb-8 pt-10 sm:px-8 lg:px-14 xl:px-20">
+    <footer className="px-4 pb-8 pt-10 sm:px-8 lg:px-14 xl:px-20">
       <div className="shell">
         <motion.div
           initial={{ opacity: 0, y: 28 }}
@@ -619,22 +595,22 @@ function Footer() {
             className="object-cover opacity-[.42]"
           />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_12%,rgba(200,205,210,.3),transparent_24rem),linear-gradient(180deg,rgba(7,17,31,.18),rgba(7,17,31,.74)_48%,rgba(7,17,31,.96))]" />
-          <div className="absolute inset-x-0 bottom-0 z-0 translate-y-[19%] overflow-hidden whitespace-nowrap text-center font-display text-[clamp(5.3rem,18vw,18rem)] uppercase leading-none text-white/[.09]">
+          <div className="absolute inset-x-0 bottom-0 z-0 translate-y-[19%] overflow-hidden whitespace-nowrap text-center font-display text-[clamp(4.5rem,18vw,18rem)] uppercase leading-none text-white/[.09]">
             Driftwear
           </div>
 
-          <div className="relative z-10 flex min-h-[520px] flex-col justify-between p-5 sm:min-h-[560px] sm:p-8 lg:p-10">
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div className="relative z-10 flex min-h-[480px] flex-col justify-between p-5 sm:min-h-[560px] sm:p-8 lg:p-10">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <a href="#home" className="inline-flex items-center gap-3 self-start" aria-label="Driftwear Clo. home">
-                <Image src="/assets/logo.png" alt="" width={54} height={54} className="h-12 w-12 rounded-full border border-gold/30 object-cover" />
-                <span className="font-brand text-2xl uppercase leading-none text-white">Driftwear Clo.</span>
+                <Image src="/assets/logo.png" alt="" width={54} height={54} className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border border-gold/30 object-cover" />
+                <span className="font-brand text-xl sm:text-2xl uppercase leading-none text-white">Driftwear Clo.</span>
               </a>
-              <p className="font-grande max-w-xs text-left text-xs font-bold uppercase leading-5 tracking-[.22em] text-gold sm:text-right">
+              <p className="font-grande max-w-xs text-left text-[11px] font-bold uppercase leading-5 tracking-[.22em] text-gold sm:text-right sm:text-xs">
                 Wear fast. Print premium.
               </p>
             </div>
 
-            <div className="grid gap-10 border-y border-white/15 py-8 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1.15fr]">
+            <div className="grid gap-8 border-y border-white/15 py-8 sm:grid-cols-2 sm:gap-10 lg:grid-cols-[1fr_1fr_1fr_1.15fr]">
               <FooterColumn title="Menu">
                 {navItems.map((item) => (
                   <a key={item.href} href={item.href} className="footer-link">{item.label}</a>
@@ -658,22 +634,24 @@ function Footer() {
 
               <div>
                 <p className="font-brand text-xs font-bold uppercase tracking-[.22em] text-white">Order Studio</p>
-                <div className="mt-4 space-y-3 text-sm leading-6 text-white/60">
+                <div className="mt-3 space-y-2 text-xs sm:text-sm leading-6 text-white/60">
                   <p>{contact.location}</p>
                   <p>{contact.phone}</p>
                   <p className="break-words">{contact.email}</p>
                 </div>
-                <Magnetic>
-                  <a href={whatsappLink('Hi Driftwear Clo., I want to send a design and start an order.')} target="_blank" rel="noreferrer" className="cta-primary mt-6">
-                    <Send size={16} /> Send a message
-                  </a>
-                </Magnetic>
+                <div className="mt-5">
+                  <AnimatedWhatsAppButton
+                    text="Send Message"
+                    message="Hi Driftwear Clo., I want to send a design and start an order."
+                    size="sm"
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="font-grande flex flex-col gap-3 text-xs font-bold uppercase tracking-[.16em] text-white/40 sm:flex-row sm:items-center sm:justify-between">
+            <div className="font-grande flex flex-col gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-[.16em] text-white/40 sm:flex-row sm:items-center sm:justify-between">
               <p>© {new Date().getFullYear()} Driftwear Clo. All rights reserved.</p>
-              <p>Custom T-shirts and DTF printing in Galle, Sri Lanka.</p>
+              <p>Custom T-shirts & DTF printing in Galle, Sri Lanka.</p>
             </div>
           </div>
         </motion.div>
@@ -686,7 +664,7 @@ function FooterColumn({ title, children }: { title: string; children: ReactNode 
   return (
     <div>
       <p className="font-brand text-xs font-bold uppercase tracking-[.22em] text-white">{title}</p>
-      <div className="mt-4 grid gap-2 text-sm text-white/60">
+      <div className="mt-3 grid gap-2 text-xs sm:text-sm text-white/60">
         {children}
       </div>
     </div>

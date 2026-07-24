@@ -1,0 +1,12 @@
+{
+  "name": "driftwear-clo-static",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/validate-build.mjs",
+    "lint": "node --check script.js && node --check dev-server.mjs && node scripts/validate-build.mjs",
+    "typecheck": "node -e \"console.log('No TypeScript project configured for this static HTML build.')\"",
+    "dev": "node dev-server.mjs"
+  }
+}

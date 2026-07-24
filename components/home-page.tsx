@@ -83,7 +83,7 @@ export default function HomePage() {
   ];
 
   return (
-    <>
+    <div className="animated-color-bg min-h-screen text-white">
       <SafeErrorBoundary>
         <Preloader />
       </SafeErrorBoundary>
@@ -128,7 +128,7 @@ export default function HomePage() {
             initial={{ scale: 0.85, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={springQuick}
-            className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-2xl border border-white/20 bg-carbon p-2 shadow-2xl sm:rounded-3xl"
+            className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-2xl border border-gold/40 bg-carbon p-2 shadow-2xl sm:rounded-3xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -141,7 +141,7 @@ export default function HomePage() {
               <Image src={selectedImage} alt="Driftwear visual preview" fill className="object-cover" />
             </div>
             <div className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
-              <span className="font-brand text-xs font-bold uppercase tracking-wider text-gold">
+              <span className="font-brand text-xs font-bold uppercase tracking-wider gold-gradient-text">
                 Driftwear Clo. Visual Spec
               </span>
               <AnimatedWhatsAppButton
@@ -153,35 +153,34 @@ export default function HomePage() {
           </motion.div>
         </motion.div>
       )}
-    </>
+    </div>
   );
 }
 
 /* ==========================================================================
-   HERO SECTION - Redesigned to match Image 1 with Layered Frosted Glass Card
-   & Floating Driftwear Black T-Shirt in Atmospheric Golden Smoke
+   HERO SECTION - Enlarged Logo, Gold Gradient Branding & Seamless Floating Tee
    ========================================================================== */
 function Hero() {
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#07050A] px-4 pb-12 pt-28 sm:px-8 sm:pt-32 lg:px-14 lg:pt-28" aria-labelledby="hero-title">
-      {/* Golden Atmospheric Smoke & Embers Radial Background */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_45%,rgba(226,166,59,0.22),transparent_35rem),radial-gradient(circle_at_25%_65%,rgba(168,74,196,0.15),transparent_28rem),linear-gradient(180deg,#07050A_0%,#0C0812_50%,#07050A_100%)]" />
+    <section className="relative min-h-screen overflow-hidden px-4 pb-12 pt-28 sm:px-8 sm:pt-32 lg:px-14 lg:pt-28" aria-labelledby="hero-title">
+      {/* Golden & Purple Ambient Lighting Gradients */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_45%,rgba(245,194,66,0.25),transparent_35rem),radial-gradient(circle_at_25%_65%,rgba(168,74,196,0.18),transparent_28rem)] pointer-events-none" />
 
-      {/* Pulsating Ambient Gold Light Glow behind T-Shirt */}
+      {/* Pulsating Gold Light Glow behind T-Shirt */}
       <motion.div
-        animate={{ scale: [1, 1.18, 1], opacity: [0.35, 0.65, 0.35] }}
+        animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
         transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute right-[-4rem] top-[15%] h-[32rem] w-[32rem] rounded-full bg-[#E2A63B]/25 blur-[120px] sm:right-[5%] sm:h-[45rem] sm:w-[45rem]"
+        className="absolute right-[-4rem] top-[15%] h-[32rem] w-[32rem] rounded-full bg-radial-gold blur-[130px] sm:right-[5%] sm:h-[48rem] sm:w-[48rem]"
       />
 
       <motion.div className="shell relative z-10 grid min-h-[calc(100vh-8rem)] items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12" variants={stagger} initial="hidden" animate="show">
-        {/* Left Column: Layered Frosted Glass Card */}
+        {/* Left Column: Layered Gold-Bordered Frosted Glass Card */}
         <motion.div variants={fadeLeft} className="relative z-20 w-full max-w-xl">
           {/* Layer 1: Background Offset Glass Frame */}
-          <div className="absolute -inset-2.5 rounded-[2.8rem] border border-gold/20 bg-white/[0.02] backdrop-blur-md translate-x-3.5 translate-y-3.5 hidden sm:block pointer-events-none" />
+          <div className="absolute -inset-2.5 rounded-[2.8rem] border border-gold/25 bg-gold/5 backdrop-blur-md translate-x-3.5 translate-y-3.5 hidden sm:block pointer-events-none" />
 
           {/* Layer 2: Main Layered Frosted Glass Card */}
-          <div className="relative rounded-[2.2rem] sm:rounded-[2.8rem] border border-gold/35 bg-[#0B0813]/75 p-6 sm:p-10 lg:p-12 shadow-[0_30px_90px_rgba(0,0,0,0.92),0_0_60px_rgba(226,166,59,0.2)] backdrop-blur-2xl">
+          <div className="relative rounded-[2.2rem] sm:rounded-[2.8rem] gold-gradient-border p-6 sm:p-10 lg:p-12 shadow-[0_30px_90px_rgba(0,0,0,0.92),0_0_60px_rgba(245,194,66,0.22)] backdrop-blur-2xl">
             {/* Animated Title */}
             <motion.h1
               id="hero-title"
@@ -192,18 +191,27 @@ function Hero() {
               <ShimmeringTextGradient text="Vibe." className="block text-[clamp(3.5rem,7.5vw,6.4rem)] font-body font-extrabold" />
             </motion.h1>
 
-            {/* DW Logo Emblem & Divider */}
-            <motion.div variants={fadeUp} className="my-5 sm:my-6 flex items-center gap-3">
-              <span className="h-[1px] w-12 sm:w-16 bg-gradient-to-r from-gold/60 to-transparent" />
-              <div className="flex h-7 w-7 items-center justify-center rounded-full border border-gold/50 bg-gold/10 p-0.5 shadow-[0_0_12px_rgba(216,180,95,0.4)]">
-                <Image src="/assets/logo.png" alt="DW Logo Emblem" width={22} height={22} className="rounded-full object-cover" />
+            {/* ENLARGED LOGO & DRIFTWEAR CLO. BRAND BADGE DIVIDER */}
+            <motion.div variants={fadeUp} className="my-6 flex items-center justify-center gap-3">
+              <span className="h-[1px] flex-1 max-w-[50px] sm:max-w-[70px] bg-gradient-to-r from-transparent to-gold/70" />
+              <div className="flex items-center gap-3 rounded-full border border-gold/50 bg-black/60 px-4 py-2 shadow-[0_0_25px_rgba(245,194,66,0.35)] backdrop-blur-md">
+                <Image
+                  src="/assets/logo.png"
+                  alt="Driftwear Clo. Logo"
+                  width={48}
+                  height={48}
+                  className="h-11 w-11 sm:h-12 sm:w-12 rounded-full object-cover border border-gold/70 shadow-md"
+                />
+                <span className="font-brand text-sm sm:text-base font-extrabold uppercase tracking-[.24em] gold-gradient-text">
+                  Driftwear <span className="text-white">Clo.</span>
+                </span>
               </div>
-              <span className="h-[1px] w-12 sm:w-16 bg-gradient-to-l from-gold/60 to-transparent" />
+              <span className="h-[1px] flex-1 max-w-[50px] sm:max-w-[70px] bg-gradient-to-l from-transparent to-gold/70" />
             </motion.div>
 
             {/* Subtitle with Character Entrance Animation */}
             <motion.div variants={fadeUp}>
-              <AnimatedTextReveal text="Custom T-shirts & Premium DTF Printing" className="font-brand text-sm sm:text-base font-medium leading-6 text-white/80" />
+              <AnimatedTextReveal text="Custom T-shirts & Premium DTF Printing" className="font-brand text-sm sm:text-base font-medium leading-6 text-white/85" />
             </motion.div>
 
             {/* Action Buttons */}
@@ -215,7 +223,7 @@ function Hero() {
               />
               <a
                 href="#shop"
-                className="font-brand inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-gold/40 bg-white/[0.05] px-6 py-3 text-xs font-bold uppercase tracking-[.18em] text-white transition duration-300 hover:border-gold hover:bg-gold/15 hover:text-gold sm:text-sm"
+                className="font-brand inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-gold/50 bg-gold/10 px-6 py-3 text-xs font-bold uppercase tracking-[.18em] text-white transition duration-300 hover:border-gold hover:bg-gold/20 hover:text-gold sm:text-sm shadow-[0_0_15px_rgba(245,194,66,0.2)]"
               >
                 View Designs <ArrowRight size={17} />
               </a>
@@ -223,23 +231,23 @@ function Hero() {
           </div>
         </motion.div>
 
-        {/* Right Column: Floating Black Oversized Driftwear T-Shirt in Golden Smoke */}
+        {/* Right Column: Seamless Floating Driftwear Black T-Shirt (No Box Container Border) */}
         <motion.div variants={fadeRight} className="relative z-10 flex items-center justify-center w-full">
           <motion.div
-            animate={{ y: [0, -14, 0] }}
+            animate={{ y: [0, -16, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-            className="relative aspect-[4/5] w-full max-w-[540px] sm:aspect-square lg:aspect-[1/1.05]"
+            className="relative aspect-[4/5] w-full max-w-[560px] sm:aspect-square lg:aspect-[1/1.05]"
           >
             <Image
               src="/assets/hero_driftwear_shirt_bg.jpg"
               alt="Driftwear Oversized Black T-Shirt with Gold Logo Print in Atmospheric Smoke"
               fill
               priority
-              className="object-contain drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
+              className="object-contain filter drop-shadow-[0_30px_70px_rgba(245,194,66,0.3)]"
             />
 
-            {/* Golden Floor Reflection Effect */}
-            <div className="absolute -bottom-4 left-1/2 h-8 w-3/4 -translate-x-1/2 rounded-full bg-gold/20 blur-xl" />
+            {/* Golden Floor Glow Effect */}
+            <div className="absolute -bottom-6 left-1/2 h-10 w-3/4 -translate-x-1/2 rounded-full bg-radial-gold blur-2xl opacity-80" />
           </motion.div>
         </motion.div>
       </motion.div>
@@ -254,7 +262,7 @@ function SectionTitle({ eyebrow, title, copy }: { eyebrow: string; title: string
       <h2 className="display-title mt-3 text-[clamp(2.6rem,6.5vw,7rem)] text-white">
         <AnimatedTextReveal text={title} />
       </h2>
-      {copy ? <p className="mt-4 max-w-2xl text-base leading-7 text-white/62 sm:text-lg sm:leading-8">{copy}</p> : null}
+      {copy ? <p className="mt-4 max-w-2xl text-base leading-7 text-white/68 sm:text-lg sm:leading-8">{copy}</p> : null}
     </motion.div>
   );
 }
@@ -267,23 +275,23 @@ function FeaturedProducts({ onPreview }: { onPreview: (img: string) => void }) {
         <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {products.map((product) => (
             <motion.div key={product.name} variants={fadeUp}>
-              <TiltCard className="group gold-border overflow-hidden rounded-[1.5rem] h-full flex flex-col justify-between">
+              <TiltCard className="group gold-gradient-border overflow-hidden rounded-[1.5rem] h-full flex flex-col justify-between">
                 <div>
                   <div className="relative aspect-[4/5] overflow-hidden bg-carbon">
                     <Image src={product.image} alt={`${product.name} mockup`} fill sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 group-hover:scale-110" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
                     <button
                       onClick={() => onPreview(product.image)}
-                      className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white opacity-0 transition duration-300 group-hover:opacity-100"
+                      className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-gold/40 bg-black/60 text-white opacity-0 transition duration-300 group-hover:opacity-100"
                       title="Zoom Preview"
                     >
                       <Maximize2 size={16} />
                     </button>
                   </div>
                   <div className="p-5">
-                    <p className="font-grande text-xs font-bold uppercase tracking-[.2em] text-gold">{product.category}</p>
+                    <p className="font-grande text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">{product.category}</p>
                     <h3 className="font-calista mt-2 text-2xl font-semibold text-white sm:text-3xl">{product.name}</h3>
-                    <p className="mt-1.5 text-xs text-white/58 sm:text-sm">{product.price}</p>
+                    <p className="mt-1.5 text-xs text-white/60 sm:text-sm">{product.price}</p>
                   </div>
                 </div>
                 <div className="px-5 pb-5 pt-2">
@@ -335,13 +343,13 @@ function PrintSpecsAndDelivery() {
         <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {specs.map((item) => (
             <motion.div key={item.title} variants={fadeUp}>
-              <TiltCard className="gold-border rounded-[1.5rem] p-6 h-full flex flex-col justify-between">
+              <TiltCard className="gold-gradient-border rounded-[1.5rem] p-6 h-full flex flex-col justify-between">
                 <div>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-gold/30 bg-gold/10">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-gold/40 bg-gold/15 shadow-[0_0_15px_rgba(245,194,66,0.25)]">
                     {item.icon}
                   </div>
                   <h3 className="font-calista mt-4 text-xl font-bold text-white sm:text-2xl">{item.title}</h3>
-                  <p className="mt-2.5 text-xs sm:text-sm leading-6 text-white/60">{item.description}</p>
+                  <p className="mt-2.5 text-xs sm:text-sm leading-6 text-white/65">{item.description}</p>
                 </div>
               </TiltCard>
             </motion.div>
@@ -366,7 +374,7 @@ function GarmentSizeGuide() {
     <section className="section-pad">
       <div className="shell">
         <SectionTitle eyebrow="Sizing & Fit Guide" title="Find your perfect fit." copy="Streetwear oversized cut or classic regular fit. Measure your favorite tee to select the ideal size." />
-        <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="overflow-hidden rounded-[2rem] border border-gold/30 bg-black/50 p-6 sm:p-8 backdrop-blur-xl">
+        <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="overflow-hidden rounded-[2rem] gold-gradient-border bg-black/60 p-6 sm:p-8 backdrop-blur-xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left font-brand text-xs sm:text-sm">
               <thead>
@@ -380,7 +388,7 @@ function GarmentSizeGuide() {
               <tbody className="divide-y divide-white/10 text-white/80">
                 {sizes.map((row) => (
                   <tr key={row.size} className="transition hover:bg-white/[0.04]">
-                    <td className="py-4 px-4 font-bold text-gold">{row.size}</td>
+                    <td className="py-4 px-4 font-bold gold-gradient-text">{row.size}</td>
                     <td className="py-4 px-4">{row.chest}</td>
                     <td className="py-4 px-4">{row.length}</td>
                     <td className="py-4 px-4">{row.sleeve}</td>
@@ -410,10 +418,10 @@ function Process() {
         <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-4 sm:grid-cols-2">
           {processSteps.map(([number, title, copy]) => (
             <motion.div key={number} variants={fadeRight}>
-              <TiltCard className="gold-border rounded-[1.5rem] p-5 sm:p-6 h-full">
-                <span className="font-brand text-5xl sm:text-6xl text-gold">{number}</span>
+              <TiltCard className="gold-gradient-border rounded-[1.5rem] p-5 sm:p-6 h-full">
+                <span className="font-brand text-5xl sm:text-6xl gold-gradient-text">{number}</span>
                 <h3 className="font-calista mt-3 sm:mt-4 text-2xl sm:text-3xl font-semibold text-white">{title}</h3>
-                <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-6 sm:leading-7 text-white/60">{copy}</p>
+                <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-6 sm:leading-7 text-white/65">{copy}</p>
               </TiltCard>
             </motion.div>
           ))}
@@ -431,7 +439,7 @@ function WhyChoose() {
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
-        className="shell overflow-hidden rounded-[2rem] border border-gold/20 bg-[radial-gradient(circle_at_20%_20%,rgba(200,205,210,.2),transparent_28rem)] p-5 sm:p-10 lg:p-14"
+        className="shell overflow-hidden rounded-[2rem] gold-gradient-border bg-[radial-gradient(circle_at_20%_20%,rgba(245,194,66,0.18),transparent_28rem)] p-5 sm:p-10 lg:p-14"
       >
         <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
           <div>
@@ -444,10 +452,10 @@ function WhyChoose() {
                 key={reason}
                 whileHover={{ scale: 1.02, x: 6 }}
                 transition={springQuick}
-                className="flex gap-3.5 rounded-2xl border border-white/10 bg-black/35 p-4 sm:p-5 transition hover:border-gold/40"
+                className="flex gap-3.5 rounded-2xl border border-gold/30 bg-black/40 p-4 sm:p-5 transition hover:border-gold/60"
               >
                 <Check className="mt-0.5 shrink-0 text-gold" size={18} />
-                <p className="font-lucky m-0 text-xs sm:text-sm text-white/72">{reason}</p>
+                <p className="font-lucky m-0 text-xs sm:text-sm text-white/80">{reason}</p>
               </motion.div>
             ))}
           </div>
@@ -468,11 +476,11 @@ function Gallery({ onPreview }: { onPreview: (img: string) => void }) {
               key={image}
               variants={fadeUp}
               onClick={() => onPreview(image)}
-              className="group relative mb-4 sm:mb-5 cursor-pointer overflow-hidden rounded-[1.25rem] sm:rounded-[1.5rem] border border-white/10 bg-white/[.04]"
+              className="group relative mb-4 sm:mb-5 cursor-pointer overflow-hidden rounded-[1.25rem] sm:rounded-[1.5rem] gold-gradient-border bg-white/[.04]"
             >
               <Image src={image} alt={`Driftwear gallery item ${index + 1}`} width={800} height={1000} className="w-full object-cover transition duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-black/40 opacity-0 transition duration-300 group-hover:opacity-100 flex items-center justify-center">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-black/60 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md">
+                <span className="inline-flex items-center gap-2 rounded-full border border-gold/50 bg-black/70 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md">
                   <Maximize2 size={14} /> Preview
                 </span>
               </div>
@@ -492,10 +500,10 @@ function Testimonials() {
         <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-5 md:grid-cols-3">
           {['Clean print quality and the design looked exactly like the mockup.', 'Fast WhatsApp communication and a premium feel for our team tees.', 'The midnight and silver brand style feels unique and bold.'].map((quote, index) => (
             <motion.div key={quote} variants={fadeUp}>
-              <TiltCard className="gold-border rounded-[1.5rem] p-5 sm:p-6 h-full">
+              <TiltCard className="gold-gradient-border rounded-[1.5rem] p-5 sm:p-6 h-full">
                 <div className="flex gap-1 text-gold">{Array.from({ length: 5 }).map((_, star) => <Sparkles key={star} size={15} fill="currentColor" />)}</div>
-                <p className="font-lucky mt-4 text-lg sm:text-xl italic text-white/70">{quote}</p>
-                <p className="font-brand mt-4 text-[10px] sm:text-xs font-bold uppercase tracking-[.18em] text-white/45">Verified order {index + 1}</p>
+                <p className="font-lucky mt-4 text-lg sm:text-xl italic text-white/80">{quote}</p>
+                <p className="font-brand mt-4 text-[10px] sm:text-xs font-bold uppercase tracking-[.18em] gold-gradient-text">Verified order {index + 1}</p>
               </TiltCard>
             </motion.div>
           ))}
@@ -512,9 +520,9 @@ function FAQ() {
         <SectionTitle eyebrow="FAQ" title="Before you order." />
         <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-4 lg:grid-cols-2">
           {faqs.map(([question, answer]) => (
-            <motion.article key={question} variants={fadeUp} className="gold-border rounded-[1.25rem] p-5 sm:p-6">
+            <motion.article key={question} variants={fadeUp} className="gold-gradient-border rounded-[1.25rem] p-5 sm:p-6">
               <h3 className="font-calista text-xl sm:text-2xl font-semibold text-white">{question}</h3>
-              <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-white/62">{answer}</p>
+              <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-white/65">{answer}</p>
             </motion.article>
           ))}
         </motion.div>
@@ -531,12 +539,12 @@ function Contact() {
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
-        className="shell grid min-w-0 gap-8 overflow-hidden rounded-[2rem] border border-gold/20 bg-gold-radial p-5 sm:p-10 lg:grid-cols-[1fr_.8fr] lg:p-14"
+        className="shell grid min-w-0 gap-8 overflow-hidden rounded-[2rem] border border-gold/40 bg-gold-radial p-5 sm:p-10 lg:grid-cols-[1fr_.8fr] lg:p-14 shadow-[0_20px_80px_rgba(245,194,66,0.18)]"
       >
         <div className="min-w-0">
           <p className="eyebrow">Contact / Order Now</p>
           <h2 className="display-title mt-4 text-[clamp(2.8rem,7vw,8rem)] text-white">Ready to wear your vibe?</h2>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-white/68 sm:text-lg sm:leading-8">Message Driftwear Clo. with your idea, artwork, T-shirt color, size, and quantity. We will confirm the print details before production.</p>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-white/75 sm:text-lg sm:leading-8">Message Driftwear Clo. with your idea, artwork, T-shirt color, size, and quantity. We will confirm the print details before production.</p>
           <div className="mt-6 flex flex-col gap-3.5 sm:flex-row sm:items-center">
             <AnimatedWhatsAppButton
               text="Order on WhatsApp"
@@ -562,7 +570,7 @@ function ContactLine({ icon, text }: { icon: ReactNode; text: string }) {
     <motion.div
       whileHover={{ scale: 1.03, x: 4 }}
       transition={springQuick}
-      className="flex min-w-0 items-center gap-3 rounded-2xl border border-white/10 bg-black/35 p-4 text-white/78 sm:gap-4 sm:p-5"
+      className="flex min-w-0 items-center gap-3 rounded-2xl border border-gold/30 bg-black/40 p-4 text-white/85 sm:gap-4 sm:p-5"
     >
       <span className="text-gold [&_svg]:h-5 [&_svg]:w-5">{icon}</span>
       <span className="font-lucky min-w-0 break-words text-xs sm:text-sm font-semibold">{text}</span>
@@ -592,7 +600,7 @@ function Footer() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.7 }}
-          className="relative overflow-hidden rounded-[2rem] border border-white/12 bg-[#07111F] shadow-[0_32px_100px_rgba(0,0,0,.55)]"
+          className="relative overflow-hidden rounded-[2rem] border border-gold/25 bg-[#07111F] shadow-[0_32px_100px_rgba(0,0,0,.55)]"
         >
           <Image
             src="/assets/tshirt_printing_press.jpg"
@@ -601,7 +609,7 @@ function Footer() {
             sizes="100vw"
             className="object-cover opacity-[.42]"
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_12%,rgba(200,205,210,.3),transparent_24rem),linear-gradient(180deg,rgba(7,17,31,.18),rgba(7,17,31,.74)_48%,rgba(7,17,31,.96))]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_12%,rgba(245,194,66,.3),transparent_24rem),linear-gradient(180deg,rgba(7,17,31,.18),rgba(7,17,31,.74)_48%,rgba(7,17,31,.96))]" />
           <div className="absolute inset-x-0 bottom-0 z-0 translate-y-[19%] overflow-hidden whitespace-nowrap text-center font-display text-[clamp(4.5rem,18vw,18rem)] uppercase leading-none text-white/[.09]">
             Driftwear
           </div>
@@ -609,10 +617,10 @@ function Footer() {
           <div className="relative z-10 flex min-h-[480px] flex-col justify-between p-5 sm:min-h-[560px] sm:p-8 lg:p-10">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <a href="#home" className="inline-flex items-center gap-3 self-start" aria-label="Driftwear Clo. home">
-                <Image src="/assets/logo.png" alt="" width={54} height={54} className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border border-gold/30 object-cover" />
+                <Image src="/assets/logo.png" alt="" width={54} height={54} className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border border-gold/50 object-cover shadow-md" />
                 <span className="font-brand text-xl sm:text-2xl uppercase leading-none text-white">Driftwear Clo.</span>
               </a>
-              <p className="font-grande max-w-xs text-left text-[11px] font-bold uppercase leading-5 tracking-[.22em] text-gold sm:text-right sm:text-xs">
+              <p className="font-grande max-w-xs text-left text-[11px] font-bold uppercase leading-5 tracking-[.22em] gold-gradient-text sm:text-right sm:text-xs">
                 Wear fast. Print premium.
               </p>
             </div>

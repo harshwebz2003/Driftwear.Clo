@@ -18,10 +18,7 @@ html {
 body {
   margin: 0;
   overflow-x: hidden;
-  background:
-    radial-gradient(circle at 20% 5%, rgba(200, 205, 210, .18), transparent 34rem),
-    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, .08), transparent 28rem),
-    linear-gradient(135deg, #07111F 0%, #0B1523 50%, #07111F 100%);
+  background: #06040A;
   color: #FFFFFF;
   font-family: var(--font-body), Manrope, system-ui, sans-serif;
   font-size: 16px;
@@ -34,31 +31,83 @@ body::before {
   inset: 0;
   z-index: 60;
   pointer-events: none;
-  opacity: .07;
+  opacity: .06;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
 }
 
 ::selection {
-  background: #C8CDD2;
-  color: #07111F;
+  background: #D4A017;
+  color: #06040A;
 }
 
 @layer utilities {
+  .gold-gradient-text {
+    background: linear-gradient(135deg, #FFF4CC 0%, #F5C242 30%, #E2A63B 60%, #B07B1D 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gold-text-shine 5s ease infinite;
+  }
+
+  .gold-gradient-bg {
+    background: linear-gradient(135deg, #F5C242 0%, #E2A63B 50%, #B07B1D 100%);
+  }
+
+  .gold-gradient-border {
+    border: 1px solid transparent;
+    background-image: linear-gradient(#0A0712, #0A0712), linear-gradient(135deg, rgba(245, 194, 66, 0.7), rgba(226, 166, 59, 0.25), rgba(245, 194, 66, 0.7));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+  }
+
   .bg-radial-gold {
-    background: radial-gradient(circle, rgba(226, 166, 59, 0.38) 0%, rgba(0, 0, 0, 0) 70%);
+    background: radial-gradient(circle, rgba(245, 194, 66, 0.42) 0%, rgba(0, 0, 0, 0) 70%);
   }
+
   .bg-radial-purple {
-    background: radial-gradient(circle, rgba(168, 74, 196, 0.35) 0%, rgba(0, 0, 0, 0) 70%);
+    background: radial-gradient(circle, rgba(168, 74, 196, 0.38) 0%, rgba(0, 0, 0, 0) 70%);
   }
+
   .bg-radial-cyan {
-    background: radial-gradient(circle, rgba(6, 182, 212, 0.32) 0%, rgba(0, 0, 0, 0) 70%);
+    background: radial-gradient(circle, rgba(226, 166, 59, 0.32) 0%, rgba(0, 0, 0, 0) 70%);
   }
+
   .animate-gradient-shift {
     animation: gradient-shift 6s ease infinite;
+  }
+
+  .animated-color-bg {
+    background: linear-gradient(135deg, #07050A 0%, #0D0715 35%, #140A1D 70%, #07050A 100%);
+    background-size: 400% 400%;
+    animation: bg-color-wave 16s ease infinite;
+  }
+}
+
+@keyframes gold-text-shine {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }
 
 @keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes bg-color-wave {
   0% {
     background-position: 0% 50%;
   }
@@ -109,17 +158,18 @@ body::before {
   }
 
   .gold-border {
-    @apply border border-white/10 bg-white/[.045] shadow-card backdrop-blur-xl;
+    @apply border border-gold/30 bg-white/[.045] shadow-card backdrop-blur-xl transition duration-300 hover:border-gold/60;
   }
 
   .cta-primary {
     font-family: var(--font-body), Manrope, system-ui, sans-serif;
-    @apply inline-flex min-h-12 max-w-full items-center justify-center gap-2 rounded-full bg-gold px-5 py-3 text-center text-xs font-semibold uppercase tracking-[.22em] text-obsidian shadow-gold transition hover:-translate-y-0.5 hover:bg-ambergold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-obsidian sm:px-6 sm:text-sm sm:tracking-[.24em];
+    background: linear-gradient(135deg, #F5C242 0%, #E2A63B 50%, #B07B1D 100%);
+    @apply inline-flex min-h-12 max-w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-center text-xs font-bold uppercase tracking-[.22em] text-obsidian shadow-[0_4px_25px_rgba(245,194,66,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_6px_35px_rgba(245,194,66,0.5)] focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-obsidian sm:text-sm sm:tracking-[.24em];
   }
 
   .cta-secondary {
     font-family: var(--font-body), Manrope, system-ui, sans-serif;
-    @apply inline-flex min-h-12 max-w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[.06] px-5 py-3 text-center text-xs font-semibold uppercase tracking-[.22em] text-white transition hover:-translate-y-0.5 hover:border-gold hover:text-gold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-obsidian sm:px-6 sm:text-sm sm:tracking-[.24em];
+    @apply inline-flex min-h-12 max-w-full items-center justify-center gap-2 rounded-full border border-gold/40 bg-white/[.06] px-6 py-3 text-center text-xs font-semibold uppercase tracking-[.22em] text-white transition hover:-translate-y-0.5 hover:border-gold hover:bg-gold/10 hover:text-gold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-obsidian sm:text-sm sm:tracking-[.24em];
   }
 
   .footer-link {

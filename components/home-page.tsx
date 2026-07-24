@@ -158,9 +158,34 @@ export default function HomePage() {
 }
 
 /* ==========================================================================
-   HERO SECTION - Video Background, Enlarged Logo, Gold Gradient Branding
+   HERO SECTION - Video Background, Enlarged Logo, Clean Luxury Garment Showcase
    ========================================================================== */
 function Hero() {
+  const [activeVariantIndex, setActiveVariantIndex] = useState(0);
+
+  const apparelVariants = [
+    {
+      name: 'All Eyes On Me Black Tee',
+      tag: 'Oversized 240 GSM Streetwear',
+      image: '/assets/tshirt_black_oversized.jpg',
+      badge: '🔥 Best Seller'
+    },
+    {
+      name: 'Studio White Custom Tee',
+      tag: 'Minimal DTF Print',
+      image: '/assets/tshirt_white_regular.jpg',
+      badge: '✨ Studio Pick'
+    },
+    {
+      name: 'Urban Streetwear Look',
+      tag: 'Custom DTF Graphic',
+      image: '/assets/tshirt_model_urban_black.jpg',
+      badge: '💎 Premium Release'
+    }
+  ];
+
+  const currentVariant = apparelVariants[activeVariantIndex];
+
   return (
     <section className="relative min-h-screen overflow-hidden px-4 pb-12 pt-28 sm:px-8 sm:pt-32 lg:px-14 lg:pt-28" aria-labelledby="hero-title">
       {/* Background Showcase Video */}
@@ -181,7 +206,7 @@ function Hero() {
       {/* Golden & Purple Ambient Lighting Gradients */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_45%,rgba(245,194,66,0.25),transparent_35rem),radial-gradient(circle_at_25%_65%,rgba(168,74,196,0.18),transparent_28rem)] pointer-events-none z-0" />
 
-      {/* Pulsating Gold Light Glow behind T-Shirt */}
+      {/* Pulsating Gold Light Glow behind Garment Showcase */}
       <motion.div
         animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
         transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
@@ -246,24 +271,78 @@ function Hero() {
           </div>
         </motion.div>
 
-        {/* Right Column: Seamless Floating Driftwear Black T-Shirt (No Box Container Border) */}
-        <motion.div variants={fadeRight} className="relative z-10 flex items-center justify-center w-full">
-          <motion.div
-            animate={{ y: [0, -16, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-            className="relative aspect-[4/5] w-full max-w-[560px] sm:aspect-square lg:aspect-[1/1.05]"
-          >
-            <Image
-              src="/assets/hero_driftwear_shirt_bg.jpg"
-              alt="Driftwear Oversized Black T-Shirt with Gold Logo Print in Atmospheric Smoke"
-              fill
-              priority
-              className="object-contain filter drop-shadow-[0_30px_70px_rgba(245,194,66,0.3)]"
-            />
+        {/* Right Column: High-End Interactive Garment Showcase (No Box Container Border around Image) */}
+        <motion.div variants={fadeRight} className="relative z-10 w-full max-w-lg">
+          <TiltCard className="relative overflow-hidden rounded-[2.2rem] sm:rounded-[2.5rem] gold-gradient-border bg-[#0A0712]/85 p-5 sm:p-7 shadow-[0_30px_90px_rgba(0,0,0,0.92),0_0_50px_rgba(245,194,66,0.2)] backdrop-blur-2xl">
+            {/* Top Variant Selector Tabs */}
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+              <span className="font-brand text-xs font-bold uppercase tracking-[.2em] gold-gradient-text">
+                Apparel Showcase
+              </span>
 
-            {/* Golden Floor Glow Effect */}
-            <div className="absolute -bottom-6 left-1/2 h-10 w-3/4 -translate-x-1/2 rounded-full bg-radial-gold blur-2xl opacity-80" />
-          </motion.div>
+              <div className="flex items-center gap-1 rounded-full border border-gold/30 bg-black/60 p-1">
+                {apparelVariants.map((v, idx) => (
+                  <button
+                    key={v.name}
+                    onClick={() => setActiveVariantIndex(idx)}
+                    className={`relative rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition sm:px-3 sm:text-[11px] ${
+                      activeVariantIndex === idx ? 'text-slate-950' : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    {activeVariantIndex === idx && (
+                      <motion.div
+                        layoutId="heroGarmentVariantPill"
+                        transition={springQuick}
+                        className="absolute inset-0 rounded-full bg-gradient-to-r from-gold via-ambergold to-gold shadow-md"
+                      />
+                    )}
+                    <span className="relative z-10">V{idx + 1}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Main High-Res Garment Photography Showcase */}
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-carbon sm:aspect-[1.15/1]">
+              <motion.div
+                key={currentVariant.name}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={springGentle}
+                className="relative h-full w-full"
+              >
+                <Image
+                  src={currentVariant.image}
+                  alt={currentVariant.name}
+                  fill
+                  priority
+                  className="object-cover object-center transition duration-700 hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+
+                {/* Floating Badge */}
+                <div className="absolute left-3 top-3 flex flex-col gap-1.5 sm:left-4 sm:top-4">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-gold/40 bg-black/70 px-3 py-1 font-brand text-xs font-bold text-gold backdrop-blur-md shadow-lg">
+                    <Sparkles size={13} />
+                    {currentVariant.badge}
+                  </span>
+                </div>
+
+                {/* Bottom Product Info & Order Action */}
+                <div className="absolute bottom-3 left-3 right-3 flex flex-col gap-2 rounded-xl border border-gold/30 bg-black/80 p-3.5 backdrop-blur-xl sm:bottom-4 sm:left-4 sm:right-4 sm:flex-row sm:items-center sm:justify-between sm:p-4">
+                  <div>
+                    <h3 className="font-calista text-lg font-bold text-white sm:text-2xl">{currentVariant.name}</h3>
+                    <p className="font-brand text-xs font-bold uppercase tracking-wider gold-gradient-text">{currentVariant.tag}</p>
+                  </div>
+                  <AnimatedWhatsAppButton
+                    text="Order Tee"
+                    message={`Hi Driftwear Clo., I want to order: ${currentVariant.name}`}
+                    size="sm"
+                  />
+                </div>
+              </motion.div>
+            </div>
+          </TiltCard>
         </motion.div>
       </motion.div>
     </section>

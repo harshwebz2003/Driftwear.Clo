@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { useState, type ReactNode } from 'react';
 import {
   ArrowUpRight,
@@ -33,8 +34,19 @@ import {
   springGentle,
   springBouncy
 } from '@/components/motion';
-import TshirtCustomizer from '@/components/tshirt-customizer';
 import { contact, faqs, gallery, navItems, processSteps, products, reasons, whatsappLink } from '@/lib/site-data';
+
+const TshirtCustomizer = dynamic(() => import('@/components/tshirt-customizer'), {
+  ssr: false,
+  loading: () => (
+    <section className="section-pad grid place-items-center text-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-gold border-t-transparent" />
+        <p className="font-brand text-xs font-bold uppercase tracking-[.2em] text-gold">Loading 3D T-Shirt Studio...</p>
+      </div>
+    </section>
+  )
+});
 
 export default function HomePage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);

@@ -115,15 +115,6 @@ export default function HomePage() {
 
       <Footer />
 
-      {/* WhatsApp Sticky Floating Button */}
-      <div className="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-6 select-none">
-        <AnimatedWhatsAppButton
-          text="Order"
-          message="Hi Driftwear Clo., I want to order a custom T-shirt."
-          size="lg"
-        />
-      </div>
-
       {/* Image Lightbox Modal */}
       {selectedImage && (
         <motion.div

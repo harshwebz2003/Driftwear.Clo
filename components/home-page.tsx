@@ -24,7 +24,8 @@ import {
   Layers,
   Award,
   Navigation,
-  ExternalLink
+  ExternalLink,
+  MoveRight
 } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import { SafeErrorBoundary } from '@/components/error-boundary';
@@ -193,7 +194,7 @@ function Hero() {
       />
 
       <motion.div className="shell relative z-10 flex flex-col items-center text-center justify-center min-h-[calc(100vh-10rem)]" variants={stagger} initial="hidden" animate="show">
-        {/* Frameless Floating Hero Container (No Outer Card Shapes or Box Borders) */}
+        {/* Frameless Floating Hero Container */}
         <motion.div variants={fadeUp} className="relative z-20 w-full max-w-2xl flex flex-col items-center drop-shadow-[0_15px_35px_rgba(0,0,0,0.9)]">
           {/* ANIMATED HERO TITLE: WEAR YOUR VIBE. */}
           <motion.div variants={fadeUp} className="flex justify-center">
@@ -255,18 +256,33 @@ function SectionTitle({ eyebrow, title, copy }: { eyebrow: string; title: string
   );
 }
 
+/* SHOP SECTION: Mobile Horizontal Touch Scroll + Desktop Grid */
 function FeaturedProducts({ onPreview }: { onPreview: (img: string) => void }) {
   return (
     <section id="shop" className="section-pad">
       <div className="shell">
-        <SectionTitle eyebrow="Shop / Designs" title="Featured T-shirt designs." copy="Modern DTF-ready pieces with a premium streetwear presentation. Prices are confirmed per garment, print size, and quantity." />
-        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-2">
+          <SectionTitle eyebrow="Shop / Designs" title="Featured T-shirt designs." copy="Modern DTF-ready pieces with a premium streetwear presentation. Prices are confirmed per garment, print size, and quantity." />
+          {/* Mobile Swipe Indicator Pill */}
+          <div className="mb-6 sm:hidden inline-flex items-center gap-2 self-start rounded-full border border-gold/40 bg-gold/15 px-3.5 py-1.5 font-brand text-xs font-bold text-gold">
+            Swipe left & right <MoveRight size={14} className="animate-pulse" />
+          </div>
+        </div>
+
+        {/* Responsive Horizontal Touch Scroll Track on Mobile / Grid on Desktop */}
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="flex overflow-x-auto gap-4 pb-6 pt-2 snap-x snap-mandatory scrollbar-none sm:grid sm:gap-5 sm:grid-cols-2 xl:grid-cols-4 sm:overflow-visible sm:pb-0"
+        >
           {products.map((product) => (
-            <motion.div key={product.name} variants={fadeUp}>
+            <motion.div key={product.name} variants={fadeUp} className="snap-center shrink-0 w-[84vw] max-w-[340px] sm:w-auto sm:max-w-none">
               <TiltCard className="group gold-gradient-border overflow-hidden rounded-[1.5rem] h-full flex flex-col justify-between">
                 <div>
                   <div className="relative aspect-[4/5] overflow-hidden bg-carbon">
-                    <Image src={product.image} alt={`${product.name} mockup`} fill sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 group-hover:scale-110" />
+                    <Image src={product.image} alt={`${product.name} mockup`} fill sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 84vw" className="object-cover transition duration-700 group-hover:scale-110" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
                     <button
                       onClick={() => onPreview(product.image)}
@@ -453,18 +469,33 @@ function WhyChoose() {
   );
 }
 
+/* GALLERY SECTION: Mobile Horizontal Touch Scroll + Desktop Columns */
 function Gallery({ onPreview }: { onPreview: (img: string) => void }) {
   return (
     <section id="gallery" className="section-pad">
       <div className="shell">
-        <SectionTitle eyebrow="Gallery / Latest Work" title="Real product energy." copy="A visual feed inspired by the current Facebook brand presence, refined into a premium global streetwear look." />
-        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }} className="columns-1 gap-4 sm:columns-2 lg:columns-3">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-2">
+          <SectionTitle eyebrow="Gallery / Latest Work" title="Real product energy." copy="A visual feed inspired by the current Facebook brand presence, refined into a premium global streetwear look." />
+          {/* Mobile Swipe Indicator Pill */}
+          <div className="mb-6 sm:hidden inline-flex items-center gap-2 self-start rounded-full border border-gold/40 bg-gold/15 px-3.5 py-1.5 font-brand text-xs font-bold text-gold">
+            Swipe showcase <MoveRight size={14} className="animate-pulse" />
+          </div>
+        </div>
+
+        {/* Responsive Horizontal Touch Scroll Track on Mobile / Columns on Desktop */}
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="flex overflow-x-auto gap-4 pb-6 pt-2 snap-x snap-mandatory scrollbar-none sm:block sm:columns-2 lg:columns-3 sm:overflow-visible sm:pb-0"
+        >
           {gallery.map((image, index) => (
             <motion.div
               key={image}
               variants={fadeUp}
               onClick={() => onPreview(image)}
-              className="group relative mb-4 sm:mb-5 cursor-pointer overflow-hidden rounded-[1.25rem] sm:rounded-[1.5rem] gold-gradient-border bg-white/[.04]"
+              className="snap-center shrink-0 w-[80vw] max-w-[320px] sm:w-auto sm:max-w-none group relative mb-0 sm:mb-5 cursor-pointer overflow-hidden rounded-[1.25rem] sm:rounded-[1.5rem] gold-gradient-border bg-white/[.04]"
             >
               <Image src={image} alt={`Driftwear gallery item ${index + 1}`} width={800} height={1000} className="w-full object-cover transition duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-black/40 opacity-0 transition duration-300 group-hover:opacity-100 flex items-center justify-center">
@@ -630,6 +661,7 @@ function LocationMap() {
   );
 }
 
+/* SPLIT FOOTER SECTION - Card 1: Brand Banner & Menu | Card 2: Contact Info & Copyright */
 function Footer() {
   const resources = [
     { label: '3D Customizer', href: '#customizer' },
@@ -645,28 +677,27 @@ function Footer() {
   ];
 
   return (
-    <footer className="px-4 pb-8 pt-10 sm:px-8 lg:px-14 xl:px-20">
+    <footer className="px-4 pb-8 pt-10 sm:px-8 lg:px-14 xl:px-20 space-y-6">
       <div className="shell">
+        {/* CARD 1: Brand Banner & Interactive Navigation Card */}
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.7 }}
-          className="relative overflow-hidden rounded-[2rem] border border-gold/25 bg-[#07111F] shadow-[0_32px_100px_rgba(0,0,0,.55)]"
+          className="relative overflow-hidden rounded-[2.2rem] border border-gold/30 bg-[#07111F] shadow-[0_32px_100px_rgba(0,0,0,.55)] p-6 sm:p-10"
         >
           <Image
             src="/assets/tshirt_printing_press.jpg"
             alt="Driftwear DTF printing studio footer visual"
             fill
             sizes="100vw"
-            className="object-cover opacity-[.42]"
+            className="object-cover opacity-[.35]"
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_12%,rgba(245,194,66,.3),transparent_24rem),linear-gradient(180deg,rgba(7,17,31,.18),rgba(7,17,31,.74)_48%,rgba(7,17,31,.96))]" />
-          <div className="absolute inset-x-0 bottom-0 z-0 translate-y-[19%] overflow-hidden whitespace-nowrap text-center font-display text-[clamp(4.5rem,18vw,18rem)] uppercase leading-none text-white/[.09]">
-            Driftwear
-          </div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_12%,rgba(245,194,66,.3),transparent_24rem),linear-gradient(180deg,rgba(7,17,31,.2),rgba(7,17,31,.85)_50%,rgba(7,17,31,.98))]" />
 
-          <div className="relative z-10 flex min-h-[480px] flex-col justify-between p-5 sm:min-h-[560px] sm:p-8 lg:p-10">
+          <div className="relative z-10 flex flex-col justify-between gap-8">
+            {/* Header Identity Row */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <a href="#home" className="inline-flex items-center gap-3 self-start" aria-label="Driftwear Clo. home">
                 <Image src="/assets/logo.png" alt="" width={54} height={54} className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border border-gold/50 object-cover shadow-md" />
@@ -677,7 +708,8 @@ function Footer() {
               </p>
             </div>
 
-            <div className="grid gap-8 border-y border-white/15 py-8 sm:grid-cols-2 sm:gap-10 lg:grid-cols-[1fr_1fr_1fr_1.15fr]">
+            {/* Navigation Grid */}
+            <div className="grid gap-8 border-t border-white/15 pt-8 sm:grid-cols-3 sm:gap-10">
               <FooterColumn title="Menu">
                 {navItems.map((item) => (
                   <a key={item.href} href={item.href} className="footer-link">{item.label}</a>
@@ -698,28 +730,30 @@ function Footer() {
                   <a key={item.href} href={item.href} className="footer-link">{item.label}</a>
                 ))}
               </FooterColumn>
-
-              <div>
-                <p className="font-brand text-xs font-bold uppercase tracking-[.22em] text-white">Order Studio</p>
-                <div className="mt-3 space-y-2 text-xs sm:text-sm leading-6 text-white/60">
-                  <p>{contact.location}</p>
-                  <p>{contact.phone}</p>
-                  <p className="break-words">{contact.email}</p>
-                </div>
-                <div className="mt-5">
-                  <AnimatedWhatsAppButton
-                    text="Send Message"
-                    message="Hi Driftwear Clo., I want to send a design and start an order."
-                    size="sm"
-                  />
-                </div>
-              </div>
             </div>
+          </div>
+        </motion.div>
 
-            <div className="font-grande flex flex-col gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-[.16em] text-white/40 sm:flex-row sm:items-center sm:justify-between">
-              <p>© {new Date().getFullYear()} Driftwear Clo. All rights reserved.</p>
-              <p>Custom T-shirts & DTF printing in Galle, Sri Lanka.</p>
-            </div>
+        {/* CARD 2: Studio Dispatch Info, Contact Details & Copyright Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="relative mt-5 overflow-hidden rounded-[2rem] gold-gradient-border bg-black/85 p-6 sm:p-8 backdrop-blur-2xl shadow-xl flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div>
+            <p className="font-brand text-xs font-bold uppercase tracking-[.22em] gold-gradient-text">Driftwear DTF Studio</p>
+            <p className="text-xs sm:text-sm text-white/70 mt-1">{contact.location} • {contact.phone}</p>
+            <p className="text-[11px] text-white/40 mt-0.5">© {new Date().getFullYear()} Driftwear Clo. All rights reserved.</p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <AnimatedWhatsAppButton
+              text="Send Order Message"
+              message="Hi Driftwear Clo., I want to send a design and start an order."
+              size="sm"
+            />
           </div>
         </motion.div>
       </div>

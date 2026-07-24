@@ -839,4 +839,8 @@ document.addEventListener('DOMContentLoaded', () => {
   injectStructuredData();
   initPreloader();
   renderShop();
+  const initialPage = new URLSearchParams(window.location.search).get('page');
+  if (initialPage && document.getElementById(`page-${initialPage}`)) {
+    go(initialPage);
+  }
 });
